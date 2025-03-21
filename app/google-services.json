@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "744004697987",
+    "project_id": "final-central-db-for-physique",
+    "storage_bucket": "final-central-db-for-physique.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:744004697987:android:adaf721fe676cb7d5000b6",
+        "android_client_info": {
+          "package_name": "com.example.physiqueaiapkfinal"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB0vTlCrKJA2Por28T-mIkkXOX3u5LgMaU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

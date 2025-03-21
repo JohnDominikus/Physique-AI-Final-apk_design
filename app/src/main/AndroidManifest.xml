@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <!-- 🔹 Required for Firebase Authentication & Firestore -->
+    <uses-permission android:name="android.permission.INTERNET" />
+
+    <application
+        android:allowBackup="true"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:fullBackupContent="@xml/backup_rules"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.Physiqueaiapkfinal">
+
+        <!-- 🔹 Launcher -->
+        <activity android:name=".LandingActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <!-- 🔹 Authentication Activities -->
+        <activity android:name=".RegisterActivity" android:exported="true" />
+        <activity android:name=".LoginActivity" android:exported="true" />
+
+        <!-- 🔹 Main Activities -->
+        <activity android:name=".DashboardActivity" android:exported="true" />
+
+        <!-- 🔹 Physical and Medical Activities -->
+        <activity android:name=".PhysicalActivity" android:exported="true" />
+        <activity android:name=".MedicalActivity" android:exported="true" />
+
+
+
+
+    </application>
+</manifest>
