@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools">
+    package="com.example.physiqueaiapkfinal">
 
     <!-- 🔹 Required for Firebase Authentication & Firestore -->
     <uses-permission android:name="android.permission.INTERNET" />
@@ -15,8 +15,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Physiqueaiapkfinal">
 
-        <!-- 🔹 Launcher -->
-        <activity android:name=".LandingActivity"
+        <!-- 🔹 Launcher Activity -->
+        <activity
+            android:name=".LandingActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -26,17 +27,13 @@
 
         <!-- 🔹 Authentication Activities -->
         <activity android:name=".RegisterActivity" android:exported="true" />
-        <activity android:name=".LoginActivity" android:exported="true" />
+        <activity android:name=".utils.LoginActivity" android:exported="true" />
+        <activity android:name=".utils.DashboardActivity" android:exported="true" />
 
-        <!-- 🔹 Main Activities -->
-        <activity android:name=".DashboardActivity" android:exported="true" />
 
         <!-- 🔹 Physical and Medical Activities -->
         <activity android:name=".PhysicalActivity" android:exported="true" />
         <activity android:name=".MedicalActivity" android:exported="true" />
-
-
-
 
     </application>
 </manifest>

@@ -11,20 +11,18 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
 
     companion object {
         private const val DATABASE_NAME = "PhysiqueAI.db"
-        private const val DATABASE_VERSION = 4
+        private const val DATABASE_VERSION = 5
 
-        // Tables
-        const val TABLE_USERS = "users"
-        const val TABLE_PHYSICAL_INFO = "physical_info"
-        const val TABLE_MEDICAL_ACTIVITIES = "medical_activities"
+        // Table Name
+        const val TABLE_USERINFO = "userinfo"
 
         // Common Columns
         const val COLUMN_ID = "id"
         const val COLUMN_FIREBASE_ID = "firebase_id"
-        const val COLUMN_DATE = "date"
         const val COLUMN_SYNC_STATUS = "is_synced"
+        const val COLUMN_DATE = "date"
 
-        // User Columns
+        // User Info
         const val COLUMN_FIRST_NAME = "first_name"
         const val COLUMN_LAST_NAME = "last_name"
         const val COLUMN_BIRTHDATE = "birthdate"
@@ -32,239 +30,259 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
         const val COLUMN_EMAIL = "email"
         const val COLUMN_PASSWORD = "password"
 
-        // Physical Info Columns
+        // Physical Info
         const val COLUMN_BODY_LEVEL = "body_level"
         const val COLUMN_BODY_CLASSIFICATION = "body_classification"
         const val COLUMN_EXERCISE_ROUTINE = "exercise_routine"
         const val COLUMN_OTHER_INFO = "other_info"
 
-        // Medical Activity Columns
+        // Medical Activities
         const val COLUMN_ALLERGIES = "allergies"
         const val COLUMN_MEDICAL_HISTORY = "medical_history"
         const val COLUMN_FRACTURES = "fractures"
         const val COLUMN_OTHER_CONDITIONS = "other_conditions"
     }
 
+    // --- DATABASE CREATION ---
     override fun onCreate(db: SQLiteDatabase) {
-        createTables(db)
+        createUnifiedTable(db)
     }
 
-    private fun createTables(db: SQLiteDatabase) {
+    private fun createUnifiedTable(db: SQLiteDatabase) {
         try {
-            // Users Table
-            db.execSQL("""
-                CREATE TABLE $TABLE_USERS (
+            db.execSQL(
+                """
+                CREATE TABLE IF NOT EXISTS $TABLE_USERINFO (
                     $COLUMN_ID INTEGER PRIMARY KEY AUTOINCREMENT,
                     $COLUMN_FIREBASE_ID TEXT UNIQUE,
+                    
+                    -- User Info
                     $COLUMN_FIRST_NAME TEXT,
                     $COLUMN_LAST_NAME TEXT,
                     $COLUMN_BIRTHDATE TEXT,
                     $COLUMN_PHONE TEXT,
                     $COLUMN_EMAIL TEXT UNIQUE,
                     $COLUMN_PASSWORD TEXT,
-                    $COLUMN_SYNC_STATUS INTEGER DEFAULT 0
-                )""")
-
-            // Physical Info Table
-            db.execSQL("""
-                CREATE TABLE $TABLE_PHYSICAL_INFO (
-                    $COLUMN_ID INTEGER PRIMARY KEY AUTOINCREMENT,
-                    $COLUMN_FIREBASE_ID TEXT,
+                    
+                    -- Physical Info
                     $COLUMN_BODY_LEVEL TEXT,
                     $COLUMN_BODY_CLASSIFICATION TEXT,
                     $COLUMN_EXERCISE_ROUTINE TEXT,
                     $COLUMN_OTHER_INFO TEXT,
-                    $COLUMN_DATE TEXT,
-                    $COLUMN_SYNC_STATUS INTEGER DEFAULT 0
-                )""")
-
-            // Medical Activities Table
-            db.execSQL("""
-                CREATE TABLE $TABLE_MEDICAL_ACTIVITIES (
-                    $COLUMN_ID INTEGER PRIMARY KEY AUTOINCREMENT,
-                    $COLUMN_FIREBASE_ID TEXT,
+                    
+                    -- Medical Activities
                     $COLUMN_ALLERGIES TEXT,
                     $COLUMN_MEDICAL_HISTORY TEXT,
                     $COLUMN_FRACTURES TEXT,
                     $COLUMN_OTHER_CONDITIONS TEXT,
+                    
+                    -- Sync Info
                     $COLUMN_DATE TEXT,
                     $COLUMN_SYNC_STATUS INTEGER DEFAULT 0
-                )""")
-
-            Log.d("DatabaseHelper", "Tables created successfully")
+                )
+                """
+            )
+            Log.d("DatabaseHelper", "Unified table created successfully")
         } catch (e: Exception) {
-            Log.e("DatabaseHelper", "Error creating tables: ${e.message}")
+            Log.e("DatabaseHelper", "Error creating unified table: ${e.message}")
         }
     }
 
+    // --- DATABASE UPGRADE ---
     override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
-        if (oldVersion < 4) {
+        if (oldVersion < newVersion) {
+            db.execSQL("DROP TABLE IF EXISTS $TABLE_USERINFO")
+            onCreate(db)
+            Log.d("DatabaseHelper", "Database upgraded to version $newVersion")
+        }
+        db.close()  // Close the database to prevent leaks
+    }
+
+    // --- SYNC METHODS ---
+    fun markAsSynced(localId: String) {
+        writableDatabase.use { db ->
             try {
-                listOf(TABLE_USERS, TABLE_PHYSICAL_INFO, TABLE_MEDICAL_ACTIVITIES).forEach { table ->
-                    db.execSQL("ALTER TABLE $table ADD COLUMN $COLUMN_SYNC_STATUS INTEGER DEFAULT 0")
+                val values = ContentValues().apply {
+                    put(COLUMN_SYNC_STATUS, 1)
                 }
-                Log.d("DatabaseHelper", "Database upgraded to version $newVersion")
+                val rowsUpdated = db.update(TABLE_USERINFO, values, "$COLUMN_ID = ?", arrayOf(localId))
+                Log.d("DatabaseHelper", "Record $localId marked as synced. Rows updated: $rowsUpdated")
             } catch (e: Exception) {
-                Log.e("DatabaseHelper", "Upgrade error: ${e.message}")
+                Log.e("DatabaseHelper", "Mark sync error: ${e.message}")
             }
         }
     }
 
-    // region Sync Methods
-    fun markAsSynced(table: String, localId: Long) {
-        val db = writableDatabase
-        try {
-            db.execSQL(
-                "UPDATE $table SET $COLUMN_SYNC_STATUS = 1 WHERE $COLUMN_ID = ?",
-                arrayOf(localId.toString())
+    fun getUnsyncedRecords(): Cursor? {
+        val db = readableDatabase
+        return try {
+            val cursor = db.rawQuery(
+                "SELECT * FROM $TABLE_USERINFO WHERE $COLUMN_SYNC_STATUS = 0",
+                null
             )
+            cursor
         } catch (e: Exception) {
-            Log.e("DatabaseHelper", "Mark sync error: ${e.message}")
-        } finally {
+            Log.e("DatabaseHelper", "Error retrieving unsynced records: ${e.message}")
             db.close()
+            null
         }
     }
 
-    fun getUnsyncedRecords(table: String): Cursor {
-        return readableDatabase.rawQuery(
-            "SELECT * FROM $table WHERE $COLUMN_SYNC_STATUS = 0",
-            null
-        )
-    }
-    // endregion
+    // --- CRUD OPERATIONS ---
 
-    // region CRUD Operations
-    fun insertUser(
+    /**
+     * Inserts or updates user info with proper transactions and error handling.
+     */
+    fun insertOrUpdateUser(
         firebaseId: String,
         firstName: String,
         lastName: String,
         birthdate: String,
         phone: String,
         email: String,
-        password: String
+        password: String,
+        bodyLevel: String? = null,
+        bodyClassification: String? = null,
+        exerciseRoutine: String? = null,
+        otherInfo: String? = null,
+        allergies: String? = null,
+        medicalHistory: String? = null,
+        fractures: String? = null,
+        otherConditions: String? = null
     ): Long {
         val db = writableDatabase
-        val values = ContentValues().apply {
-            put(COLUMN_FIREBASE_ID, firebaseId)
-            put(COLUMN_FIRST_NAME, firstName)
-            put(COLUMN_LAST_NAME, lastName)
-            put(COLUMN_BIRTHDATE, birthdate)
-            put(COLUMN_PHONE, phone)
-            put(COLUMN_EMAIL, email)
-            put(COLUMN_PASSWORD, password)
-            put(COLUMN_SYNC_STATUS, 0)
-        }
+        var rowId: Long = -1
 
-        return try {
-            db.insertWithOnConflict(TABLE_USERS, null, values, SQLiteDatabase.CONFLICT_REPLACE).also {
-                db.close()
+        db.beginTransaction()
+        try {
+            val values = ContentValues().apply {
+                put(COLUMN_FIREBASE_ID, firebaseId)
+                put(COLUMN_FIRST_NAME, firstName)
+                put(COLUMN_LAST_NAME, lastName)
+                put(COLUMN_BIRTHDATE, birthdate)
+                put(COLUMN_PHONE, phone)
+                put(COLUMN_EMAIL, email)
+                put(COLUMN_PASSWORD, password)
+
+                // Physical Info
+                put(COLUMN_BODY_LEVEL, bodyLevel)
+                put(COLUMN_BODY_CLASSIFICATION, bodyClassification)
+                put(COLUMN_EXERCISE_ROUTINE, exerciseRoutine)
+                put(COLUMN_OTHER_INFO, otherInfo)
+
+                // Medical Activities
+                put(COLUMN_ALLERGIES, allergies)
+                put(COLUMN_MEDICAL_HISTORY, medicalHistory)
+                put(COLUMN_FRACTURES, fractures)
+                put(COLUMN_OTHER_CONDITIONS, otherConditions)
+
+                // Sync info
+                put(COLUMN_DATE, System.currentTimeMillis().toString())
+                put(COLUMN_SYNC_STATUS, 0)
             }
+
+            rowId = db.insertWithOnConflict(
+                TABLE_USERINFO, null, values, SQLiteDatabase.CONFLICT_REPLACE
+            )
+            db.setTransactionSuccessful()
+            Log.d("DatabaseHelper", "User info inserted/updated successfully. Row ID: $rowId")
         } catch (e: Exception) {
-            Log.e("DatabaseHelper", "User insert error: ${e.message}")
-            -1
+            Log.e("DatabaseHelper", "Insert/update error: ${e.message}")
+        } finally {
+            db.endTransaction()
+            db.close()
         }
+
+        return rowId
     }
 
-    fun insertPhysicalInfo(
-        userId: String,
-        bodyLevel: String,
-        bodyClassification: String,
-        exerciseRoutine: String,
-        otherInfo: String
-    ): Boolean {
-        val db = writableDatabase
-        val values = ContentValues().apply {
-            put(COLUMN_FIREBASE_ID, userId)
-            put(COLUMN_BODY_LEVEL, bodyLevel)
-            put(COLUMN_BODY_CLASSIFICATION, bodyClassification)
-            put(COLUMN_EXERCISE_ROUTINE, exerciseRoutine)
-            put(COLUMN_OTHER_INFO, otherInfo)
-            put(COLUMN_DATE, System.currentTimeMillis().toString())
-            put(COLUMN_SYNC_STATUS, 0)
-        }
-
+    fun getUser(email: String): Cursor? {
+        val db = readableDatabase
         return try {
-            val result = db.insert(TABLE_PHYSICAL_INFO, null, values)
-            db.close()
-            result != -1L  // Return true if insertion was successful
+            val cursor = db.rawQuery(
+                "SELECT * FROM $TABLE_USERINFO WHERE $COLUMN_EMAIL = ?",
+                arrayOf(email)
+            )
+            cursor
         } catch (e: Exception) {
-            Log.e("DatabaseHelper", "Physical info insert error: ${e.message}")
+            Log.e("DatabaseHelper", "Error retrieving user: ${e.message}")
             db.close()
-            false  // Return false if insertion failed
+            null
         }
     }
 
-    fun insertMedicalActivity(
-        userId: String,
-        allergies: String,
-        medicalHistory: String,
-        fractures: String,
-        otherConditions: String
-    ): Boolean {
-        val db = writableDatabase
-        val values = ContentValues().apply {
-            put(COLUMN_FIREBASE_ID, userId)
-            put(COLUMN_ALLERGIES, allergies)
-            put(COLUMN_MEDICAL_HISTORY, medicalHistory)
-            put(COLUMN_FRACTURES, fractures)
-            put(COLUMN_OTHER_CONDITIONS, otherConditions)
-            put(COLUMN_DATE, System.currentTimeMillis().toString())
-            put(COLUMN_SYNC_STATUS, 0)
-        }
-
-        return try {
-            val result = db.insert(TABLE_MEDICAL_ACTIVITIES, null, values)
-            db.close()
-            result != -1L  // Return true if insertion was successful
-        } catch (e: Exception) {
-            Log.e("DatabaseHelper", "Medical activity insert error: ${e.message}")
-            db.close()
-            false  // Return false if insertion failed
-        }
-    }
-
-    fun userExists(email: String): Boolean {
+    /**
+     * Retrieves the Firebase ID and full name based on the email.
+     */
+    fun getUserIdAndName(email: String): Pair<String?, String?> {
         val db = readableDatabase
-        val cursor = db.rawQuery(
-            "SELECT $COLUMN_ID FROM $TABLE_USERS WHERE $COLUMN_EMAIL = ?",
-            arrayOf(email)
-        )
-        val exists = cursor.count > 0
-        cursor.close()
-        db.close()
-        return exists
-    }
+        val query = """
+            SELECT $COLUMN_FIREBASE_ID, $COLUMN_FIRST_NAME, $COLUMN_LAST_NAME 
+            FROM $TABLE_USERINFO 
+            WHERE $COLUMN_EMAIL = ?
+        """
 
-    fun getUserId(email: String): String? {
-        val db = readableDatabase
-        val cursor = db.rawQuery(
-            "SELECT $COLUMN_FIREBASE_ID FROM $TABLE_USERS WHERE $COLUMN_EMAIL = ?",
-            arrayOf(email)
-        )
-        val userId = if (cursor.moveToFirst()) {
-            cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_FIREBASE_ID))
-        } else null
-        cursor.close()
-        db.close()
-        return userId
-    }
-
-    fun getPhysicalInfo(userId: String): Map<String, String?> {
-        val db = readableDatabase
-        val cursor = db.rawQuery(
-            "SELECT * FROM $TABLE_PHYSICAL_INFO WHERE $COLUMN_FIREBASE_ID = ?",
-            arrayOf(userId)
-        )
-        val result = mutableMapOf<String, String?>()
-        if (cursor.moveToFirst()) {
-            result["bodyLevel"] = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_BODY_LEVEL))
-            result["bodyClassification"] = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_BODY_CLASSIFICATION))
-            result["exerciseRoutine"] = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_EXERCISE_ROUTINE))
-            result["otherInfo"] = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_OTHER_INFO))
+        db.rawQuery(query, arrayOf(email)).use { cursor ->
+            return if (cursor.moveToFirst()) {
+                val firebaseId = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_FIREBASE_ID))
+                val fullName = "${cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_FIRST_NAME))} " +
+                        "${cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_LAST_NAME))}"
+                Pair(firebaseId, fullName)
+            } else {
+                Pair(null, null)
+            }
         }
-        cursor.close()
-        db.close()
-        return result
     }
-    // endregion
+    /**
+     * Retrieves a user by their local database ID.
+     */
+    fun getDashboardInfoById(firebaseId: String): DashboardInfo? {
+        val db = readableDatabase
+        var dashboardInfo: DashboardInfo? = null
+
+        val query = """
+            SELECT 
+                $COLUMN_FIREBASE_ID,
+                $COLUMN_FIRST_NAME,
+                $COLUMN_LAST_NAME,
+                $COLUMN_BODY_LEVEL
+            FROM $TABLE_USERINFO
+            WHERE $COLUMN_FIREBASE_ID = ?
+        """.trimIndent()
+
+        val cursor: Cursor? = db.rawQuery(query, arrayOf(firebaseId))
+
+        cursor?.use {
+            if (it.moveToFirst()) {
+                dashboardInfo = DashboardInfo(
+                    firebaseId = it.getString(it.getColumnIndexOrThrow(COLUMN_FIREBASE_ID)),
+                    firstName = it.getString(it.getColumnIndexOrThrow(COLUMN_FIRST_NAME)),
+                    lastName = it.getString(it.getColumnIndexOrThrow(COLUMN_LAST_NAME)),
+                    bodyLevel = it.getString(it.getColumnIndexOrThrow(COLUMN_BODY_LEVEL))
+                )
+            }
+        }
+
+        cursor?.close()
+        db.close()
+
+        if (dashboardInfo == null) {
+            Log.e("DatabaseHelper", "No dashboard info found for Firebase ID: $firebaseId")
+        } else {
+            Log.d("DatabaseHelper", "Dashboard info retrieved successfully: $dashboardInfo")
+        }
+
+        return dashboardInfo
+    }
+
+    /**
+     * Clears all records in the table.
+     */
+    fun clearAllRecords() {
+        writableDatabase.use { db ->
+            db.execSQL("DELETE FROM $TABLE_USERINFO")
+            Log.d("DatabaseHelper", "All records deleted.")
+        }
+    }
 }
+

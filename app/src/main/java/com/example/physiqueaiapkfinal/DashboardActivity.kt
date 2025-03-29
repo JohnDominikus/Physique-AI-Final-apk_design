@@ -1,145 +1,141 @@
-package com.example.physiqueaiapkfinal.utils
+package com.example.physiqueaiapkfinal
 
-import android.content.Context
-import android.database.Cursor
-import android.os.Parcel
-import android.os.Parcelable
+import android.content.Intent
+import android.os.Bundle
 import android.util.Log
-import com.example.physiqueaiapkfinal.DatabaseHelper
+import android.view.View
+import android.widget.ImageView
+import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity
+import com.example.physiqueaiapkfinal.models.DashboardInfo
+import com.example.physiqueaiapkfinal.utils.UserOperations
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.SetOptions
+import com.google.firebase.auth.FirebaseUser
 
-class FirebaseConnector(context: Context) : Parcelable {
-    private val auth: FirebaseAuth = FirebaseAuth.getInstance()
-    private val firestore: FirebaseFirestore = FirebaseFirestore.getInstance()
-    private val dbHelper = DatabaseHelper(context)
+class DashboardActivity : AppCompatActivity() {
 
-    constructor(parcel: Parcel) : this(TODO("context")) {
+    private lateinit var userOperations: UserOperations
+    private lateinit var auth: FirebaseAuth
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_dashboard)
+
+        // ✅ Initialize Firebase Auth and UserOperations
+        auth = FirebaseAuth.getInstance()
+        userOperations = UserOperations(this)
+
+        // ✅ Display user info
+        fetchAndDisplayUserInfo()
+
+        // 🔥 Bottom navigation setup
+        setupBottomNavigation()
     }
 
-    // User Operations
-    inner class UserOperations {
-        fun registerUser(
-            firstName: String,
-            lastName: String,
-            birthdate: String,
-            phone: String,
-            email: String,
-            password: String,
-            onComplete: (Boolean, String?) -> Unit
-        ) {
-            auth.createUserWithEmailAndPassword(email, password)
-                .addOnCompleteListener { task ->
-                    if (task.isSuccessful) {
-                        val user = auth.currentUser
-                        val uid = user?.uid ?: run {
-                            onComplete(false, "User authentication failed")
-                            return@addOnCompleteListener
-                        }
+    /**
+     * ✅ Sets up the bottom navigation listener
+     */
+    private fun setupBottomNavigation() {
+        val bottomNavigation = findViewById<BottomNavigationView>(R.id.bottom_navigation)
 
-                        // Prepare user data for Firestore
-                        val userData = hashMapOf(
-                            "personalInfo" to hashMapOf(
-                                "firstName" to firstName,
-                                "lastName" to lastName,
-                                "birthdate" to birthdate,
-                                "phone" to phone,
-                                "email" to email
-                            ),
-                            "physicalInfo" to hashMapOf<String, Any>(),  // Empty for now
-                            "medicalInfo" to hashMapOf<String, Any>()   // Empty for now
-                        )
-
-                        // Save to Firestore
-                        firestore.collection("userinfo").document(uid)
-                            .set(userData, SetOptions.merge())
-                            .addOnSuccessListener {
-                                // Save to SQLite
-                                val isInserted = dbHelper.insertUser(uid, firstName, lastName, birthdate, phone, email, password)
-
-                                if (isInserted != -1L) {  // Check if SQLite insertion was successful
-                                    onComplete(true, null)
-                                } else {
-                                    onComplete(false, "Failed to save user data locally")
-                                }
-                            }
-                            .addOnFailureListener { e ->
-                                onComplete(false, "Firestore error: ${e.message}")
-                            }
-                    } else {
-                        onComplete(false, task.exception?.message ?: "Registration failed")
-                    }
-                }
-        }
-    }
-
-    // Sync Operations
-    inner class SyncOperations {
-        fun syncAllData() {
-            syncTable(DatabaseHelper.TABLE_USERS, "userinfo")
-            syncTable(DatabaseHelper.TABLE_PHYSICAL_INFO, "physical_info")
-            syncTable(DatabaseHelper.TABLE_MEDICAL_ACTIVITIES, "medical_activities")
-        }
-
-        private fun syncTable(localTable: String, cloudCollection: String) {
-            val cursor = dbHelper.getUnsyncedRecords(localTable)
-            while (cursor.moveToNext()) {
-                val docId = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_FIREBASE_ID))
-                val data = hashMapOf<String, Any>()
-
-                // Map all columns except internal IDs and sync status
-                for (column in cursor.columnNames) {
-                    if (column !in listOf(
-                            DatabaseHelper.COLUMN_ID,
-                            DatabaseHelper.COLUMN_SYNC_STATUS
-                        )
-                    ) {
-                        when (cursor.getType(cursor.getColumnIndexOrThrow(column))) {
-                            Cursor.FIELD_TYPE_STRING -> data[column] = cursor.getString(cursor.getColumnIndexOrThrow(column))
-                            Cursor.FIELD_TYPE_INTEGER -> data[column] = cursor.getLong(cursor.getColumnIndexOrThrow(column))
-                            Cursor.FIELD_TYPE_FLOAT -> data[column] = cursor.getDouble(cursor.getColumnIndexOrThrow(column))
-                        }
-                    }
-                }
-
-                // Save to Firestore under the appropriate nested field
-                val firestoreData = when (localTable) {
-                    DatabaseHelper.TABLE_PHYSICAL_INFO -> hashMapOf("physicalInfo" to data)
-                    DatabaseHelper.TABLE_MEDICAL_ACTIVITIES -> hashMapOf("medicalInfo" to data)
-                    else -> data
-                }
-
-                firestore.collection("userinfo").document(docId)
-                    .set(firestoreData, SetOptions.merge())
-                    .addOnSuccessListener {
-                        // Mark as synced in SQLite
-                        dbHelper.markAsSynced(localTable, cursor.getLong(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_ID)))
-                        Log.d("FirebaseSync", "$localTable record $docId synced")
-                    }
-                    .addOnFailureListener { e ->
-                        Log.e("FirebaseSync", "Sync failed for $docId: ${e.message}")
-                    }
+        bottomNavigation.setOnItemSelectedListener { item ->
+            when (item.itemId) {
+                // Example navigation handlers
+                R.id.menu_home -> startActivity(Intent(this, DashboardActivity::class.java))
+                R.id.menu_profile -> startActivity(Intent(this, ProfileActivity::class.java))
+                R.id.menu_settings -> startActivity(Intent(this, SettingsActivity::class.java))
+                else -> Log.e("Dashboard", "Unknown menu item selected")
             }
-            cursor.close()
+            true
         }
     }
 
-    override fun writeToParcel(parcel: Parcel, flags: Int) {
+    /**
+     * ✅ Fetches and displays the logged-in user's information.
+     */
+    private fun fetchAndDisplayUserInfo() {
+        val tvUserName = findViewById<TextView>(R.id.tvUserName)
+        val tvPhysicalLevel = findViewById<TextView>(R.id.tvPhysicalLevel)
+        val ivStar = findViewById<ImageView>(R.id.ivStar)
+        val ivVerified = findViewById<ImageView>(R.id.ivVerified)
+        val ivMuscles = findViewById<ImageView>(R.id.ivMuscles)
 
+        // ✅ Hide all icons initially
+        hideIcons(ivStar, ivVerified, ivMuscles)
+
+        val currentUser: FirebaseUser? = auth.currentUser
+
+        if (currentUser != null) {
+            val firebaseUserId = currentUser.uid
+            Log.d("Dashboard", "Fetching user info for Firebase ID: $firebaseUserId")
+
+            val dashboardInfo: DashboardInfo? = userOperations.getDashboardInfoById(firebaseUserId)
+
+            if (dashboardInfo != null) {
+                // ✅ Display full name
+                val fullName = "${dashboardInfo.firstName} ${dashboardInfo.lastName}".trim()
+                tvUserName.text = if (fullName.isNotBlank()) fullName else "Guest User"
+
+                // ✅ Display physical level and corresponding icon
+                val physicalLevel = dashboardInfo.bodyLevel ?: "Beginner"
+                tvPhysicalLevel.text = "Level: $physicalLevel"
+
+                updatePhysicalLevelUI(physicalLevel, tvPhysicalLevel, ivStar, ivVerified, ivMuscles)
+            } else {
+                Log.e("Dashboard", "No user info found for ID: $firebaseUserId")
+                displayGuestUser(tvUserName, tvPhysicalLevel)
+            }
+        } else {
+            Log.e("Dashboard", "No authenticated user found")
+            displayGuestUser(tvUserName, tvPhysicalLevel)
+        }
     }
 
-    override fun describeContents(): Int {
-        return 0
+    /**
+     * ✅ Hides all physical level icons.
+     */
+    private fun hideIcons(vararg icons: ImageView) {
+        icons.forEach { it.visibility = View.GONE }
     }
 
-    companion object CREATOR : Parcelable.Creator<FirebaseConnector> {
-        override fun createFromParcel(parcel: Parcel): FirebaseConnector {
-            return FirebaseConnector(parcel)
-        }
+    /**
+     * ✅ Updates the UI based on physical level.
+     */
+    private fun updatePhysicalLevelUI(
+        level: String,
+        tvLevel: TextView,
+        ivStar: ImageView,
+        ivVerified: ImageView,
+        ivMuscles: ImageView
+    ) {
+        hideIcons(ivStar, ivVerified, ivMuscles)  // Ensure all icons are hidden first
 
-        override fun newArray(size: Int): Array<FirebaseConnector?> {
-            return arrayOfNulls(size)
+        when (level.lowercase()) {
+            "beginner" -> {
+                tvLevel.setTextColor(getColor(R.color.green))
+                ivStar.visibility = View.VISIBLE
+            }
+            "intermediate" -> {
+                tvLevel.setTextColor(getColor(R.color.orange))
+                ivVerified.visibility = View.VISIBLE
+            }
+            "advanced" -> {
+                tvLevel.setTextColor(getColor(R.color.red))
+                ivMuscles.visibility = View.VISIBLE
+            }
+            else -> {
+                tvLevel.setTextColor(getColor(R.color.black))
+            }
         }
+    }
+
+    /**
+     * ✅ Displays guest user info if no authenticated user is found.
+     */
+    private fun displayGuestUser(tvUserName: TextView, tvPhysicalLevel: TextView) {
+        tvUserName.text = "Guest User"
+        tvPhysicalLevel.text = "Level: N/A"
+        tvPhysicalLevel.setTextColor(getColor(R.color.black))
     }
 }

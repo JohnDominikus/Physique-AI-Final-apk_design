@@ -12,20 +12,20 @@ class PhysicalActivity : AppCompatActivity() {
 
     private lateinit var auth: FirebaseAuth
     private lateinit var firestore: FirebaseFirestore
-    private lateinit var sqliteHelper: DatabaseHelper
+    private lateinit var dbHelper: DatabaseHelper
     private lateinit var email: String
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_physical)
 
-        // Initialize Firebase and SQLite
+        // Initialize Firebase, Firestore, and SQLite
         auth = FirebaseAuth.getInstance()
         firestore = FirebaseFirestore.getInstance()
-        sqliteHelper = DatabaseHelper(this)
+        dbHelper = DatabaseHelper(this)
 
         // Retrieve the email from the previous activity
-        email = intent.getStringExtra("email").toString()
+        email = intent.getStringExtra("email").orEmpty()
 
         // Initialize UI elements
         val spinnerBodyLevel = findViewById<Spinner>(R.id.spinnerBodyLevel)
@@ -35,13 +35,11 @@ class PhysicalActivity : AppCompatActivity() {
         val btnBack = findViewById<Button>(R.id.btnBackToNext)
         val btnNext = findViewById<Button>(R.id.btnNext)
 
-        // Populate Spinners with sample data
+        // Populate Spinners
         setupSpinners()
 
         // Handle Back Button
-        btnBack.setOnClickListener {
-            finish()  // Go back to the previous screen
-        }
+        btnBack.setOnClickListener { finish() }
 
         // Handle Next Button
         btnNext.setOnClickListener {
@@ -50,8 +48,8 @@ class PhysicalActivity : AppCompatActivity() {
             val exerciseRoutine = spinnerExercise.selectedItem.toString()
             val otherInfo = spinnerOthers.selectedItem.toString()
 
-            // Validate selection
-            if (bodyLevel != "Select" && bodyClassification != "Select" && exerciseRoutine != "Select") {
+            // Validate spinner selections
+            if (validateSelection(bodyLevel, bodyClassification, exerciseRoutine)) {
                 savePhysicalInfo(bodyLevel, bodyClassification, exerciseRoutine, otherInfo)
             } else {
                 Toast.makeText(this, "Please fill all required fields", Toast.LENGTH_SHORT).show()
@@ -59,7 +57,6 @@ class PhysicalActivity : AppCompatActivity() {
         }
     }
 
-    // Populate Spinner Data
     private fun setupSpinners() {
         val bodyLevels = arrayOf("Select", "Beginner", "Intermediate", "Advanced")
         val classifications = arrayOf("Select", "Endomorph", "Mesomorph", "Ectomorph")
@@ -72,7 +69,6 @@ class PhysicalActivity : AppCompatActivity() {
         setupSpinner(R.id.spinnerOthers, others)
     }
 
-    // Helper function to setup Spinner with ArrayAdapter
     private fun setupSpinner(spinnerId: Int, items: Array<String>) {
         val spinner = findViewById<Spinner>(spinnerId)
         val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, items)
@@ -80,7 +76,14 @@ class PhysicalActivity : AppCompatActivity() {
         spinner.adapter = adapter
     }
 
-    // Save Physical Info to SQLite and Firebase Firestore
+    private fun validateSelection(
+        bodyLevel: String,
+        bodyClassification: String,
+        exerciseRoutine: String
+    ): Boolean {
+        return bodyLevel != "Select" && bodyClassification != "Select" && exerciseRoutine != "Select"
+    }
+
     private fun savePhysicalInfo(
         bodyLevel: String,
         bodyClassification: String,
@@ -88,8 +91,8 @@ class PhysicalActivity : AppCompatActivity() {
         otherInfo: String
     ) {
         val userId = auth.currentUser?.uid
+
         if (userId != null) {
-            // Prepare data for Firestore
             val physicalInfo = hashMapOf(
                 "bodyLevel" to bodyLevel,
                 "bodyClassification" to bodyClassification,
@@ -97,37 +100,55 @@ class PhysicalActivity : AppCompatActivity() {
                 "otherInfo" to otherInfo
             )
 
-            // Save to Firestore
             firestore.collection("userinfo").document(userId)
-                .set(physicalInfo)
+                .update("physicalInfo", physicalInfo)
                 .addOnSuccessListener {
-                    // Save to SQLite
-                    val isInserted = sqliteHelper.insertPhysicalInfo(
-                        userId,
-                        bodyLevel,
-                        bodyClassification,
-                        exerciseRoutine,
-                        otherInfo
+                    Log.d("Firestore", "Physical info saved to Firestore successfully")
+
+                    saveToLocalDatabase(
+                        userId, bodyLevel, bodyClassification, exerciseRoutine, otherInfo
                     )
 
-                    if (isInserted) {
-                        Toast.makeText(this, "Physical info saved successfully!", Toast.LENGTH_SHORT).show()
-
-                        // Proceed to MedicalActivity with the email
-                        val intent = Intent(this, MedicalActivity::class.java)
-                        intent.putExtra("email", email)
-                        startActivity(intent)
-                        finish()
-                    } else {
-                        Toast.makeText(this, "Failed to save physical info in SQLite", Toast.LENGTH_SHORT).show()
+                    // ✅ Navigate to MedicalActivity, passing userId
+                    val intent = Intent(this, MedicalActivity::class.java).apply {
+                        putExtra("userId", userId)  // Pass the user ID
                     }
+                    startActivity(intent)
+                    finish()
                 }
                 .addOnFailureListener { e ->
-                    Log.e("FirestoreError", "Error saving physical info: ${e.message}")
-                    Toast.makeText(this, "Failed to save physical info to Firestore", Toast.LENGTH_SHORT).show()
+                    Log.e("FirestoreError", "Failed to save physical info: ${e.message}")
+                    Toast.makeText(this, "Failed to save to Firestore", Toast.LENGTH_SHORT).show()
                 }
         } else {
             Toast.makeText(this, "User not authenticated", Toast.LENGTH_SHORT).show()
         }
+    }
+
+    private fun saveToLocalDatabase(
+        userId: String,
+        bodyLevel: String,
+        bodyClassification: String,
+        exerciseRoutine: String,
+        otherInfo: String
+    ) {
+        val db = dbHelper.writableDatabase
+
+        val values = android.content.ContentValues().apply {
+            put("firebase_id", userId)
+            put("body_level", bodyLevel)
+            put("body_classification", bodyClassification)
+            put("exercise_routine", exerciseRoutine)
+            put("other_info", otherInfo)
+            put("date", System.currentTimeMillis().toString())
+            put("is_synced", 0)
+        }
+
+        db.insertWithOnConflict(
+            DatabaseHelper.TABLE_USERINFO,
+            null,
+            values,
+            android.database.sqlite.SQLiteDatabase.CONFLICT_REPLACE
+        )
     }
 }

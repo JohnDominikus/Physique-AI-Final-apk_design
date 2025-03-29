@@ -1,6 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="black">#FF000000</color>
+
     <color name="white">#FFFFFFFF</color>
-    <color name="primaryColor">#6200EE</color> <!-- Example color (purple) -->
+
+    <color name="colorPrimary">#27332A</color> <!-- Example color (purple) -->
+
+    <color name="secondaryColor">#03DAC5</color>
+    <color name="primaryColor">#6200EE</color>
+
+
+    <color name="black">#000000</color>
+    <color name="blue">#2196F3</color>
+    <color name="green">#4CAF50</color>
+    <color name="violet">#9C27B0</color>
+    <color name="ash_grey">#B0BEC5</color>
+    <color name="orange">#FF5722</color>
+    <color name="red">#FF1100</color>
+
 </resources>
