@@ -43,7 +43,6 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
         const val COLUMN_OTHER_CONDITIONS = "other_conditions"
     }
 
-    // --- DATABASE CREATION ---
     override fun onCreate(db: SQLiteDatabase) {
         createUnifiedTable(db)
     }
@@ -55,28 +54,20 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
                 CREATE TABLE IF NOT EXISTS $TABLE_USERINFO (
                     $COLUMN_ID INTEGER PRIMARY KEY AUTOINCREMENT,
                     $COLUMN_FIREBASE_ID TEXT UNIQUE,
-                    
-                    -- User Info
                     $COLUMN_FIRST_NAME TEXT,
                     $COLUMN_LAST_NAME TEXT,
                     $COLUMN_BIRTHDATE TEXT,
                     $COLUMN_PHONE TEXT,
                     $COLUMN_EMAIL TEXT UNIQUE,
                     $COLUMN_PASSWORD TEXT,
-                    
-                    -- Physical Info
                     $COLUMN_BODY_LEVEL TEXT,
                     $COLUMN_BODY_CLASSIFICATION TEXT,
                     $COLUMN_EXERCISE_ROUTINE TEXT,
                     $COLUMN_OTHER_INFO TEXT,
-                    
-                    -- Medical Activities
                     $COLUMN_ALLERGIES TEXT,
                     $COLUMN_MEDICAL_HISTORY TEXT,
                     $COLUMN_FRACTURES TEXT,
                     $COLUMN_OTHER_CONDITIONS TEXT,
-                    
-                    -- Sync Info
                     $COLUMN_DATE TEXT,
                     $COLUMN_SYNC_STATUS INTEGER DEFAULT 0
                 )
@@ -88,17 +79,14 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
         }
     }
 
-    // --- DATABASE UPGRADE ---
     override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
         if (oldVersion < newVersion) {
             db.execSQL("DROP TABLE IF EXISTS $TABLE_USERINFO")
             onCreate(db)
             Log.d("DatabaseHelper", "Database upgraded to version $newVersion")
         }
-        db.close()  // Close the database to prevent leaks
     }
 
-    // --- SYNC METHODS ---
     fun markAsSynced(localId: String) {
         writableDatabase.use { db ->
             try {
@@ -116,11 +104,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
     fun getUnsyncedRecords(): Cursor? {
         val db = readableDatabase
         return try {
-            val cursor = db.rawQuery(
-                "SELECT * FROM $TABLE_USERINFO WHERE $COLUMN_SYNC_STATUS = 0",
-                null
-            )
-            cursor
+            db.rawQuery("SELECT * FROM $TABLE_USERINFO WHERE $COLUMN_SYNC_STATUS = 0", null)
         } catch (e: Exception) {
             Log.e("DatabaseHelper", "Error retrieving unsynced records: ${e.message}")
             db.close()
@@ -128,11 +112,6 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
         }
     }
 
-    // --- CRUD OPERATIONS ---
-
-    /**
-     * Inserts or updates user info with proper transactions and error handling.
-     */
     fun insertOrUpdateUser(
         firebaseId: String,
         firstName: String,
@@ -163,27 +142,19 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
                 put(COLUMN_PHONE, phone)
                 put(COLUMN_EMAIL, email)
                 put(COLUMN_PASSWORD, password)
-
-                // Physical Info
                 put(COLUMN_BODY_LEVEL, bodyLevel)
                 put(COLUMN_BODY_CLASSIFICATION, bodyClassification)
                 put(COLUMN_EXERCISE_ROUTINE, exerciseRoutine)
                 put(COLUMN_OTHER_INFO, otherInfo)
-
-                // Medical Activities
                 put(COLUMN_ALLERGIES, allergies)
                 put(COLUMN_MEDICAL_HISTORY, medicalHistory)
                 put(COLUMN_FRACTURES, fractures)
                 put(COLUMN_OTHER_CONDITIONS, otherConditions)
-
-                // Sync info
                 put(COLUMN_DATE, System.currentTimeMillis().toString())
                 put(COLUMN_SYNC_STATUS, 0)
             }
 
-            rowId = db.insertWithOnConflict(
-                TABLE_USERINFO, null, values, SQLiteDatabase.CONFLICT_REPLACE
-            )
+            rowId = db.insertWithOnConflict(TABLE_USERINFO, null, values, SQLiteDatabase.CONFLICT_REPLACE)
             db.setTransactionSuccessful()
             Log.d("DatabaseHelper", "User info inserted/updated successfully. Row ID: $rowId")
         } catch (e: Exception) {
@@ -199,11 +170,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
     fun getUser(email: String): Cursor? {
         val db = readableDatabase
         return try {
-            val cursor = db.rawQuery(
-                "SELECT * FROM $TABLE_USERINFO WHERE $COLUMN_EMAIL = ?",
-                arrayOf(email)
-            )
-            cursor
+            db.rawQuery("SELECT * FROM $TABLE_USERINFO WHERE $COLUMN_EMAIL = ?", arrayOf(email))
         } catch (e: Exception) {
             Log.e("DatabaseHelper", "Error retrieving user: ${e.message}")
             db.close()
@@ -211,73 +178,21 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
         }
     }
 
-    /**
-     * Retrieves the Firebase ID and full name based on the email.
-     */
     fun getUserIdAndName(email: String): Pair<String?, String?> {
         val db = readableDatabase
-        val query = """
-            SELECT $COLUMN_FIREBASE_ID, $COLUMN_FIRST_NAME, $COLUMN_LAST_NAME 
-            FROM $TABLE_USERINFO 
-            WHERE $COLUMN_EMAIL = ?
-        """
+        val query = "SELECT $COLUMN_FIREBASE_ID, $COLUMN_FIRST_NAME, $COLUMN_LAST_NAME FROM $TABLE_USERINFO WHERE $COLUMN_EMAIL = ?"
 
-        db.rawQuery(query, arrayOf(email)).use { cursor ->
-            return if (cursor.moveToFirst()) {
+        return db.rawQuery(query, arrayOf(email)).use { cursor ->
+            if (cursor.moveToFirst()) {
                 val firebaseId = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_FIREBASE_ID))
-                val fullName = "${cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_FIRST_NAME))} " +
-                        "${cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_LAST_NAME))}"
+                val fullName = "${cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_FIRST_NAME))} ${cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_LAST_NAME))}"
                 Pair(firebaseId, fullName)
             } else {
                 Pair(null, null)
             }
         }
     }
-    /**
-     * Retrieves a user by their local database ID.
-     */
-    fun getDashboardInfoById(firebaseId: String): DashboardInfo? {
-        val db = readableDatabase
-        var dashboardInfo: DashboardInfo? = null
 
-        val query = """
-            SELECT 
-                $COLUMN_FIREBASE_ID,
-                $COLUMN_FIRST_NAME,
-                $COLUMN_LAST_NAME,
-                $COLUMN_BODY_LEVEL
-            FROM $TABLE_USERINFO
-            WHERE $COLUMN_FIREBASE_ID = ?
-        """.trimIndent()
-
-        val cursor: Cursor? = db.rawQuery(query, arrayOf(firebaseId))
-
-        cursor?.use {
-            if (it.moveToFirst()) {
-                dashboardInfo = DashboardInfo(
-                    firebaseId = it.getString(it.getColumnIndexOrThrow(COLUMN_FIREBASE_ID)),
-                    firstName = it.getString(it.getColumnIndexOrThrow(COLUMN_FIRST_NAME)),
-                    lastName = it.getString(it.getColumnIndexOrThrow(COLUMN_LAST_NAME)),
-                    bodyLevel = it.getString(it.getColumnIndexOrThrow(COLUMN_BODY_LEVEL))
-                )
-            }
-        }
-
-        cursor?.close()
-        db.close()
-
-        if (dashboardInfo == null) {
-            Log.e("DatabaseHelper", "No dashboard info found for Firebase ID: $firebaseId")
-        } else {
-            Log.d("DatabaseHelper", "Dashboard info retrieved successfully: $dashboardInfo")
-        }
-
-        return dashboardInfo
-    }
-
-    /**
-     * Clears all records in the table.
-     */
     fun clearAllRecords() {
         writableDatabase.use { db ->
             db.execSQL("DELETE FROM $TABLE_USERINFO")
@@ -285,4 +200,3 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
         }
     }
 }
-

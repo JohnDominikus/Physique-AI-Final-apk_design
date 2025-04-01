@@ -3,7 +3,10 @@
     package="com.example.physiqueaiapkfinal">
 
     <!-- 🔹 Required for Firebase Authentication & Firestore -->
+    <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-feature android:name="android.hardware.camera" android:required="true" />
+    <uses-feature android:name="android.hardware.camera.any" android:required="true" />
 
     <application
         android:allowBackup="true"
@@ -28,12 +31,19 @@
         <!-- 🔹 Authentication Activities -->
         <activity android:name=".RegisterActivity" android:exported="true" />
         <activity android:name=".utils.LoginActivity" android:exported="true" />
-        <activity android:name=".utils.DashboardActivity" android:exported="true" />
-
+        <activity android:name=".DashboardActivity" android:exported="true" />
 
         <!-- 🔹 Physical and Medical Activities -->
         <activity android:name=".PhysicalActivity" android:exported="true" />
         <activity android:name=".MedicalActivity" android:exported="true" />
 
+        <!-- 🔹 Functional Activities -->
+        <activity android:name=".WorkoutActivity" android:exported="true" />
+        <activity android:name=".PostureActivity" android:exported="true" />
+        <activity android:name=".DietaryActivity" android:exported="true" />
+        <activity android:name=".TaskActivity" android:exported="true" />
+        <activity android:name=".BmiCalculatorActivity" android:exported="true" />
+
     </application>
+
 </manifest>

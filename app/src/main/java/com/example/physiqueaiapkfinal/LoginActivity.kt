@@ -8,7 +8,7 @@ import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.physiqueaiapkfinal.R
-import com.example.physiqueaiapkfinal.utils.DashboardActivity
+import com.example.physiqueaiapkfinal.DashboardActivity
 import com.google.firebase.auth.FirebaseAuth
 import java.util.concurrent.TimeUnit
 

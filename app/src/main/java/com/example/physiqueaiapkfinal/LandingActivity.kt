@@ -6,7 +6,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import com.example.physiqueaiapkfinal.databinding.ActivityLandingBinding
-import com.example.physiqueaiapkfinal.utils.DashboardActivity
+import com.example.physiqueaiapkfinal.DashboardActivity
 import com.example.physiqueaiapkfinal.utils.LoginActivity
 import com.google.firebase.auth.FirebaseAuth
 

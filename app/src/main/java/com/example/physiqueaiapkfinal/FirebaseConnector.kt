@@ -2,13 +2,13 @@ package com.example.physiqueaiapkfinal.utils
 
 import android.content.Context
 import android.database.Cursor
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import com.example.physiqueaiapkfinal.DatabaseHelper
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
-import android.os.Handler
-import android.os.Looper
 import kotlin.math.pow
 
 // --- Firebase Initialization ---
@@ -30,20 +30,18 @@ fun retrySync(
         syncAction(attempt)
         attempt++
         if (attempt < maxRetries) {
-            FirebaseManager.handler.postDelayed(
-                { execute() },
-                delayMillis * (2.0.pow(attempt).toLong())
-            )
+            FirebaseManager.handler.postDelayed({ execute() }, delayMillis * (2.0.pow(attempt).toLong()))
         }
     }
     execute()
 }
 
-// --- User Operations ---
+// --- Combined User and Sync Operations ---
 class UserOperations(private val context: Context) {
 
     private val dbHelper = DatabaseHelper(context)
 
+    // Registers a new user with Firebase and stores data locally
     fun registerUser(
         firstName: String,
         lastName: String,
@@ -79,7 +77,6 @@ class UserOperations(private val context: Context) {
                     FirebaseManager.firestore.collection("userinfo").document(uid)
                         .set(userData, SetOptions.merge())
                         .addOnSuccessListener {
-                            // Use the correct SQLite insertion method
                             val rowId = dbHelper.insertOrUpdateUser(
                                 firebaseId = uid,
                                 firstName = firstName,
@@ -112,12 +109,8 @@ class UserOperations(private val context: Context) {
                 }
             }
     }
-}
 
-// --- Sync Operations ---
-class SyncOperations(private val context: Context) {
-
-    private val dbHelper = DatabaseHelper(context)
+    // --- Sync Operations ---
 
     /**
      * Syncs all unsynced user records from SQLite to Firestore.
@@ -132,7 +125,6 @@ class SyncOperations(private val context: Context) {
     private fun syncTable(localTable: String) {
         val cursor: Cursor? = dbHelper.getUnsyncedRecords()
 
-        // Null-safety check for the cursor
         cursor?.use { safeCursor ->
             if (safeCursor.count == 0) {
                 Log.d("Sync", "No unsynced records in $localTable.")
@@ -140,27 +132,23 @@ class SyncOperations(private val context: Context) {
             }
 
             while (safeCursor.moveToNext()) {
-                val docId =
-                    safeCursor.getStringOrNull(safeCursor.getColumnIndex(DatabaseHelper.COLUMN_FIREBASE_ID))
-                        ?: continue
+                val firebaseIdIndex = safeCursor.getColumnIndex(DatabaseHelper.COLUMN_FIREBASE_ID)
+                val docId = safeCursor.getStringOrNull(firebaseIdIndex) ?: continue
                 val data = extractDataFromCursor(safeCursor)
 
                 retrySync { attempt ->
                     FirebaseManager.firestore.collection("userinfo").document(docId)
                         .set(data, SetOptions.merge())
                         .addOnSuccessListener {
-                            val recordId =
-                                safeCursor.getLongOrNull(safeCursor.getColumnIndex(DatabaseHelper.COLUMN_ID))
+                            val idIndex = safeCursor.getColumnIndex(DatabaseHelper.COLUMN_ID)
+                            val recordId = safeCursor.getLongOrNull(idIndex)
                             recordId?.let {
                                 dbHelper.markAsSynced(it.toString())
                                 Log.d("FirebaseSync", "Record $docId synced successfully")
                             }
                         }
                         .addOnFailureListener { e ->
-                            Log.e(
-                                "FirebaseSync",
-                                "Sync failed on attempt $attempt for $docId: ${e.message}"
-                            )
+                            Log.e("FirebaseSync", "Sync failed on attempt $attempt for $docId: ${e.message}")
                         }
                 }
             }
@@ -172,24 +160,18 @@ class SyncOperations(private val context: Context) {
      */
     private fun extractDataFromCursor(cursor: Cursor): HashMap<String, Any> {
         val data = hashMapOf<String, Any>()
-
         for (column in cursor.columnNames) {
             if (column !in listOf(DatabaseHelper.COLUMN_ID, DatabaseHelper.COLUMN_SYNC_STATUS)) {
-                when (cursor.getType(cursor.getColumnIndexOrThrow(column))) {
+                val index = cursor.getColumnIndexOrThrow(column)
+                when (cursor.getType(index)) {
                     Cursor.FIELD_TYPE_STRING -> {
-                        cursor.getStringOrNull(cursor.getColumnIndexOrThrow(column))?.let {
-                            data[column] = it
-                        }
+                        cursor.getStringOrNull(index)?.let { data[column] = it }
                     }
-
                     Cursor.FIELD_TYPE_INTEGER -> {
-                        data[column] =
-                            cursor.getLongOrNull(cursor.getColumnIndexOrThrow(column)) ?: 0L
+                        data[column] = cursor.getLongOrNull(index) ?: 0L
                     }
-
                     Cursor.FIELD_TYPE_FLOAT -> {
-                        data[column] =
-                            cursor.getDoubleOrNull(cursor.getColumnIndexOrThrow(column)) ?: 0.0
+                        data[column] = cursor.getDoubleOrNull(index) ?: 0.0
                     }
                 }
             }

@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:padding="16dp"
+    tools:context=".PostureActivity">
+
+    <!-- Toolbar with Back Button -->
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:background="?attr/colorPrimary"
+        android:title="Posture"
+        app:titleTextColor="@color/white"
+        android:contentDescription="Posture Activity"
+        android:elevation="4dp"
+        android:popupTheme="@style/ThemeOverlay.AppCompat.Light">
+
+        <!-- Back Button -->
+        <androidx.appcompat.widget.AppCompatImageButton
+            android:id="@+id/back_button"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:src="@android:drawable/ic_menu_close_clear_cancel"
+            android:contentDescription="Back"
+            android:background="?android:attr/selectableItemBackgroundBorderless"
+            android:layout_alignParentStart="true"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:layout_gravity="start|center_vertical"
+            android:focusable="true"
+            android:clickable="true"
+            android:padding="12dp" />
+    </androidx.appcompat.widget.Toolbar>
+
+    <!-- Camera Preview -->
+    <androidx.camera.view.PreviewView
+        android:id="@+id/previewView"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
+
+    <!-- Controls: Reps Counter, Timer, Home Button -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:paddingTop="16dp">
+
+        <!-- Reps Counter Icon -->
+        <ImageView
+            android:id="@+id/ivReps"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:src="@drawable/reps"
+            android:contentDescription="Reps Counter"
+            android:layout_marginEnd="16dp"
+            android:clickable="true"
+            android:focusable="true" />
+
+        <!-- Timer Icon -->
+        <ImageView
+            android:id="@+id/ivTimer"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:src="@drawable/timer"
+            android:contentDescription="Timer"
+            android:layout_marginEnd="16dp"
+            android:clickable="true"
+            android:focusable="true" />
+
+        <!-- Camera Icon to Capture Image -->
+        <ImageView
+            android:id="@+id/ivCamera"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:src="@drawable/camera"
+            android:contentDescription="Capture Image"
+            android:clickable="true"
+            android:focusable="true"
+            android:layout_marginEnd="16dp"
+            android:onClick="captureImage" />
+
+        <!-- Home Icon -->
+        <ImageView
+            android:id="@+id/ivHome"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:src="@drawable/home"
+            android:contentDescription="Home"
+            android:clickable="true"
+            android:focusable="true" />
+    </LinearLayout>
+
+    <!-- Timer Countdown -->
+    <TextView
+        android:id="@+id/tvTimer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="00:00"
+        android:textSize="24sp"
+        android:textColor="@android:color/black"
+        android:gravity="center"
+        android:layout_marginTop="16dp" />
+
+</LinearLayout>

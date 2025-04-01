@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".BmiCalculatorActivity">
+
+    <!-- Gender Selection Buttons -->
+    <LinearLayout
+        android:id="@+id/genderLinearLayout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        android:padding="16dp"
+        android:gravity="center">
+
+        <Button
+            android:id="@+id/genderMaleButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Male" />
+
+        <Button
+            android:id="@+id/genderFemaleButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Female"
+            android:layout_marginStart="16dp"/>
+    </LinearLayout>
+
+    <!-- Height Slider -->
+    <SeekBar
+        android:id="@+id/heightSeekBar"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:max="250"
+        android:progress="170"
+        app:layout_constraintTop_toBottomOf="@id/genderLinearLayout"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="20dp" />
+
+    <TextView
+        android:id="@+id/heightTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Height: 170 cm"
+        app:layout_constraintTop_toBottomOf="@id/heightSeekBar"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginTop="10dp" />
+
+    <!-- Weight Buttons -->
+    <LinearLayout
+        android:id="@+id/weightLinearLayout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintTop_toBottomOf="@id/heightTextView"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:padding="16dp">
+
+        <ImageButton
+            android:id="@+id/weightDecreaseButton"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:src="@drawable/minus"
+            android:contentDescription="Decrease weight"
+            android:padding="8dp" />
+
+        <TextView
+            android:id="@+id/weightTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Weight: 70 kg"
+            android:gravity="center"
+            android:layout_marginHorizontal="16dp"
+            android:textSize="18sp" />
+
+        <ImageButton
+            android:id="@+id/weightIncreaseButton"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:src="@drawable/add"
+            android:contentDescription="Increase weight"
+            android:padding="8dp" />
+    </LinearLayout>
+
+    <!-- Age Buttons -->
+    <LinearLayout
+        android:id="@+id/ageLinearLayout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintTop_toBottomOf="@id/weightLinearLayout"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:padding="16dp">
+
+        <ImageButton
+            android:id="@+id/ageDecreaseButton"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:src="@drawable/minus"
+            android:contentDescription="Decrease age"
+            android:padding="8dp" />
+
+        <TextView
+            android:id="@+id/ageTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Age: 25"
+            android:gravity="center"
+            android:layout_marginHorizontal="16dp"
+            android:textSize="18sp" />
+
+        <ImageButton
+            android:id="@+id/ageIncreaseButton"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:src="@drawable/add"
+            android:contentDescription="Increase age"
+            android:padding="8dp" />
+    </LinearLayout>
+
+    <!-- Calculate Button -->
+    <Button
+        android:id="@+id/calculateBMIButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Calculate"
+        app:layout_constraintTop_toBottomOf="@id/ageLinearLayout"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="16dp" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
