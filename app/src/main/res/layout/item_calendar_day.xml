@@ -1,0 +1,27 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:padding="8dp"
+    android:layout_width="80dp"
+    android:layout_height="wrap_content"
+    android:background="?android:attr/selectableItemBackground">
+
+    <!-- Day of the week (e.g., Monday, Tuesday) -->
+    <TextView
+        android:id="@+id/tvDay"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Monday"
+        android:textSize="16sp"
+        android:textColor="#000000"
+        android:layout_marginBottom="4dp"/>
+
+    <!-- Task names scheduled for the day -->
+    <TextView
+        android:id="@+id/tvTask"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="No tasks"
+        android:textSize="12sp"
+        android:textColor="#666666" />
+</LinearLayout>

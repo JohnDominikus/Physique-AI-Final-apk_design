@@ -27,13 +27,13 @@ class LoginActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
 
-        // Initialize Firebase
+        // Initialize Firebase Auth
         auth = FirebaseAuth.getInstance()
 
-        // Initialize SharedPreferences
+        // Initialize SharedPreferences (for storing cookies)
         sharedPreferences = getSharedPreferences("USER_DATA", MODE_PRIVATE)
 
-        // 🔥 Check if user is already logged in and if cookies are valid
+        // Check if the user is already logged in with valid cookies
         if (isUserLoggedIn()) {
             navigateToDashboard()
             return
@@ -59,22 +59,28 @@ class LoginActivity : AppCompatActivity() {
         }
     }
 
-    // ✅ Function to check if the user is logged in and if the cookie is still valid
+    /**
+     * Function to check if the user is logged in and if the cookie is still valid.
+     * Returns true if logged in and cookie is valid, otherwise false.
+     */
     private fun isUserLoggedIn(): Boolean {
         val storedUserId = sharedPreferences.getString(USER_ID_KEY, null)
         val lastLoginTimestamp = sharedPreferences.getLong(TIMESTAMP_KEY, 0)
 
-        // 🚫 No stored user ID → force login
+        // No stored user ID or timestamp means the user is not logged in or cookies are invalid.
         if (storedUserId == null || lastLoginTimestamp == 0L) return false
 
-        // 🔥 Check if 30 days have passed
+        // Check if the stored cookie is valid (less than COOKIE_EXPIRATION_DAYS)
         val currentTime = System.currentTimeMillis()
         val daysSinceLastLogin = TimeUnit.MILLISECONDS.toDays(currentTime - lastLoginTimestamp)
 
         return daysSinceLastLogin < COOKIE_EXPIRATION_DAYS
     }
 
-    // ✅ Firebase Authentication with Email and Password
+    /**
+     * Firebase Authentication with Email and Password.
+     * Attempts to log the user in using Firebase Auth.
+     */
     private fun loginUser(email: String, password: String) {
         auth.signInWithEmailAndPassword(email, password)
             .addOnCompleteListener { task ->
@@ -95,15 +101,21 @@ class LoginActivity : AppCompatActivity() {
             }
     }
 
-    // ✅ Save user ID and timestamp in SharedPreferences (cookies)
+    /**
+     * Save the user's ID and timestamp in SharedPreferences (cookies)
+     * to persist the login state across sessions.
+     */
     private fun saveUserSession(userId: String) {
         val editor = sharedPreferences.edit()
         editor.putString(USER_ID_KEY, userId)
-        editor.putLong(TIMESTAMP_KEY, System.currentTimeMillis())  // Save current time
+        editor.putLong(TIMESTAMP_KEY, System.currentTimeMillis())  // Save current time as last login time
         editor.apply()
     }
 
-    // ✅ Navigate to DashboardActivity
+    /**
+     * Navigate to DashboardActivity after a successful login.
+     * Pass the user ID and email for further use in the Dashboard.
+     */
     private fun navigateToDashboard() {
         val user = auth.currentUser
         val userId = user?.uid ?: "Unknown ID"
