@@ -6,8 +6,8 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import com.example.physiqueaiapkfinal.databinding.ActivityLandingBinding
-import com.example.physiqueaiapkfinal.DashboardActivity
 import com.example.physiqueaiapkfinal.utils.LoginActivity
+import com.example.physiqueaiapkfinal.RegisterActivity
 import com.google.firebase.auth.FirebaseAuth
 
 class LandingActivity : AppCompatActivity() {
@@ -18,7 +18,7 @@ class LandingActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // Use ViewBinding for cleaner code and better performance
+        // Initialize ViewBinding
         binding = ActivityLandingBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
@@ -31,13 +31,18 @@ class LandingActivity : AppCompatActivity() {
 
         // 🔥 Check if the user is already authenticated
         if (storedUserId != null && auth.currentUser != null && auth.currentUser?.uid == storedUserId) {
-            // ✅ User is authenticated → go to Dashboard
             Log.d("LandingActivity", "User found in cookies: ${auth.currentUser?.email}")
             navigateTo(DashboardActivity::class.java)
-        } else {
-            // 🔥 User not authenticated → Go to Login
-            Log.d("LandingActivity", "No valid user found → Redirecting to Login")
+        }
+
+        // Handle Sign In button click → Redirect to LoginActivity
+        binding.btnSignIn.setOnClickListener {
             navigateTo(LoginActivity::class.java)
+        }
+
+        // Handle Sign Up button click → Redirect to RegisterActivity
+        binding.txtSignUp.setOnClickListener {
+            navigateTo(RegisterActivity::class.java)
         }
     }
 
@@ -45,6 +50,7 @@ class LandingActivity : AppCompatActivity() {
     private fun navigateTo(activity: Class<*>) {
         val intent = Intent(this, activity)
         startActivity(intent)
+        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out) // Smooth transition
         finish()
     }
 }

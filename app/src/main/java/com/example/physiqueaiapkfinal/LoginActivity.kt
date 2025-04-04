@@ -5,10 +5,12 @@ import android.content.SharedPreferences
 import android.os.Bundle
 import android.widget.Button
 import android.widget.EditText
+import android.widget.ImageView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.physiqueaiapkfinal.R
 import com.example.physiqueaiapkfinal.DashboardActivity
+import com.example.physiqueaiapkfinal.LandingActivity
 import com.google.firebase.auth.FirebaseAuth
 import java.util.concurrent.TimeUnit
 
@@ -56,6 +58,14 @@ class LoginActivity : AppCompatActivity() {
 
             // Firebase authentication
             loginUser(email, password)
+        }
+
+        // Back Button to navigate to LandingActivity
+        val btnBack = findViewById<ImageView>(R.id.btnBack)
+        btnBack.setOnClickListener {
+            val intent = Intent(this, LandingActivity::class.java)
+            startActivity(intent)
+            finish()  // Close LoginActivity after navigating
         }
     }
 

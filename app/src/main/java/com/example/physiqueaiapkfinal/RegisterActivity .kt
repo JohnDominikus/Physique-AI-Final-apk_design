@@ -40,7 +40,12 @@ class RegisterActivity : AppCompatActivity() {
         tvBirthdate.text = getString(R.string.select_birthdate)
 
         // Back button action
-        btnBack.setOnClickListener { finish() }
+        btnBack.setOnClickListener {
+            // Create an intent to go back to the Landing Activity
+            val intent = Intent(this, LandingActivity::class.java)
+            startActivity(intent) // Start the LandingActivity
+            finish() // Finish the current activity to remove it from the back stack
+        }
 
         // Birthdate picker
         tvBirthdate.setOnClickListener { showDatePicker(tvBirthdate) }
@@ -60,7 +65,7 @@ class RegisterActivity : AppCompatActivity() {
         }
     }
 
-    // ✅ DatePicker Dialog
+    // DatePicker Dialog
     private fun showDatePicker(tvBirthdate: TextView) {
         val calendar = Calendar.getInstance()
         val year = calendar.get(Calendar.YEAR)
@@ -75,7 +80,7 @@ class RegisterActivity : AppCompatActivity() {
         datePicker.show()
     }
 
-    // ✅ Input Validation
+    // Input Validation
     private fun validateInput(
         firstName: String,
         lastName: String,
@@ -103,7 +108,7 @@ class RegisterActivity : AppCompatActivity() {
         return true
     }
 
-    // ✅ Register User with Firebase Authentication
+    // Register User with Firebase Authentication
     private fun registerUser(
         firstName: String,
         lastName: String,
@@ -129,7 +134,7 @@ class RegisterActivity : AppCompatActivity() {
             }
     }
 
-    // ✅ Save User Data to Firestore and SQLite
+    // Save User Data to Firestore and SQLite
     private fun saveUserToFirestoreAndLocal(
         uid: String,
         firstName: String,
@@ -161,7 +166,7 @@ class RegisterActivity : AppCompatActivity() {
             }
     }
 
-    // ✅ Save to Local SQLite Database (Directly inside RegisterActivity)
+    // Save to Local SQLite Database
     private fun saveToLocalDatabase(
         uid: String,
         firstName: String,
@@ -171,7 +176,6 @@ class RegisterActivity : AppCompatActivity() {
         email: String,
         password: String
     ) {
-        // SQLite Insertion Logic (directly in RegisterActivity)
         val db = dbHelper.writableDatabase
 
         val values = android.content.ContentValues().apply {
@@ -208,7 +212,7 @@ class RegisterActivity : AppCompatActivity() {
         }
     }
 
-    // ✅ Error Display Helper
+    // Error Display Helper
     private fun showError(message: String) {
         Log.e("RegisterActivity", message)
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show()

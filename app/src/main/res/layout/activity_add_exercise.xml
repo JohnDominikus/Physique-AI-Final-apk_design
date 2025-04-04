@@ -1,0 +1,94 @@
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:padding="20dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal">
+
+        <!-- Upload Video Button -->
+        <Button
+            android:id="@+id/selectVideoButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Upload Exercise Video"
+            android:backgroundTint="#FF9800" />
+
+        <!-- Video Status -->
+        <TextView
+            android:id="@+id/videoStatus"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="No video selected"
+            android:layout_marginTop="8dp"
+            android:textColor="#757575" />
+
+        <!-- Video Preview -->
+        <VideoView
+            android:id="@+id/videoPreview"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:layout_marginTop="10dp"
+            android:visibility="gone" />
+
+        <!-- Exercise Name -->
+        <EditText
+            android:id="@+id/exerciseName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Exercise Name"
+            android:inputType="textCapWords"
+            android:layout_marginTop="16dp" />
+
+        <!-- Exercise Details -->
+        <EditText
+            android:id="@+id/exerciseDetails"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Details"
+            android:inputType="textMultiLine"
+            android:minLines="3"
+            android:gravity="top|start"
+            android:layout_marginTop="8dp" />
+
+        <!-- Exercise Time -->
+        <EditText
+            android:id="@+id/exerciseTime"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Time (e.g., 30s, 1m)"
+            android:inputType="text"
+            android:layout_marginTop="8dp" />
+
+        <!-- Exercise Level Spinner -->
+        <Spinner
+            android:id="@+id/exerciseLevelSpinner"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:minHeight="48dp" />
+
+        <!-- Save Button -->
+        <Button
+            android:id="@+id/saveExerciseButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Save Exercise"
+            android:layout_marginTop="24dp"
+            android:backgroundTint="#4CAF50"
+            android:textColor="#FFFFFF" />
+
+        <ProgressBar
+            android:id="@+id/progressBar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            android:layout_centerInParent="true"
+            />
+
+    </LinearLayout>
+</ScrollView>
