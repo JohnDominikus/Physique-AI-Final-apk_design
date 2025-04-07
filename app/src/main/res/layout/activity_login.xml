@@ -3,9 +3,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".utils.LoginActivity"
+    android:background="#F5F5F5"
     android:padding="16dp"
-    android:background="#F5F5F5">
+    tools:context=".utils.LoginActivity">
 
     <!-- Back Button at the top-left corner -->
     <ImageView
@@ -18,14 +18,14 @@
         android:layout_alignParentStart="true"
         android:layout_marginTop="16dp"
         android:layout_marginStart="16dp"
-        android:layout_gravity="start"/>
+        app:tint="@android:color/black" />
 
     <!-- ScrollView for the rest of the content -->
     <ScrollView
         android:layout_below="@id/btnBack"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:padding="16dp">
+        android:paddingTop="16dp">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -35,15 +35,17 @@
             android:padding="20dp">
 
             <!-- Logo -->
+
+            <!-- App Name -->
             <ImageView
                 android:id="@+id/ivLogo"
                 android:layout_width="100dp"
                 android:layout_height="100dp"
-                android:src="@drawable/physiqueailogo"
+                android:layout_marginBottom="16dp"
+                android:layout_marginTop="16dp"
                 android:contentDescription="App Logo"
-                android:layout_marginBottom="16dp" />
+                android:src="@drawable/physiqueailogo" />
 
-            <!-- App Name -->
             <TextView
                 android:id="@+id/tvAppName"
                 android:layout_width="wrap_content"
@@ -51,7 +53,7 @@
                 android:text="Physique Ai"
                 android:textSize="24sp"
                 android:textStyle="bold"
-                android:textColor="@android:color/black"
+                android:textColor="#1C1F2A"
                 android:layout_marginBottom="20dp" />
 
             <!-- Sign In Section -->
@@ -63,7 +65,8 @@
                 android:padding="20dp"
                 android:elevation="4dp"
                 android:layout_marginBottom="20dp"
-                android:layout_gravity="center_horizontal">
+                android:layout_gravity="center_horizontal"
+                android:backgroundTint="#FFFFFF">
 
                 <TextView
                     android:id="@+id/tvSignInTitle"
@@ -72,6 +75,7 @@
                     android:text="Sign In"
                     android:textSize="20sp"
                     android:textStyle="bold"
+                    android:textColor="#2C3E50"
                     android:layout_gravity="center_horizontal"
                     android:layout_marginBottom="16dp" />
 
@@ -80,10 +84,9 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
-                    android:background="@android:color/white"
+                    android:background="#DDDDDD"
                     android:padding="8dp"
                     android:layout_marginBottom="12dp"
-                    android:backgroundTint="#DDDDDD"
                     android:gravity="center_vertical">
 
                     <ImageView
@@ -96,10 +99,11 @@
                     <EditText
                         android:id="@+id/etEmail"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
+                        android:layout_height="48dp"
                         android:hint="Email"
                         android:inputType="textEmailAddress"
-                        android:minHeight="48dp" />
+                        android:textColor="#2C3E50"
+                        android:textColorHint="#BDC3C7" />
                 </LinearLayout>
 
                 <!-- Password -->
@@ -107,11 +111,11 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
-                    android:background="@android:color/white"
+                    android:background="#DDDDDD"
                     android:padding="8dp"
                     android:layout_marginBottom="12dp"
-                    android:backgroundTint="#DDDDDD"
-                    android:gravity="center_vertical">
+                    android:gravity="center_vertical"
+                    tools:ignore="ExtraText">
 
                     <ImageView
                         android:layout_width="24dp"
@@ -126,7 +130,21 @@
                         android:layout_height="48dp"
                         android:layout_weight="1"
                         android:hint="Password"
-                        android:inputType="textPassword" />
+                        android:inputType="textPassword"
+                        android:textColor="#2C3E50"
+                        android:textColorHint="#BDC3C7" />
+
+                    <!-- Toggle Button for Password Visibility -->
+                    <ImageView
+                        android:id="@+id/passwordToggle"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:layout_marginStart="8dp"
+                        android:clickable="true"
+                        android:contentDescription="Password Visibility Toggle"
+                        android:focusable="true"
+                        android:src="@drawable/ic_eye"
+                        tools:ignore="TouchTargetSizeCheck" />
                 </LinearLayout>
 
                 <!-- Remember Me & Forgot Password -->
@@ -142,7 +160,8 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:text="Remember me"
-                        android:layout_weight="1" />
+                        android:layout_weight="1"
+                        android:textColor="#2C3E50" />
 
                     <TextView
                         android:id="@+id/tvForgotPassword"
@@ -154,17 +173,19 @@
                         android:gravity="end"
                         android:minHeight="48dp"
                         android:text="Forgot password?"
-                        android:textColor="@android:color/holo_blue_dark" />
+                        android:textColor="#2980B9"
+                        android:textSize="14sp" />
                 </LinearLayout>
 
                 <!-- Login Button -->
                 <Button
                     android:id="@+id/btnLogin"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="48dp"
                     android:text="LOGIN"
-                    android:backgroundTint="@android:color/holo_blue_dark"
-                    android:textColor="@android:color/white"
+                    android:backgroundTint="#2980B9"
+                    android:textColor="#FFFFFF"
+                    android:textSize="16sp"
                     android:layout_marginBottom="16dp" />
             </LinearLayout>
 
@@ -172,19 +193,19 @@
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
-                android:background="@android:color/darker_gray"
+                android:background="#BDC3C7"
                 android:layout_marginVertical="16dp" />
 
             <!-- Google Sign Up Button -->
             <Button
                 android:id="@+id/btnGoogleSignUp"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="48dp"
                 android:text="GOOGLE SIGN UP"
                 android:drawableStart="@drawable/login"
-                android:backgroundTint="@android:color/holo_blue_light"
-                android:textColor="@android:color/black"
-                android:layout_marginBottom="16dp"
+                android:backgroundTint="#FF6347"
+                android:textColor="#FFFFFF"
+                android:textSize="16sp"
                 android:drawablePadding="8dp" />
 
         </LinearLayout>

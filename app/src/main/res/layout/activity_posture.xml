@@ -5,8 +5,8 @@
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
-    android:gravity="center"
     android:padding="16dp"
+    android:gravity="center"
     tools:context=".PostureActivity">
 
     <!-- Toolbar with Back Button -->
@@ -17,7 +17,6 @@
         android:background="?attr/colorPrimary"
         android:title="Posture"
         app:titleTextColor="@color/white"
-        android:contentDescription="Posture Activity"
         android:elevation="4dp"
         android:popupTheme="@style/ThemeOverlay.AppCompat.Light">
 
@@ -29,13 +28,11 @@
             android:src="@android:drawable/ic_menu_close_clear_cancel"
             android:contentDescription="Back"
             android:background="?android:attr/selectableItemBackgroundBorderless"
-            android:layout_alignParentStart="true"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="8dp"
             android:layout_gravity="start|center_vertical"
-            android:focusable="true"
-            android:clickable="true"
-            android:padding="12dp" />
+            android:layout_marginStart="8dp"
+            android:padding="12dp"
+            android:onClick="onBackPressed"
+            tools:ignore="OnClick" />
     </androidx.appcompat.widget.Toolbar>
 
     <!-- Camera Preview -->
@@ -43,15 +40,16 @@
         android:id="@+id/previewView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1" />
+        android:layout_weight="1"
+        android:layout_marginTop="16dp" />
 
-    <!-- Controls: Reps Counter, Timer, Home Button -->
+    <!-- Controls (Reps, Timer, Capture Image, Home) -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:gravity="center"
-        android:paddingTop="16dp">
+        android:layout_marginTop="16dp">
 
         <!-- Reps Counter Icon -->
         <ImageView
@@ -60,9 +58,7 @@
             android:layout_height="50dp"
             android:src="@drawable/reps"
             android:contentDescription="Reps Counter"
-            android:layout_marginEnd="16dp"
-            android:clickable="true"
-            android:focusable="true" />
+            android:layout_marginEnd="16dp" />
 
         <!-- Timer Icon -->
         <ImageView
@@ -70,10 +66,12 @@
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:src="@drawable/timer"
-            android:contentDescription="Timer"
-            android:layout_marginEnd="16dp"
-            android:clickable="true"
-            android:focusable="true" />
+        android:contentDescription="Timer"
+        android:layout_marginEnd="16dp"
+        android:clickable="true"
+        android:focusable="true"
+        android:onClick="startTimer"
+            tools:ignore="OnClick" /> <!-- Handling timer click in activity -->
 
         <!-- Camera Icon to Capture Image -->
         <ImageView
@@ -82,10 +80,9 @@
             android:layout_height="50dp"
             android:src="@drawable/camera"
             android:contentDescription="Capture Image"
-            android:clickable="true"
-            android:focusable="true"
             android:layout_marginEnd="16dp"
-            android:onClick="captureImage" />
+            android:onClick="captureImage"
+            tools:ignore="OnClick" />
 
         <!-- Home Icon -->
         <ImageView
@@ -93,9 +90,7 @@
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:src="@drawable/home"
-            android:contentDescription="Home"
-            android:clickable="true"
-            android:focusable="true" />
+            android:contentDescription="Home" />
     </LinearLayout>
 
     <!-- Timer Countdown -->
@@ -107,6 +102,7 @@
         android:textSize="24sp"
         android:textColor="@android:color/black"
         android:gravity="center"
-        android:layout_marginTop="16dp" />
+        android:layout_marginTop="16dp"
+        android:visibility="gone" /> <!-- Hide initially, make visible when the timer starts -->
 
 </LinearLayout>

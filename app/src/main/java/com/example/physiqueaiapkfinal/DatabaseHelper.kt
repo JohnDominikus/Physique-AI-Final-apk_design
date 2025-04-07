@@ -41,10 +41,29 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
         const val COLUMN_MEDICAL_HISTORY = "medical_history"
         const val COLUMN_FRACTURES = "fractures"
         const val COLUMN_OTHER_CONDITIONS = "other_conditions"
+
+
+        // Table for Video Exercises
+        const val TABLE_VIDEO_EXERCISES = "video_exercises"
+        const val COLUMN_VIDEO_ID = "id"
+        const val COLUMN_VIDEO_URL = "video_url"
+        const val COLUMN_EXERCISE_TITLE = "exercise_title"
+        const val COLUMN_EXERCISE_DESCRIPTION = "exercise_description"
+        const val COLUMN_DURATION = "duration"
+        const val COLUMN_TARGET_USER_LEVEL = "target_user_level"
+        const val COLUMN_TARGET_WORKOUT_TYPE = "target_workout_type"
+        const val COLUMN_VIDEO_DATETIME = "date_time"
+
     }
 
+
+
+
+
     override fun onCreate(db: SQLiteDatabase) {
-        createUnifiedTable(db)
+        createUnifiedTable(db)// for user information
+        createVideoExercisesTable(db) // for  video exercises
+
     }
 
     private fun createUnifiedTable(db: SQLiteDatabase) {
@@ -199,4 +218,35 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
             Log.d("DatabaseHelper", "All records deleted.")
         }
     }
+    fun clearAllRecordsVideo() {
+        writableDatabase.use { db ->
+            db.execSQL("DELETE FROM $TABLE_VIDEO_EXERCISES")
+            Log.d("DatabaseHelper", "All records deleted.")
+        }
+    }
+
+    private fun createVideoExercisesTable(db: SQLiteDatabase) {
+        try {
+            db.execSQL(
+                """
+            CREATE TABLE IF NOT EXISTS $TABLE_VIDEO_EXERCISES (
+                $COLUMN_VIDEO_ID INTEGER PRIMARY KEY AUTOINCREMENT,
+                $COLUMN_VIDEO_URL TEXT,
+                $COLUMN_EXERCISE_TITLE TEXT,
+                $COLUMN_EXERCISE_DESCRIPTION TEXT,
+                $COLUMN_DURATION TEXT,
+                $COLUMN_TARGET_USER_LEVEL TEXT,
+                $COLUMN_TARGET_WORKOUT_TYPE TEXT,
+                $COLUMN_VIDEO_DATETIME TEXT
+            )
+            """
+            )
+            Log.d("DatabaseHelper", "Video exercises table created successfully")
+        } catch (e: Exception) {
+            Log.e("DatabaseHelper", "Error creating video exercises table: ${e.message}")
+        }
+    }
+
+
+
 }

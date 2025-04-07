@@ -1,4 +1,5 @@
 package com.example.physiqueaiapkfinal
+
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
 import android.os.Bundle
@@ -87,14 +88,15 @@ class TaskActivity : AppCompatActivity() {
             if (taskName.isNotEmpty()) {
                 val newTask = Task(taskName, formattedDate, selectedWorkoutType, false)
                 taskList.add(newTask)
-                taskAdapter.notifyItemInserted(taskList.size - 1)
-                updateWeeklyCalendar()
+                taskAdapter.notifyItemInserted(taskList.size - 1) // Notify Task List Adapter
+                updateWeeklyCalendar() // Notify Weekly Calendar Adapter
                 etTaskInput.text.clear()
             }
         }
     }
 
     private fun updateWeeklyCalendar() {
+        // Notify the weekly calendar adapter that data has changed
         weeklyCalendarAdapter.notifyDataSetChanged()
     }
 
@@ -187,4 +189,3 @@ class TaskActivity : AppCompatActivity() {
         }
     }
 }
-

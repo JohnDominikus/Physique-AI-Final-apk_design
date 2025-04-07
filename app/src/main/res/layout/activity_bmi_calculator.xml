@@ -1,140 +1,207 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".BmiCalculatorActivity">
+    android:background="#FFFFFF"
+    android:padding="24dp">
 
-    <!-- Gender Selection Buttons -->
-    <LinearLayout
-        android:id="@+id/genderLinearLayout"
+    <!-- Title -->
+    <TextView
+        android:id="@+id/title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
+        android:text="BMI Calculator"
+        android:textColor="#1C1F2A"
+        android:textSize="22sp"
+        android:textStyle="bold"
         app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <!-- Gender Buttons -->
+    <LinearLayout
+        android:id="@+id/genderLayout"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="24dp"
+        app:layout_constraintTop_toBottomOf="@id/title"
         app:layout_constraintStart_toStartOf="parent"
-        android:padding="16dp"
+        app:layout_constraintEnd_toEndOf="parent"
         android:gravity="center">
 
         <Button
-            android:id="@+id/genderMaleButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Male" />
+            android:id="@+id/maleButton"
+            android:layout_width="0dp"
+            android:layout_height="80dp"
+            android:layout_weight="1"
+            android:text="Male"
+            android:textColor="@drawable/gender_text_selector"
+            android:drawableTop="@drawable/ic_male"
+            android:background="@drawable/gender_button_unselected"
+            android:textStyle="bold" />
+
+        <Space
+            android:layout_width="16dp"
+            android:layout_height="wrap_content"/>
 
         <Button
-            android:id="@+id/genderFemaleButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:id="@+id/femaleButton"
+            android:layout_width="0dp"
+            android:layout_height="80dp"
+            android:layout_weight="1"
             android:text="Female"
-            android:layout_marginStart="16dp"/>
+            android:textColor="@drawable/gender_text_selector"
+            android:drawableTop="@drawable/ic_female"
+            android:background="@drawable/gender_button_selected"
+            android:textStyle="bold" />
     </LinearLayout>
 
-    <!-- Height Slider -->
-    <SeekBar
-        android:id="@+id/heightSeekBar"
+    <!-- Input Fields -->
+    <LinearLayout
+        android:id="@+id/inputFields"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:max="250"
+        android:orientation="vertical"
+        android:layout_marginTop="32dp"
+        app:layout_constraintTop_toBottomOf="@id/genderLayout"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        tools:ignore="ExtraText">
+
+        <!-- Height -->
+        <TextView
+            android:text="Height (cm)"
+            android:textColor="#1C1F2A"
+            android:textSize="14sp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <!-- SeekBar for Height -->
+        <SeekBar
+            android:id="@+id/heightSeekBar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:max="250"
         android:progress="170"
-        app:layout_constraintTop_toBottomOf="@id/genderLinearLayout"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="20dp" />
-
-    <TextView
-        android:id="@+id/heightTextView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Height: 170 cm"
-        app:layout_constraintTop_toBottomOf="@id/heightSeekBar"
-        app:layout_constraintStart_toStartOf="parent"
-        android:layout_marginTop="10dp" />
-
-    <!-- Weight Buttons -->
-    <LinearLayout
-        android:id="@+id/weightLinearLayout"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        app:layout_constraintTop_toBottomOf="@id/heightTextView"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:padding="16dp">
-
-        <ImageButton
-            android:id="@+id/weightDecreaseButton"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:src="@drawable/minus"
-            android:contentDescription="Decrease weight"
-            android:padding="8dp" />
+        android:thumb="@drawable/seekbar_thumb"
+        android:progressDrawable="@drawable/seekbar_progress"
+        android:layout_marginTop="8dp" />
 
         <TextView
-            android:id="@+id/weightTextView"
+            android:id="@+id/heightValue"
+            android:text="Height: 170 cm"
+            android:textColor="#1C1F2A"
+            android:textSize="16sp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Weight: 70 kg"
-            android:gravity="center"
-            android:layout_marginHorizontal="16dp"
-            android:textSize="18sp" />
+            android:layout_marginTop="8dp"/>
 
-        <ImageButton
-            android:id="@+id/weightIncreaseButton"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:src="@drawable/add"
-            android:contentDescription="Increase weight"
-            android:padding="8dp" />
-    </LinearLayout>
-
-    <!-- Age Buttons -->
-    <LinearLayout
-        android:id="@+id/ageLinearLayout"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        app:layout_constraintTop_toBottomOf="@id/weightLinearLayout"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:padding="16dp">
-
-        <ImageButton
-            android:id="@+id/ageDecreaseButton"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:src="@drawable/minus"
-            android:contentDescription="Decrease age"
-            android:padding="8dp" />
-
+        <!-- Weight -->
         <TextView
-            android:id="@+id/ageTextView"
+            android:text="Weight (kg)"
+            android:textColor="#1C1F2A"
+            android:textSize="14sp"
+            android:layout_marginTop="12dp"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Age: 25"
-            android:gravity="center"
-            android:layout_marginHorizontal="16dp"
-            android:textSize="18sp" />
+            android:layout_height="wrap_content" />
 
-        <ImageButton
-            android:id="@+id/ageIncreaseButton"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:src="@drawable/add"
-            android:contentDescription="Increase age"
-            android:padding="8dp" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:background="@drawable/input_box"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <ImageButton
+                android:id="@+id/weightMinus"
+                android:layout_width="48dp"
+                android:layout_height="match_parent"
+                android:src="@drawable/minus"
+                android:background="@android:color/white"
+                android:contentDescription="Decrease weight" />
+
+            <EditText
+                android:id="@+id/weightInput"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:inputType="numberDecimal"
+                android:text="80.3"
+                android:textColor="#1C1F2A"
+                android:textSize="18sp"
+                android:background="@android:color/white" />
+
+            <ImageButton
+                android:id="@+id/weightPlus"
+                android:layout_width="48dp"
+                android:layout_height="match_parent"
+                android:src="@drawable/add"
+                android:background="@android:color/white"
+                android:contentDescription="Increase weight" />
+        </LinearLayout>
+
+        <!-- Age -->
+        <TextView
+            android:text="Age"
+            android:textColor="#1C1F2A"
+            android:layout_marginTop="12dp"
+            android:textSize="14sp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:background="@drawable/input_box"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <ImageButton
+                android:id="@+id/ageMinus"
+                android:layout_width="48dp"
+                android:layout_height="match_parent"
+                android:src="@drawable/minus"
+                android:background="@android:color/white"
+                android:contentDescription="Decrease age" />
+
+            <EditText
+                android:id="@+id/ageInput"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:inputType="number"
+                android:text="29"
+                android:textColor="#1C1F2A"
+                android:textSize="18sp"
+                android:background="@android:color/white" />
+
+            <ImageButton
+                android:id="@+id/agePlus"
+                android:layout_width="48dp"
+                android:layout_height="match_parent"
+                android:src="@drawable/add"
+                android:background="@android:color/white"
+                android:contentDescription="Increase age" />
+        </LinearLayout>
     </LinearLayout>
 
     <!-- Calculate Button -->
     <Button
-        android:id="@+id/calculateBMIButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Calculate"
-        app:layout_constraintTop_toBottomOf="@id/ageLinearLayout"
+        android:id="@+id/calculateButton"
+        android:layout_width="0dp"
+        android:layout_height="50dp"
+        android:text="Calculate your BMI!"
+        android:textColor="#FFFFFF"
+        android:textStyle="bold"
+        android:background="@drawable/button_gradient"
+        app:layout_constraintTop_toBottomOf="@id/inputFields"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="16dp" />
+        android:layout_marginTop="32dp" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

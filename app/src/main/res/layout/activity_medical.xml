@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="24dp"
+    android:padding="16dp"
     android:fillViewport="true"
     tools:context=".MedicalActivity">
 
@@ -12,135 +12,151 @@
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:gravity="center_horizontal"
-        android:padding="16dp">
+        android:padding="8dp">
 
         <!-- Back Button -->
-        <Button
+        <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/btnBack"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="← Back"
-            android:backgroundTint="@android:color/darker_gray"
+            android:textSize="20dp"
             android:textColor="@android:color/white"
-            android:paddingHorizontal="32dp"
-            android:paddingVertical="14dp"
-            android:layout_marginBottom="24dp" />
+            android:background="@drawable/button_background"
+            android:paddingHorizontal="24dp"
+            android:paddingVertical="12dp"
+            android:layout_marginBottom="16dp"
+            />
 
         <!-- Title -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Medical Information"
-            android:textSize="28sp"
+            android:textSize="22sp"
             android:textStyle="bold"
             android:textColor="@android:color/black"
-            android:layout_marginBottom="24dp" />
+            android:layout_marginBottom="16dp" />
 
-        <!-- Conditions -->
+        <!-- Condition -->
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Condition:"
-            android:textSize="20sp"
-            android:layout_marginBottom="8dp" />
+            android:textSize="18sp"
+            android:layout_marginBottom="4dp" />
 
         <EditText
             android:id="@+id/editCondition"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="48dp"
             android:hint="Enter condition"
-            android:inputType="text" />
+            android:inputType="text"
+            android:background="@drawable/custom_edittext_background"
+            android:padding="12dp"
+            android:layout_marginBottom="16dp" />
 
         <!-- Medication -->
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Medication:"
-            android:textSize="20sp"
-            android:layout_marginTop="16dp"
-            android:layout_marginBottom="8dp" />
+            android:textSize="18sp"
+            android:layout_marginBottom="4dp" />
 
         <EditText
             android:id="@+id/editMedication"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="48dp"
             android:hint="Enter medication"
-            android:inputType="text" />
+            android:inputType="text"
+            android:background="@drawable/custom_edittext_background"
+            android:padding="12dp"
+            android:layout_marginBottom="16dp" />
 
         <!-- Allergies -->
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Allergies:"
-            android:textSize="20sp"
-            android:layout_marginTop="16dp"
-            android:layout_marginBottom="8dp" />
+            android:textSize="18sp"
+            android:layout_marginBottom="4dp" />
 
         <EditText
             android:id="@+id/editAllergies"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="48dp"
             android:hint="Enter allergies"
-            android:inputType="text" />
+            android:inputType="text"
+            android:background="@drawable/custom_edittext_background"
+            android:padding="12dp"
+            android:layout_marginBottom="16dp" />
 
         <!-- Medical History -->
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Medical History:"
-            android:textSize="20sp"
-            android:layout_marginTop="16dp"
-            android:layout_marginBottom="8dp" />
+            android:textSize="18sp"
+            android:layout_marginBottom="4dp" />
 
         <EditText
             android:id="@+id/editMedicalHistory"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="48dp"
             android:hint="Enter medical history"
-            android:inputType="text" />
+            android:inputType="text"
+            android:background="@drawable/custom_edittext_background"
+            android:padding="12dp"
+            android:layout_marginBottom="16dp" />
 
         <!-- Fractures -->
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Fractures:"
-            android:textSize="20sp"
-            android:layout_marginTop="16dp"
-            android:layout_marginBottom="8dp" />
+            android:textSize="18sp"
+            android:layout_marginBottom="4dp" />
 
         <EditText
             android:id="@+id/editFractures"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="48dp"
             android:hint="Enter fractures"
-            android:inputType="text" />
+            android:inputType="text"
+            android:background="@drawable/custom_edittext_background"
+            android:padding="12dp"
+            android:layout_marginBottom="16dp" />
 
         <!-- Other Conditions -->
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Other Conditions:"
-            android:textSize="20sp"
-            android:layout_marginTop="16dp"
-            android:layout_marginBottom="8dp" />
+            android:textSize="18sp"
+            android:layout_marginBottom="4dp" />
 
         <EditText
             android:id="@+id/editOtherConditions"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="48dp"
             android:hint="Enter other conditions"
-            android:inputType="text" />
+            android:inputType="text"
+            android:background="@drawable/custom_edittext_background"
+            android:padding="12dp"
+            android:layout_marginBottom="24dp" />
 
         <!-- Submit Button -->
-        <Button
+        <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/btnSubmit"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Submit"
-            android:backgroundTint="@android:color/holo_blue_dark"
             android:textColor="@android:color/white"
-            android:paddingHorizontal="32dp"
-            android:paddingVertical="14dp"
-            android:layout_marginTop="24dp" />
+            android:backgroundTint="@android:color/holo_blue_dark"
+            android:paddingHorizontal="24dp"
+            android:paddingVertical="12dp"
+            android:layout_marginTop="16dp"
+             />
     </LinearLayout>
-</ScrollView>
+</androidx.core.widget.NestedScrollView>

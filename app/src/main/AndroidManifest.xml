@@ -38,12 +38,12 @@
         <activity android:name=".MedicalActivity" android:exported="true" />
 
         <!-- 🔹 Functional Activities -->
-        <activity android:name=".WorkoutActivity" android:exported="true" />
+        <!--<activity android:name=".WorkoutActivity" android:exported="true" /> -->
         <activity android:name=".PostureActivity" android:exported="true" />
         <activity android:name=".DietaryActivity" android:exported="true" />
         <activity android:name=".TaskActivity" android:exported="true" />
         <activity android:name=".BmiCalculatorActivity" android:exported="true" />
-
+        <activity android:name=".ResultActivity" android:exported="true" />
     </application>
 
 </manifest>

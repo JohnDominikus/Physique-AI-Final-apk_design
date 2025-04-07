@@ -3,7 +3,9 @@ package com.example.physiqueaiapkfinal.utils
 import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
+import android.text.InputType
 import android.widget.Button
+import android.widget.CheckBox
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.Toast
@@ -13,6 +15,7 @@ import com.example.physiqueaiapkfinal.DashboardActivity
 import com.example.physiqueaiapkfinal.LandingActivity
 import com.google.firebase.auth.FirebaseAuth
 import java.util.concurrent.TimeUnit
+import android.util.Patterns
 
 class LoginActivity : AppCompatActivity() {
 
@@ -46,6 +49,21 @@ class LoginActivity : AppCompatActivity() {
         val etPassword = findViewById<EditText>(R.id.etPassword)
         val btnLogin = findViewById<Button>(R.id.btnLogin)
 
+        // Password visibility toggle
+        val passwordToggle = findViewById<ImageView>(R.id.passwordToggle)
+
+        // Handle Password visibility toggle
+        passwordToggle.setOnClickListener {
+            if (etPassword.inputType == InputType.TYPE_TEXT_VARIATION_PASSWORD) {
+                etPassword.inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD
+                passwordToggle.setImageResource(R.drawable.ic_eye)  // Open eye icon
+            } else {
+                etPassword.inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
+                passwordToggle.setImageResource(R.drawable.ic_eye_open)  // Closed eye icon
+            }
+            etPassword.setSelection(etPassword.text.length)  // Keep cursor at the end
+        }
+
         // Handle Login Button Click
         btnLogin.setOnClickListener {
             val email = etEmail.text.toString().trim().lowercase()
@@ -53,6 +71,11 @@ class LoginActivity : AppCompatActivity() {
 
             if (email.isEmpty() || password.isEmpty()) {
                 Toast.makeText(this, "Please enter both email and password", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+                Toast.makeText(this, "Please enter a valid email address", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 

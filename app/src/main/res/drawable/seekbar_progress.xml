@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Background (unfilled part of the progress bar) -->
+    <item
+        android:id="@android:id/background"
+        android:drawable="@android:color/darker_gray" />
+
+    <!-- Progress (filled part of the progress bar) -->
+    <item
+        android:id="@android:id/progress"
+        android:drawable="@drawable/progress_fill" />
+</layer-list>

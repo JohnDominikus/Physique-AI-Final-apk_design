@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="#FFFFFF"
+    android:padding="24dp">
+
+    <!-- BMI Result Text -->
+    <TextView
+        android:id="@+id/bmiResultText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Your BMI: 0.0"
+        android:textColor="#1C1F2A"
+        android:textSize="28sp"
+        android:textStyle="bold"
+        android:layout_marginTop="32dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:gravity="center" />
+
+    <!-- BMI Status Text -->
+    <TextView
+        android:id="@+id/bmiStatusText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Status: Normal"
+        android:textColor="#1C1F2A"
+        android:textSize="20sp"
+        android:layout_marginTop="16dp"
+        app:layout_constraintTop_toBottomOf="@id/bmiResultText"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:gravity="center"
+        android:textStyle="bold" />
+
+    <!-- BMI Categories Table Layout -->
+    <TableLayout
+        android:id="@+id/bmiCategoriesTable"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
+        android:stretchColumns="1"
+        app:layout_constraintTop_toBottomOf="@id/bmiStatusText"
+        android:background="@drawable/rounded_border"
+        android:padding="16dp"
+        android:elevation="4dp"
+        android:layout_marginBottom="32dp">
+
+        <!-- Table Row 1: BMI Category and Range -->
+        <TableRow>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Underweight:"
+                android:textColor="#FF6347"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:paddingEnd="16dp"
+                android:gravity="end"
+                android:layout_marginEnd="8dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="8dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Bellow 18.5"
+                android:textColor="#1C1F2A"
+                android:textSize="16sp"
+                android:gravity="start"
+                android:layout_marginTop="8dp" />
+        </TableRow>
+
+        <!-- Table Row 2: BMI Category and Range -->
+        <TableRow>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Normal:"
+                android:textColor="#32CD32"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:paddingEnd="16dp"
+                android:gravity="end"
+                android:layout_marginEnd="8dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="8dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="18.5 - 24.9"
+                android:textColor="#1C1F2A"
+                android:textSize="16sp"
+                android:gravity="start"
+                android:layout_marginTop="8dp" />
+        </TableRow>
+
+        <!-- Table Row 3: BMI Category and Range -->
+        <TableRow>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Overweight:"
+                android:textColor="#FFA500"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:paddingEnd="16dp"
+                android:gravity="end"
+                android:layout_marginEnd="8dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="8dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="25 - 29.9"
+                android:textColor="#1C1F2A"
+                android:textSize="16sp"
+                android:gravity="start"
+                android:layout_marginTop="8dp" />
+        </TableRow>
+
+        <!-- Table Row 4: BMI Category and Range -->
+        <TableRow>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Obese:"
+                android:textColor="#FF4500"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:paddingEnd="16dp"
+                android:gravity="end"
+                android:layout_marginEnd="8dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="8dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="≥ 30"
+                android:textColor="#1C1F2A"
+                android:textSize="16sp"
+                android:gravity="start"
+                android:layout_marginTop="8dp" />
+        </TableRow>
+    </TableLayout>
+
+    <!-- Save BMI Button -->
+    <Button
+        android:id="@+id/saveBmiButton"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Save BMI"
+        android:textColor="#FFFFFF"
+        android:backgroundTint="#32CD32"
+    android:textSize="16sp"
+    android:layout_marginTop="32dp"
+    app:layout_constraintTop_toBottomOf="@id/bmiCategoriesTable"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintEnd_toEndOf="parent"
+    android:padding="16dp" />
+
+    <!-- Back to BMI Calculator Activity Button -->
+    <Button
+        android:id="@+id/backToBmiCalculatorButton"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Back to BMI Calculator"
+        android:textColor="#FFFFFF"
+        android:backgroundTint="#FF6347"
+    android:textSize="16sp"
+    android:layout_marginTop="16dp"
+    app:layout_constraintTop_toBottomOf="@id/saveBmiButton"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintEnd_toEndOf="parent"
+    android:padding="16dp" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

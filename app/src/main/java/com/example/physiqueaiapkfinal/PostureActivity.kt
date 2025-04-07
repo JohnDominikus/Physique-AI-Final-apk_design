@@ -1,101 +1,114 @@
 package com.example.physiqueaiapkfinal
 
-
+import android.Manifest
+import android.content.pm.PackageManager
 import android.os.Bundle
+import android.os.CountDownTimer
+import android.util.Log
+import android.view.View
 import android.widget.ImageView
+import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
-import androidx.camera.core.ImageCapture
-import androidx.camera.core.ImageCaptureException
+import androidx.camera.core.CameraSelector
 import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
-import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import androidx.core.view.isVisible
-import androidx.lifecycle.LifecycleOwner
-import com.example.physiqueaiapkfinal.R
 import com.example.physiqueaiapkfinal.databinding.ActivityPostureBinding
 
 class PostureActivity : AppCompatActivity() {
 
-    private lateinit var previewView: androidx.camera.view.PreviewView
-    private lateinit var ivCamera: ImageView
-    private lateinit var imageCapture: ImageCapture
+    private lateinit var binding: ActivityPostureBinding
+    private var isTimerRunning = false
+    private var timer: CountDownTimer? = null
+    private var timeLeftInMillis: Long = 60000 // 1 minute timer
 
-    // Define a variable for the camera provider
-    private lateinit var cameraProvider: ProcessCameraProvider
+    private val cameraPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        if (isGranted) {
+            startCamera()
+        } else {
+            Toast.makeText(this, "Camera permission denied", Toast.LENGTH_SHORT).show()
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val binding = ActivityPostureBinding.inflate(layoutInflater)
+        binding = ActivityPostureBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        previewView = findViewById(R.id.previewView)
-        ivCamera = findViewById(R.id.ivCamera)
-
-        ivCamera.setOnClickListener {
-            captureImage()
+        binding.ivTimer.setOnClickListener {
+            startTimer(binding.tvTimer, binding.ivTimer)
         }
 
-        // Request permissions before starting the camera
-        if (allPermissionsGranted()) {
-            startCamera()
+        binding.ivCamera.setOnClickListener {
+            captureImage(it)
+        }
+
+        // Request camera permission
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
+            != PackageManager.PERMISSION_GRANTED
+        ) {
+            cameraPermissionLauncher.launch(Manifest.permission.CAMERA)
         } else {
-            ActivityCompat.requestPermissions(this, arrayOf(android.Manifest.permission.CAMERA), 10)
+            startCamera()
         }
     }
 
-    private fun allPermissionsGranted() = ContextCompat.checkSelfPermission(
-        this, android.Manifest.permission.CAMERA
-    ) == android.content.pm.PackageManager.PERMISSION_GRANTED
-
     private fun startCamera() {
-        // Bind the camera provider to the lifecycle
         val cameraProviderFuture = ProcessCameraProvider.getInstance(this)
+
         cameraProviderFuture.addListener({
-            cameraProvider = cameraProviderFuture.get()
+            val cameraProvider = cameraProviderFuture.get()
+            val preview = Preview.Builder().build().also {
+                it.setSurfaceProvider(binding.previewView.surfaceProvider)
+            }
 
-            // Preview use case
-            val preview = Preview.Builder()
-                .build()
-                .also {
-                    it.setSurfaceProvider(previewView.surfaceProvider)
-                }
+            val cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
 
-            // ImageCapture use case
-            imageCapture = ImageCapture.Builder()
-                .build()
+            try {
+                cameraProvider.unbindAll()
+                cameraProvider.bindToLifecycle(this, cameraSelector, preview)
+            } catch (e: Exception) {
+                Log.e("CameraX", "Binding failed", e)
+            }
 
-            // Camera selector (rear camera)
-            val cameraSelector = androidx.camera.core.CameraSelector.DEFAULT_BACK_CAMERA
-
-            // Unbind any previous use cases
-            cameraProvider.unbindAll()
-
-            // Bind use cases to camera
-            cameraProvider.bindToLifecycle(
-                this as LifecycleOwner, cameraSelector, preview, imageCapture
-            )
         }, ContextCompat.getMainExecutor(this))
     }
 
-    private fun captureImage() {
-        // Prepare to capture the image
-        val file = java.io.File(filesDir, "captured_image.jpg")
-        val outputOptions = ImageCapture.OutputFileOptions.Builder(file).build()
+    fun captureImage(view: View) {
+        // You can add real capture logic later
+        Toast.makeText(this, "Capture clicked!", Toast.LENGTH_SHORT).show()
+    }
 
-        imageCapture.takePicture(
-            outputOptions,
-            ContextCompat.getMainExecutor(this),
-            object : ImageCapture.OnImageSavedCallback {
-                override fun onImageSaved(outputFileResults: ImageCapture.OutputFileResults) {
-                    Toast.makeText(applicationContext, "Image Saved: ${file.absolutePath}", Toast.LENGTH_SHORT).show()
+    private fun startTimer(tvTimer: TextView, ivTimer: ImageView) {
+        if (isTimerRunning) {
+            timer?.cancel()
+            isTimerRunning = false
+            ivTimer.setImageResource(R.drawable.timer)
+            tvTimer.text = "00:00"
+            tvTimer.visibility = View.GONE
+        } else {
+            timer = object : CountDownTimer(timeLeftInMillis, 1000) {
+                override fun onTick(millisUntilFinished: Long) {
+                    timeLeftInMillis = millisUntilFinished
+                    val minutes = (millisUntilFinished / 1000) / 60
+                    val seconds = (millisUntilFinished / 1000) % 60
+                    tvTimer.text = String.format("%02d:%02d", minutes, seconds)
                 }
 
-                override fun onError(exception: ImageCaptureException) {
-                    Toast.makeText(applicationContext, "Error capturing image", Toast.LENGTH_SHORT).show()
+                override fun onFinish() {
+                    isTimerRunning = false
+                    ivTimer.setImageResource(R.drawable.timer)
+                    tvTimer.visibility = View.GONE
                 }
-            })
+            }.start()
+
+            tvTimer.visibility = View.VISIBLE
+            ivTimer.setImageResource(R.drawable.timer) // Change to another icon if you want
+            isTimerRunning = true
+        }
     }
 }

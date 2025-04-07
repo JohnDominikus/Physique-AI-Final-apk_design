@@ -14,6 +14,7 @@
         android:gravity="center_horizontal"
         android:padding="16dp">
 
+        <!-- Back Button -->
         <Button
             android:id="@+id/btnBackToNext"
             android:layout_width="wrap_content"
@@ -24,13 +25,15 @@
             android:text="← Back"
             android:textColor="@android:color/white" />
 
+        <!-- Title -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Physical Classification"
             android:textSize="28sp"
             android:textStyle="bold"
-            android:layout_marginBottom="24dp" />
+            android:layout_marginBottom="24dp"
+            android:textColor="@android:color/black" />
 
         <!-- Body Level Spinner -->
         <TextView
@@ -38,15 +41,17 @@
             android:layout_height="wrap_content"
             android:text="Body Level:"
             android:textSize="20sp"
-            android:layout_marginBottom="8dp" />
+            android:layout_marginBottom="8dp"
+            android:textColor="@android:color/black" />
 
+        <!-- Custom Spinner Background -->
         <Spinner
             android:id="@+id/spinnerBodyLevel"
             android:layout_width="match_parent"
             android:layout_height="60dp"
             android:spinnerMode="dropdown"
-            android:background="@android:drawable/btn_dropdown"
-            android:layout_marginBottom="20dp" />
+            android:layout_marginBottom="20dp"
+            android:background="@drawable/custom_spinner_background" />
 
         <!-- Body Classification Spinner -->
         <TextView
@@ -54,15 +59,17 @@
             android:layout_height="wrap_content"
             android:text="Body Classification:"
             android:textSize="20sp"
-            android:layout_marginBottom="8dp" />
+            android:layout_marginBottom="8dp"
+            android:textColor="@android:color/black" />
 
+        <!-- Custom Spinner Background -->
         <Spinner
             android:id="@+id/spinnerBodyClassification"
             android:layout_width="match_parent"
             android:layout_height="60dp"
             android:spinnerMode="dropdown"
-            android:background="@android:drawable/btn_dropdown"
-            android:layout_marginBottom="20dp" />
+            android:layout_marginBottom="20dp"
+            android:background="@drawable/custom_spinner_background" />
 
         <!-- Exercise Routine Spinner -->
         <TextView
@@ -70,15 +77,17 @@
             android:layout_height="wrap_content"
             android:text="Exercise Routine:"
             android:textSize="20sp"
-            android:layout_marginBottom="8dp" />
+            android:layout_marginBottom="8dp"
+            android:textColor="@android:color/black" />
 
+        <!-- Custom Spinner Background -->
         <Spinner
             android:id="@+id/spinnerExercise"
             android:layout_width="match_parent"
             android:layout_height="60dp"
             android:spinnerMode="dropdown"
-            android:background="@android:drawable/btn_dropdown"
-            android:layout_marginBottom="20dp" />
+            android:layout_marginBottom="20dp"
+            android:background="@drawable/custom_spinner_background" />
 
         <!-- Other Gym Info Spinner -->
         <TextView
@@ -86,15 +95,17 @@
             android:layout_height="wrap_content"
             android:text="Other Gym Info:"
             android:textSize="20sp"
-            android:layout_marginBottom="8dp" />
+            android:layout_marginBottom="8dp"
+            android:textColor="@android:color/black" />
 
+        <!-- Custom Spinner Background -->
         <Spinner
             android:id="@+id/spinnerOthers"
             android:layout_width="match_parent"
             android:layout_height="60dp"
             android:spinnerMode="dropdown"
-            android:background="@android:drawable/btn_dropdown"
-            android:layout_marginBottom="40dp" />
+            android:layout_marginBottom="40dp"
+            android:background="@drawable/custom_spinner_background" />
 
         <!-- Next Button -->
         <Button

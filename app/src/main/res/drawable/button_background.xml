@@ -1,0 +1,13 @@
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Button background color -->
+    <solid android:color="#00796B"/> <!-- Dark Teal Color -->
+
+    <!-- Rounded corners -->
+    <corners android:radius="12dp"/>
+
+    <!-- Button border color and thickness (optional) -->
+    <stroke android:color="#004D40" android:width="2dp"/>
+
+    <!-- Shadow (optional) -->
+    <padding android:left="8dp" android:top="8dp" android:right="8dp" android:bottom="8dp"/>
+</shape>

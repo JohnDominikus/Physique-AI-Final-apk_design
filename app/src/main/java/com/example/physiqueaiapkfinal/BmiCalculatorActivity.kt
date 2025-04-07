@@ -1,5 +1,6 @@
 package com.example.physiqueaiapkfinal
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.widget.Button
@@ -8,7 +9,6 @@ import android.widget.SeekBar
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import com.example.physiqueaiapkfinal.R
 
 class BmiCalculatorActivity : AppCompatActivity() {
 
@@ -33,20 +33,20 @@ class BmiCalculatorActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_bmi_calculator)
 
-        // Initialize views
-        genderMaleButton = findViewById(R.id.genderMaleButton)
-        genderFemaleButton = findViewById(R.id.genderFemaleButton)
+        // Initialize views from the layout XML
+        genderMaleButton = findViewById(R.id.maleButton)
+        genderFemaleButton = findViewById(R.id.femaleButton)
         heightSeekBar = findViewById(R.id.heightSeekBar)
-        heightTextView = findViewById(R.id.heightTextView)
-        weightDecreaseButton = findViewById(R.id.weightDecreaseButton)
-        weightIncreaseButton = findViewById(R.id.weightIncreaseButton)
-        weightTextView = findViewById(R.id.weightTextView)
-        ageDecreaseButton = findViewById(R.id.ageDecreaseButton)
-        ageIncreaseButton = findViewById(R.id.ageIncreaseButton)
-        ageTextView = findViewById(R.id.ageTextView)
-        calculateBMIButton = findViewById(R.id.calculateBMIButton)
+        heightTextView = findViewById(R.id.heightValue)
+        weightDecreaseButton = findViewById(R.id.weightMinus)
+        weightIncreaseButton = findViewById(R.id.weightPlus)
+        weightTextView = findViewById(R.id.weightInput)
+        ageDecreaseButton = findViewById(R.id.ageMinus)
+        ageIncreaseButton = findViewById(R.id.agePlus)
+        ageTextView = findViewById(R.id.ageInput)
+        calculateBMIButton = findViewById(R.id.calculateButton)
 
-        // Gender buttons click listener
+        // Gender buttons click listeners
         genderMaleButton.setOnClickListener {
             gender = "Male"
             Toast.makeText(this, "Gender: Male", Toast.LENGTH_SHORT).show()
@@ -57,7 +57,7 @@ class BmiCalculatorActivity : AppCompatActivity() {
             Toast.makeText(this, "Gender: Female", Toast.LENGTH_SHORT).show()
         }
 
-        // Height slider listener
+        // Height SeekBar listener
         heightSeekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
                 height = progress
@@ -72,14 +72,14 @@ class BmiCalculatorActivity : AppCompatActivity() {
         weightDecreaseButton.setOnClickListener {
             if (weight > 30) {
                 weight -= 1
-                weightTextView.text = "Weight: $weight kg"
+                weightTextView.text = "$weight"
             }
         }
 
         weightIncreaseButton.setOnClickListener {
             if (weight < 200) {
                 weight += 1
-                weightTextView.text = "Weight: $weight kg"
+                weightTextView.text = "$weight"
             }
         }
 
@@ -87,14 +87,14 @@ class BmiCalculatorActivity : AppCompatActivity() {
         ageDecreaseButton.setOnClickListener {
             if (age > 10) {
                 age -= 1
-                ageTextView.text = "Age: $age"
+                ageTextView.text = "$age"
             }
         }
 
         ageIncreaseButton.setOnClickListener {
             if (age < 100) {
                 age += 1
-                ageTextView.text = "Age: $age"
+                ageTextView.text = "$age"
             }
         }
 
@@ -115,6 +115,10 @@ class BmiCalculatorActivity : AppCompatActivity() {
             else -> "Obese"
         }
 
-        Toast.makeText(this, "Your BMI is: %.2f ($result)".format(bmi), Toast.LENGTH_LONG).show()
+        // Pass the BMI result to the ResultActivity
+        val intent = Intent(this, ResultActivity::class.java)
+        intent.putExtra("BMI", bmi)
+        intent.putExtra("STATUS", result)
+        startActivity(intent)
     }
 }

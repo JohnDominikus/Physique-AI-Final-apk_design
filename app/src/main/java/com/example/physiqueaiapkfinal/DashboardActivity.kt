@@ -11,10 +11,10 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import com.example.physiqueaiapkfinal.utils.LoginActivity
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.android.material.card.MaterialCardView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
-
-
+import com.example.physiqueaiapkfinal.ExerciseActivity
 class DashboardActivity : AppCompatActivity() {
 
     private lateinit var auth: FirebaseAuth
@@ -37,9 +37,7 @@ class DashboardActivity : AppCompatActivity() {
         setupFrameLayoutClickListeners()
 
         // Setup logout button click listener
-        findViewById<View>(R.id.btnLogout).setOnClickListener {
-            showLogoutConfirmationDialog()
-        }
+        setupLogoutButton()
     }
 
     /**
@@ -51,7 +49,8 @@ class DashboardActivity : AppCompatActivity() {
         }
 
         findViewById<View>(R.id.btnExercise).setOnClickListener {
-            navigateToActivity(WorkoutActivity::class.java)
+
+            navigateToActivity(ExerciseActivity::class.java)
         }
 
         findViewById<View>(R.id.btnDietary).setOnClickListener {
@@ -64,6 +63,16 @@ class DashboardActivity : AppCompatActivity() {
 
         findViewById<View>(R.id.btnBMI).setOnClickListener {
             navigateToActivity(BmiCalculatorActivity::class.java)
+        }
+    }
+
+    /**
+     * Setup logout button click listener
+     */
+    private fun setupLogoutButton() {
+        val logoutCard = findViewById<MaterialCardView>(R.id.btnLogout)
+        logoutCard.setOnClickListener {
+            showLogoutConfirmationDialog()
         }
     }
 
@@ -82,8 +91,11 @@ class DashboardActivity : AppCompatActivity() {
 
         bottomNavigation.setOnItemSelectedListener { item ->
             when (item.itemId) {
-                R.id.nav_home -> navigateToActivity(DashboardActivity::class.java)
-                R.id.nav_workout -> navigateToActivity(WorkoutActivity::class.java)
+                R.id.nav_home -> {
+                    // Already on home, no action needed
+                }
+                // Uncomment when WorkoutExerciseActivity is implemented
+                 R.id.nav_workout -> navigateToActivity(ExerciseActivity::class.java)
                 R.id.nav_posture -> navigateToActivity(PostureActivity::class.java)
                 R.id.nav_dietary -> navigateToActivity(DietaryActivity::class.java)
                 R.id.nav_task -> navigateToActivity(TaskActivity::class.java)
@@ -125,6 +137,13 @@ class DashboardActivity : AppCompatActivity() {
                         // Set the user name and physical level
                         tvUserName.text = "$firstName $lastName"
                         tvPhysicalLevel.text = "Level: $physicalLevel"
+
+                        // Show icons based on level
+                        when (physicalLevel.lowercase()) {
+                            "beginner" -> ivStar.visibility = View.VISIBLE
+                            "intermediate" -> ivVerified.visibility = View.VISIBLE
+                            "advanced" -> ivMuscles.visibility = View.VISIBLE
+                        }
                     } else {
                         // Handle the case where the document doesn't exist
                         tvUserName.text = "User data not found"
@@ -179,15 +198,19 @@ class DashboardActivity : AppCompatActivity() {
         // Clear Firebase authentication session
         auth.signOut()
 
-        // Clear cookies (if any, for example via a shared preference)
-        // You can clear cookies by clearing the shared preferences or app-specific cache if used
+        // Clear shared preferences (if you're using it for storing user data)
+        val sharedPreferences = getSharedPreferences("USER_DATA", MODE_PRIVATE)
+        sharedPreferences.edit().clear().apply()
 
+        // Show a toast
         Toast.makeText(this, "Successfully logged out", Toast.LENGTH_SHORT).show()
 
         // Navigate back to the login screen
         val intent = Intent(this, LoginActivity::class.java)
         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         startActivity(intent)
+
+        // Finish the current activity so user cannot return to the dashboard
         finish()
     }
 }
