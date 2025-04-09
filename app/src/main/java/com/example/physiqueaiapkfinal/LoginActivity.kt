@@ -5,7 +5,6 @@ import android.content.SharedPreferences
 import android.os.Bundle
 import android.text.InputType
 import android.widget.Button
-import android.widget.CheckBox
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.Toast
@@ -14,57 +13,72 @@ import com.example.physiqueaiapkfinal.R
 import com.example.physiqueaiapkfinal.DashboardActivity
 import com.example.physiqueaiapkfinal.LandingActivity
 import com.google.firebase.auth.FirebaseAuth
-import java.util.concurrent.TimeUnit
 import android.util.Patterns
+import android.widget.CheckBox
+import android.widget.TextView
+import java.util.concurrent.TimeUnit
 
 class LoginActivity : AppCompatActivity() {
 
     private lateinit var auth: FirebaseAuth
     private lateinit var sharedPreferences: SharedPreferences
+    private var isPasswordVisible = false // Track password visibility state
 
     companion object {
         private const val COOKIE_EXPIRATION_DAYS = 30
         private const val USER_ID_KEY = "USER_ID"
         private const val TIMESTAMP_KEY = "LOGIN_TIMESTAMP"
+        private const val USER_EMAIL_KEY = "USER_EMAIL"
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
 
-        // Initialize Firebase Auth
-        auth = FirebaseAuth.getInstance()
 
-        // Initialize SharedPreferences (for storing cookies)
+        findViewById<TextView>(R.id.tvForgotPassword).setOnClickListener {
+            // Navigate to ForgotPasswordActivity
+            val intent = Intent(this, ForgotPasswordActivity::class.java)
+            startActivity(intent)
+        }
+
+
+        // Initialize Firebase Auth and SharedPreferences
+        auth = FirebaseAuth.getInstance()
         sharedPreferences = getSharedPreferences("USER_DATA", MODE_PRIVATE)
 
-        // Check if the user is already logged in with valid cookies
+        // Check if user is already logged in with valid cookies
         if (isUserLoggedIn()) {
             navigateToDashboard()
             return
         }
 
-        // UI elements
         val etEmail = findViewById<EditText>(R.id.etEmail)
         val etPassword = findViewById<EditText>(R.id.etPassword)
         val btnLogin = findViewById<Button>(R.id.btnLogin)
-
-        // Password visibility toggle
         val passwordToggle = findViewById<ImageView>(R.id.passwordToggle)
 
-        // Handle Password visibility toggle
+        // Password visibility toggle
         passwordToggle.setOnClickListener {
-            if (etPassword.inputType == InputType.TYPE_TEXT_VARIATION_PASSWORD) {
-                etPassword.inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD
-                passwordToggle.setImageResource(R.drawable.ic_eye)  // Open eye icon
+            isPasswordVisible = !isPasswordVisible // Toggle the state
+
+            // Set the input type based on the state
+            etPassword.inputType = if (isPasswordVisible) {
+                InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD
             } else {
-                etPassword.inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
-                passwordToggle.setImageResource(R.drawable.ic_eye_open)  // Closed eye icon
+                InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
             }
-            etPassword.setSelection(etPassword.text.length)  // Keep cursor at the end
+
+            // Move cursor to the end of the text
+            etPassword.setSelection(etPassword.text.length)
+
+            // Update the icon
+            passwordToggle.setImageResource(
+                if (isPasswordVisible) R.drawable.ic_eye else R.drawable.ic_eye_open
+            )
         }
 
-        // Handle Login Button Click
+        // Handle login button click
         btnLogin.setOnClickListener {
             val email = etEmail.text.toString().trim().lowercase()
             val password = etPassword.text.toString().trim()
@@ -79,76 +93,62 @@ class LoginActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
 
-            // Firebase authentication
             loginUser(email, password)
         }
 
-        // Back Button to navigate to LandingActivity
-        val btnBack = findViewById<ImageView>(R.id.btnBack)
-        btnBack.setOnClickListener {
-            val intent = Intent(this, LandingActivity::class.java)
-            startActivity(intent)
-            finish()  // Close LoginActivity after navigating
+        // Back button to navigate to LandingActivity
+        findViewById<ImageView>(R.id.btnBack).setOnClickListener {
+            startActivity(Intent(this, LandingActivity::class.java))
+            finish()
+        }
+
+        // Additional setup for remember me functionality (future feature)
+        val rememberMeCheckbox = findViewById<CheckBox>(R.id.cbRememberMe)
+        rememberMeCheckbox.setOnCheckedChangeListener { _, isChecked ->
+            // Optionally save the checkbox state for future reference
+            val editor = sharedPreferences.edit()
+            editor.putBoolean("REMEMBER_ME", isChecked)
+            editor.apply()
         }
     }
 
-    /**
-     * Function to check if the user is logged in and if the cookie is still valid.
-     * Returns true if logged in and cookie is valid, otherwise false.
-     */
+    // Rest of your existing code remains the same...
     private fun isUserLoggedIn(): Boolean {
         val storedUserId = sharedPreferences.getString(USER_ID_KEY, null)
         val lastLoginTimestamp = sharedPreferences.getLong(TIMESTAMP_KEY, 0)
 
-        // No stored user ID or timestamp means the user is not logged in or cookies are invalid.
         if (storedUserId == null || lastLoginTimestamp == 0L) return false
 
-        // Check if the stored cookie is valid (less than COOKIE_EXPIRATION_DAYS)
         val currentTime = System.currentTimeMillis()
         val daysSinceLastLogin = TimeUnit.MILLISECONDS.toDays(currentTime - lastLoginTimestamp)
 
         return daysSinceLastLogin < COOKIE_EXPIRATION_DAYS
     }
 
-    /**
-     * Firebase Authentication with Email and Password.
-     * Attempts to log the user in using Firebase Auth.
-     */
     private fun loginUser(email: String, password: String) {
         auth.signInWithEmailAndPassword(email, password)
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
                     val user = auth.currentUser
-                    if (user != null) {
-                        saveUserSession(user.uid)
+                    user?.let {
+                        saveUserSession(it.uid, email)
                         Toast.makeText(this, "Login successful!", Toast.LENGTH_SHORT).show()
                         navigateToDashboard()
                     }
                 } else {
-                    Toast.makeText(
-                        this,
-                        "Authentication failed: ${task.exception?.message}",
-                        Toast.LENGTH_LONG
-                    ).show()
+                    Toast.makeText(this, "Authentication failed: ${task.exception?.message}", Toast.LENGTH_LONG).show()
                 }
             }
     }
 
-    /**
-     * Save the user's ID and timestamp in SharedPreferences (cookies)
-     * to persist the login state across sessions.
-     */
-    private fun saveUserSession(userId: String) {
+    private fun saveUserSession(userId: String, userEmail: String) {
         val editor = sharedPreferences.edit()
         editor.putString(USER_ID_KEY, userId)
-        editor.putLong(TIMESTAMP_KEY, System.currentTimeMillis())  // Save current time as last login time
+        editor.putString(USER_EMAIL_KEY, userEmail)
+        editor.putLong(TIMESTAMP_KEY, System.currentTimeMillis())
         editor.apply()
     }
 
-    /**
-     * Navigate to DashboardActivity after a successful login.
-     * Pass the user ID and email for further use in the Dashboard.
-     */
     private fun navigateToDashboard() {
         val user = auth.currentUser
         val userId = user?.uid ?: "Unknown ID"
@@ -161,4 +161,11 @@ class LoginActivity : AppCompatActivity() {
         startActivity(intent)
         finish()
     }
+// Handle Forgot Password click
+
+    private fun showToast(message: String) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+    }
+
+
 }

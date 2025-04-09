@@ -31,18 +31,16 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:gravity="center_horizontal"
-            android:padding="20dp">
+            android:gravity="center"
+            android:padding="20dp"
+            android:layout_centerInParent="true">
 
             <!-- Logo -->
-
-            <!-- App Name -->
             <ImageView
                 android:id="@+id/ivLogo"
-                android:layout_width="100dp"
-                android:layout_height="100dp"
+                android:layout_width="120dp"
+                android:layout_height="120dp"
                 android:layout_marginBottom="16dp"
-                android:layout_marginTop="16dp"
                 android:contentDescription="App Logo"
                 android:src="@drawable/physiqueailogo" />
 
@@ -51,10 +49,10 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Physique Ai"
-                android:textSize="24sp"
+                android:textSize="26sp"
                 android:textStyle="bold"
                 android:textColor="#1C1F2A"
-                android:layout_marginBottom="20dp" />
+                android:layout_marginBottom="24dp" />
 
             <!-- Sign In Section -->
             <LinearLayout
@@ -62,9 +60,9 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:background="@android:color/white"
-                android:padding="20dp"
-                android:elevation="4dp"
-                android:layout_marginBottom="20dp"
+                android:padding="24dp"
+                android:elevation="6dp"
+                android:layout_marginBottom="24dp"
                 android:layout_gravity="center_horizontal"
                 android:backgroundTint="#FFFFFF">
 
@@ -73,28 +71,30 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Sign In"
-                    android:textSize="20sp"
+                    android:textSize="22sp"
                     android:textStyle="bold"
                     android:textColor="#2C3E50"
                     android:layout_gravity="center_horizontal"
-                    android:layout_marginBottom="16dp" />
+                    android:layout_marginBottom="20dp" />
 
                 <!-- Username -->
+
+                <!-- Password -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
+                    android:layout_marginBottom="14dp"
                     android:background="#DDDDDD"
-                    android:padding="8dp"
-                    android:layout_marginBottom="12dp"
-                    android:gravity="center_vertical">
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:padding="10dp">
 
                     <ImageView
                         android:layout_width="24dp"
                         android:layout_height="24dp"
-                        android:src="@drawable/users"
+                        android:layout_marginEnd="8dp"
                         android:contentDescription="Username Icon"
-                        android:layout_marginEnd="8dp" />
+                        android:src="@drawable/users" />
 
                     <EditText
                         android:id="@+id/etEmail"
@@ -102,20 +102,18 @@
                         android:layout_height="48dp"
                         android:hint="Email"
                         android:inputType="textEmailAddress"
-                        android:textColor="#2C3E50"
-                        android:textColorHint="#BDC3C7" />
+                        android:textColor="@color/black"
+                        android:textColorHint="@color/black" />
                 </LinearLayout>
 
-                <!-- Password -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
                     android:background="#DDDDDD"
-                    android:padding="8dp"
-                    android:layout_marginBottom="12dp"
-                    android:gravity="center_vertical"
-                    tools:ignore="ExtraText">
+                    android:padding="10dp"
+                    android:layout_marginBottom="14dp"
+                    android:gravity="center_vertical">
 
                     <ImageView
                         android:layout_width="24dp"
@@ -132,7 +130,7 @@
                         android:hint="Password"
                         android:inputType="textPassword"
                         android:textColor="#2C3E50"
-                        android:textColorHint="#BDC3C7" />
+                        android:textColorHint="@color/black" />
 
                     <!-- Toggle Button for Password Visibility -->
                     <ImageView

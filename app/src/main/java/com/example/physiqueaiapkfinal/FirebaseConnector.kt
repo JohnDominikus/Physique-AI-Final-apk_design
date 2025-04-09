@@ -111,7 +111,6 @@ class UserOperations(private val context: Context) {
     }
 
     // --- Sync Operations ---
-
     /**
      * Syncs all unsynced user records from SQLite to Firestore.
      */
@@ -162,16 +161,16 @@ class UserOperations(private val context: Context) {
         val data = hashMapOf<String, Any>()
         for (column in cursor.columnNames) {
             if (column !in listOf(DatabaseHelper.COLUMN_ID, DatabaseHelper.COLUMN_SYNC_STATUS)) {
-                val index = cursor.getColumnIndexOrThrow(column)
+                val index = cursor.getColumnIndexOrThrow(column) // Throws exception if column is not found
                 when (cursor.getType(index)) {
                     Cursor.FIELD_TYPE_STRING -> {
                         cursor.getStringOrNull(index)?.let { data[column] = it }
                     }
                     Cursor.FIELD_TYPE_INTEGER -> {
-                        data[column] = cursor.getLongOrNull(index) ?: 0L
+                        cursor.getLongOrNull(index)?.let { data[column] = it }
                     }
                     Cursor.FIELD_TYPE_FLOAT -> {
-                        data[column] = cursor.getDoubleOrNull(index) ?: 0.0
+                        cursor.getDoubleOrNull(index)?.let { data[column] = it }
                     }
                 }
             }

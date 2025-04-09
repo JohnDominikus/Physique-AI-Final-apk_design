@@ -9,6 +9,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+//import com.example.physiqueaiapkfinal.DietPlannerActivit
 import com.example.physiqueaiapkfinal.utils.LoginActivity
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.card.MaterialCardView
@@ -54,7 +55,7 @@ class DashboardActivity : AppCompatActivity() {
         }
 
         findViewById<View>(R.id.btnDietary).setOnClickListener {
-            navigateToActivity(DietaryActivity::class.java)
+            navigateToActivity(DietPlannerActivity::class.java)
         }
 
         findViewById<View>(R.id.btnTask).setOnClickListener {
@@ -97,7 +98,7 @@ class DashboardActivity : AppCompatActivity() {
                 // Uncomment when WorkoutExerciseActivity is implemented
                  R.id.nav_workout -> navigateToActivity(ExerciseActivity::class.java)
                 R.id.nav_posture -> navigateToActivity(PostureActivity::class.java)
-                R.id.nav_dietary -> navigateToActivity(DietaryActivity::class.java)
+                R.id.nav_dietary -> navigateToActivity(DietPlannerActivity::class.java)
                 R.id.nav_task -> navigateToActivity(TaskActivity::class.java)
                 else -> Log.e("Dashboard", "Unknown menu item selected")
             }

@@ -131,8 +131,8 @@
             app:cardCornerRadius="12dp"
             app:cardElevation="4dp"
             android:backgroundTint="@color/blue"
-            app:strokeColor="@android:color/darker_gray"
-            app:strokeWidth="1dp"
+            app:strokeColor="@android:color/white"
+            app:strokeWidth="2dp"
             android:clickable="true"
             android:focusable="true">
 
@@ -153,9 +153,9 @@
             android:layout_columnWeight="1"
             app:cardCornerRadius="12dp"
             app:cardElevation="4dp"
-            android:backgroundTint="@color/ash_grey"
-            app:strokeColor="@android:color/darker_gray"
-            app:strokeWidth="1dp"
+            android:backgroundTint="@color/black"
+            app:strokeColor="@android:color/white"
+            app:strokeWidth="2dp"
             android:clickable="true"
             android:focusable="true">
 
@@ -177,8 +177,8 @@
             app:cardCornerRadius="12dp"
             app:cardElevation="4dp"
             android:backgroundTint="@color/green"
-            app:strokeColor="@android:color/darker_gray"
-            app:strokeWidth="1dp"
+            app:strokeColor="@android:color/white"
+            app:strokeWidth="2dp"
             android:clickable="true"
             android:focusable="true">
 
@@ -199,9 +199,9 @@
             android:layout_columnWeight="1"
             app:cardCornerRadius="12dp"
             app:cardElevation="4dp"
-            android:backgroundTint="@color/violet"
-            app:strokeColor="@android:color/darker_gray"
-            app:strokeWidth="1dp"
+            android:backgroundTint="@color/orange"
+            app:strokeColor="@android:color/white"
+            app:strokeWidth="2dp"
             android:clickable="true"
             android:focusable="true">
 
@@ -222,9 +222,9 @@
             android:layout_columnWeight="1"
             app:cardCornerRadius="12dp"
             app:cardElevation="4dp"
-            android:backgroundTint="@color/purple"
-            app:strokeColor="@android:color/darker_gray"
-            app:strokeWidth="1dp"
+            android:backgroundTint="@color/violet"
+            app:strokeColor="@android:color/white"
+            app:strokeWidth="2dp"
             android:clickable="true"
             android:focusable="true">
 
@@ -246,8 +246,8 @@
             app:cardCornerRadius="12dp"
             app:cardElevation="4dp"
             android:backgroundTint="@color/red"
-            app:strokeColor="@android:color/darker_gray"
-            app:strokeWidth="1dp"
+            app:strokeColor="@android:color/white"
+            app:strokeWidth="2dp"
             android:clickable="false"
             android:focusable="false" >
 

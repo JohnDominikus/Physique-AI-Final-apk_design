@@ -20,5 +20,16 @@
 
     <string name="profile_image_description">User profile image</string>
     <string name="welcome_message">Welcome, %s!</string>
+    <string name="video_thumbnail">Video thumbnail</string>
+
+
+    <string name="meal_image">Meal image</string>
+    <string name="meal_image_description">Image of the meal</string>
+    <string name="add_to_plan">Add to Plan</string>
+    <string name="search_meals_hint">Search for meals</string>
+    <string name="add_meal" />
+    <string name="nutrition_summary_default" />
+    <string name="view_pager_description">Swipe left or right to switch between Browse Meals and My Meal Plan</string>
+
 
 </resources>

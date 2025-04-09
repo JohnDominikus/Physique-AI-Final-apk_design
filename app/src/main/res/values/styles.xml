@@ -1,0 +1,35 @@
+<resources>
+    <!-- FilterChip style for customizing chip appearance -->
+    <style name="FilterChip">
+        <!-- Chip Text Color -->
+
+        <!-- Border color -->
+        <item name="chipStrokeColor">@color/chip_stroke_color</item> <!-- Border color -->
+
+        <!-- Border width -->
+        <item name="chipStrokeWidth">1dp</item> <!-- Border thickness -->
+
+        <!-- Background color for the chip -->
+        <item name="chipBackgroundColor">@color/chip_background_color</item> <!-- Default chip background -->
+
+        <!-- Corner radius for chips -->
+        <item name="chipCornerRadius">16dp</item> <!-- Rounded corners -->
+
+        <!-- Icon visibility: false means no icon inside the chip -->
+        <item name="chipIconVisible">false</item> <!-- No icon on the chip -->
+
+        <!-- Customize text appearance within the chip -->
+      <!-- Text Appearance for Chip -->
+
+        <!-- Customize chip padding -->
+        <item name="chipStartPadding">12dp</item> <!-- Left padding -->
+        <item name="chipEndPadding">12dp</item> <!-- Right padding -->
+
+    </style>
+
+    <!-- Chip Text Appearance for consistent text styling -->
+    <style name="ChipTextAppearance">
+        <item name="android:textSize">14sp</item>
+        <item name="android:textColor">@android:color/black</item> <!-- Text color -->
+    </style>
+</resources>

@@ -11,10 +11,12 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
 
     companion object {
         private const val DATABASE_NAME = "PhysiqueAI.db"
-        private const val DATABASE_VERSION = 5
+        private const val DATABASE_VERSION = 6  // Incremented version number
 
         // Table Name
         const val TABLE_USERINFO = "userinfo"
+        const val TABLE_VIDEO_EXERCISES = "video_exercises"
+        const val TABLE_TASKS = "tasks"  // New table for tasks
 
         // Common Columns
         const val COLUMN_ID = "id"
@@ -42,10 +44,8 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
         const val COLUMN_FRACTURES = "fractures"
         const val COLUMN_OTHER_CONDITIONS = "other_conditions"
 
-
-        // Table for Video Exercises
-        const val TABLE_VIDEO_EXERCISES = "video_exercises"
-        const val COLUMN_VIDEO_ID = "id"
+        // Video Exercises
+        const val COLUMN_VIDEO_ID = "video_id"
         const val COLUMN_VIDEO_URL = "video_url"
         const val COLUMN_EXERCISE_TITLE = "exercise_title"
         const val COLUMN_EXERCISE_DESCRIPTION = "exercise_description"
@@ -54,16 +54,18 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
         const val COLUMN_TARGET_WORKOUT_TYPE = "target_workout_type"
         const val COLUMN_VIDEO_DATETIME = "date_time"
 
+        // Task Columns (new)
+        const val COLUMN_TASK_ID = "task_id"
+        const val COLUMN_TASK_NAME = "task_name"
+        const val COLUMN_TASK_DATE = "task_date"
+        const val COLUMN_TASK_WORKOUT_TYPE = "task_workout_type"
+        const val COLUMN_TASK_COMPLETED = "is_completed"
     }
 
-
-
-
-
     override fun onCreate(db: SQLiteDatabase) {
-        createUnifiedTable(db)// for user information
-        createVideoExercisesTable(db) // for  video exercises
-
+        createUnifiedTable(db) // for user information
+        createVideoExercisesTable(db) // for video exercises
+        createTasksTable(db) // for task management
     }
 
     private fun createUnifiedTable(db: SQLiteDatabase) {
@@ -98,14 +100,177 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
         }
     }
 
-    override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
-        if (oldVersion < newVersion) {
-            db.execSQL("DROP TABLE IF EXISTS $TABLE_USERINFO")
-            onCreate(db)
-            Log.d("DatabaseHelper", "Database upgraded to version $newVersion")
+    private fun createVideoExercisesTable(db: SQLiteDatabase) {
+        try {
+            db.execSQL(
+                """
+                CREATE TABLE IF NOT EXISTS $TABLE_VIDEO_EXERCISES (
+                    $COLUMN_VIDEO_ID INTEGER PRIMARY KEY AUTOINCREMENT,
+                    $COLUMN_VIDEO_URL TEXT,
+                    $COLUMN_EXERCISE_TITLE TEXT,
+                    $COLUMN_EXERCISE_DESCRIPTION TEXT,
+                    $COLUMN_DURATION TEXT,
+                    $COLUMN_TARGET_USER_LEVEL TEXT,
+                    $COLUMN_TARGET_WORKOUT_TYPE TEXT,
+                    $COLUMN_VIDEO_DATETIME TEXT
+                )
+                """
+            )
+            Log.d("DatabaseHelper", "Video exercises table created successfully")
+        } catch (e: Exception) {
+            Log.e("DatabaseHelper", "Error creating video exercises table: ${e.message}")
         }
     }
 
+    private fun createTasksTable(db: SQLiteDatabase) {
+        try {
+            db.execSQL(
+                """
+                CREATE TABLE IF NOT EXISTS $TABLE_TASKS (
+                    $COLUMN_TASK_ID INTEGER PRIMARY KEY AUTOINCREMENT,
+                    $COLUMN_TASK_NAME TEXT,
+                    $COLUMN_TASK_DATE TEXT,
+                    $COLUMN_TASK_WORKOUT_TYPE TEXT,
+                    $COLUMN_TASK_COMPLETED INTEGER DEFAULT 0,
+                    $COLUMN_FIREBASE_ID TEXT,
+                    FOREIGN KEY ($COLUMN_FIREBASE_ID) REFERENCES $TABLE_USERINFO($COLUMN_FIREBASE_ID)
+                )
+                """
+            )
+            Log.d("DatabaseHelper", "Tasks table created successfully")
+        } catch (e: Exception) {
+            Log.e("DatabaseHelper", "Error creating tasks table: ${e.message}")
+        }
+    }
+
+    override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
+        if (oldVersion < newVersion) {
+            try {
+                db.execSQL("DROP TABLE IF EXISTS $TABLE_USERINFO")
+                db.execSQL("DROP TABLE IF EXISTS $TABLE_VIDEO_EXERCISES")
+                db.execSQL("DROP TABLE IF EXISTS $TABLE_TASKS")
+                onCreate(db)
+                Log.d("DatabaseHelper", "Database upgraded to version $newVersion")
+            } catch (e: Exception) {
+                Log.e("DatabaseHelper", "Error during database upgrade: ${e.message}")
+            }
+        }
+    }
+
+    // Task-related methods
+    fun insertTask(taskName: String, taskDate: String, workoutType: String, firebaseId: String? = null): Long {
+        val db = writableDatabase
+        var rowId: Long = -1
+
+        try {
+            val values = ContentValues().apply {
+                put(COLUMN_TASK_NAME, taskName)
+                put(COLUMN_TASK_DATE, taskDate)
+                put(COLUMN_TASK_WORKOUT_TYPE, workoutType)
+                put(COLUMN_TASK_COMPLETED, 0)
+                if (firebaseId != null) {
+                    put(COLUMN_FIREBASE_ID, firebaseId)
+                }
+            }
+
+            rowId = db.insert(TABLE_TASKS, null, values)
+            Log.d("DatabaseHelper", "Task inserted successfully. Row ID: $rowId")
+        } catch (e: Exception) {
+            Log.e("DatabaseHelper", "Error inserting task: ${e.message}")
+        } finally {
+            db.close()
+        }
+
+        return rowId
+    }
+
+    fun getAllTasks(firebaseId: String? = null): Cursor {
+        val db = readableDatabase
+        return if (firebaseId != null) {
+            db.query(
+                TABLE_TASKS,
+                null,
+                "$COLUMN_FIREBASE_ID = ?",
+                arrayOf(firebaseId),
+                null,
+                null,
+                "$COLUMN_TASK_DATE ASC"
+            )
+        } else {
+            db.query(
+                TABLE_TASKS,
+                null,
+                null,
+                null,
+                null,
+                null,
+                "$COLUMN_TASK_DATE ASC"
+            )
+        }
+    }
+
+    fun updateTaskCompletion(taskId: Long, isCompleted: Boolean): Int {
+        val db = writableDatabase
+        var rowsAffected = 0
+
+        try {
+            val values = ContentValues().apply {
+                put(COLUMN_TASK_COMPLETED, if (isCompleted) 1 else 0)
+            }
+
+            rowsAffected = db.update(
+                TABLE_TASKS,
+                values,
+                "$COLUMN_TASK_ID = ?",
+                arrayOf(taskId.toString())
+            )
+            Log.d("DatabaseHelper", "Task $taskId completion updated to $isCompleted. Rows affected: $rowsAffected")
+        } catch (e: Exception) {
+            Log.e("DatabaseHelper", "Error updating task completion: ${e.message}")
+        } finally {
+            db.close()
+        }
+
+        return rowsAffected
+    }
+
+    fun deleteTask(taskId: Long): Int {
+        val db = writableDatabase
+        var rowsDeleted = 0
+
+        try {
+            rowsDeleted = db.delete(
+                TABLE_TASKS,
+                "$COLUMN_TASK_ID = ?",
+                arrayOf(taskId.toString())
+            )
+            Log.d("DatabaseHelper", "Task $taskId deleted. Rows deleted: $rowsDeleted")
+        } catch (e: Exception) {
+            Log.e("DatabaseHelper", "Error deleting task: ${e.message}")
+        } finally {
+            db.close()
+        }
+
+        return rowsDeleted
+    }
+
+    fun getTasksForDate(date: String, firebaseId: String? = null): Cursor {
+        val db = readableDatabase
+        val selection = "$COLUMN_TASK_DATE LIKE ?" + if (firebaseId != null) " AND $COLUMN_FIREBASE_ID = ?" else ""
+        val selectionArgs = if (firebaseId != null) arrayOf("$date%", firebaseId) else arrayOf("$date%")
+
+        return db.query(
+            TABLE_TASKS,
+            null,
+            selection,
+            selectionArgs,
+            null,
+            null,
+            "$COLUMN_TASK_DATE ASC"
+        )
+    }
+
+    // Existing methods remain unchanged...
     fun markAsSynced(localId: String) {
         writableDatabase.use { db ->
             try {
@@ -218,35 +383,18 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
             Log.d("DatabaseHelper", "All records deleted.")
         }
     }
+
     fun clearAllRecordsVideo() {
         writableDatabase.use { db ->
             db.execSQL("DELETE FROM $TABLE_VIDEO_EXERCISES")
-            Log.d("DatabaseHelper", "All records deleted.")
+            Log.d("DatabaseHelper", "All video records deleted.")
         }
     }
 
-    private fun createVideoExercisesTable(db: SQLiteDatabase) {
-        try {
-            db.execSQL(
-                """
-            CREATE TABLE IF NOT EXISTS $TABLE_VIDEO_EXERCISES (
-                $COLUMN_VIDEO_ID INTEGER PRIMARY KEY AUTOINCREMENT,
-                $COLUMN_VIDEO_URL TEXT,
-                $COLUMN_EXERCISE_TITLE TEXT,
-                $COLUMN_EXERCISE_DESCRIPTION TEXT,
-                $COLUMN_DURATION TEXT,
-                $COLUMN_TARGET_USER_LEVEL TEXT,
-                $COLUMN_TARGET_WORKOUT_TYPE TEXT,
-                $COLUMN_VIDEO_DATETIME TEXT
-            )
-            """
-            )
-            Log.d("DatabaseHelper", "Video exercises table created successfully")
-        } catch (e: Exception) {
-            Log.e("DatabaseHelper", "Error creating video exercises table: ${e.message}")
+    fun clearAllTasks() {
+        writableDatabase.use { db ->
+            db.execSQL("DELETE FROM $TABLE_TASKS")
+            Log.d("DatabaseHelper", "All tasks deleted.")
         }
     }
-
-
-
 }

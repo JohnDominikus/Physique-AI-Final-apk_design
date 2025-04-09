@@ -1,3 +1,24 @@
 <resources>
     <dimen name="fab_margin">16dp</dimen>
+       <!-- Card Dimensions -->
+        <dimen name="card_corner_radius">8dp</dimen>
+        <dimen name="card_elevation">4dp</dimen>
+        <dimen name="card_margin">8dp</dimen>
+        <dimen name="card_padding">12dp</dimen>
+
+        <!-- Text Sizes -->
+        <dimen name="text_size_headline">20sp</dimen>
+        <dimen name="text_size_title">16sp</dimen>
+        <dimen name="text_size_body">14sp</dimen>
+        <dimen name="text_size_caption">12sp</dimen>
+
+        <!-- Spacing -->
+        <dimen name="spacing_large">16dp</dimen>
+        <dimen name="spacing_medium">8dp</dimen>
+        <dimen name="spacing_small">4dp</dimen>
+
+        <!-- Tab Layout -->
+        <dimen name="tab_indicator_height">4dp</dimen>
+        <dimen name="tab_padding">16dp</dimen>
+
 </resources>

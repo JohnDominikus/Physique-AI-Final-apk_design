@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- State when the chip is checked (selected) -->
+    <item android:drawable="@color/lightGray" android:state_checked="true" />
+
+    <!-- State when the chip is not checked (deselected) -->
+    <item android:drawable="@color/ash_grey" />
+</selector>

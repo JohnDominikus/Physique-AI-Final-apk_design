@@ -3,6 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:background="?attr/selectableItemBackground"
     android:padding="16dp">
 
     <!-- Task Name -->
@@ -13,9 +15,14 @@
         android:text="Task Name"
         android:textSize="16sp"
         android:textColor="@android:color/black"
+        android:textStyle="bold"
+        android:ellipsize="end"
+        android:maxLines="1"
         app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/cbTask"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintHorizontal_bias="0"
+        tools:text="Complete workout routine" />
 
     <!-- Task Date -->
     <TextView
@@ -25,8 +32,23 @@
         android:text="Date"
         android:textSize="12sp"
         android:textColor="@android:color/darker_gray"
-        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginTop="4dp"
         app:layout_constraintTop_toBottomOf="@id/tvTaskName"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/cbTask"
+        tools:text="Today, 3:00 PM" />
+
+    <!-- Workout Type Chip -->
+    <com.google.android.material.chip.Chip
+        android:id="@+id/chipWorkoutType"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="Cardio"
+        style="@style/Widget.MaterialComponents.Chip.Entry"
+        app:chipBackgroundColor="@color/chip_background_color"
+        app:layout_constraintTop_toBottomOf="@id/tvTaskDate"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
     <!-- Task Checkbox -->
@@ -34,9 +56,34 @@
         android:id="@+id/cbTask"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Completed"
+        android:buttonTint="@color/colorPrimary"
+        android:layout_marginTop="8dp"
+        app:layout_constraintTop_toBottomOf="@id/chipWorkoutType"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- Delete Button -->
+    <ImageButton
+        android:id="@+id/btnDeleteTask"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_marginTop="8dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:contentDescription="@string/action_settings"
+        android:src="@drawable/ic_delete"
+        app:tint="@android:color/black"
+        app:layout_constraintTop_toBottomOf="@id/cbTask"
+        app:layout_constraintEnd_toEndOf="parent"
+        tools:ignore="UseAppTint,TouchTargetSizeCheck" />
+
+    <!-- Divider Line -->
+    <View
+        android:layout_width="0dp"
+        android:layout_height="1dp"
+        android:layout_marginTop="16dp"
+        android:background="@android:color/darker_gray"
+        android:alpha="0.1"
+        app:layout_constraintTop_toBottomOf="@id/btnDeleteTask"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tvTaskDate"
         app:layout_constraintEnd_toEndOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

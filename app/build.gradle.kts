@@ -54,6 +54,18 @@ dependencies {
     implementation ("androidx.cardview:cardview:1.0.0")
     implementation ("com.google.android.material:material:1.10.0")
 
+    //temporary
+    implementation ("com.github.bumptech.glide:glide:4.12.0")
+    implementation(libs.androidx.media3.common.ktx)
+    annotationProcessor ("com.github.bumptech.glide:compiler:4.12.0")
+
+    implementation ("androidx.appcompat:appcompat:1.4.0")
+    implementation ("com.google.android.material:material:1.4.0")
+    implementation  ("androidx.lifecycle:lifecycle-viewmodel-ktx:2.4.0")
+    implementation ("androidx.fragment:fragment-ktx:1.4.0")
+
+
+
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
     implementation(libs.androidx.constraintlayout)
@@ -69,4 +81,8 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
+}
+
+fun import(s: String) {
+
 }

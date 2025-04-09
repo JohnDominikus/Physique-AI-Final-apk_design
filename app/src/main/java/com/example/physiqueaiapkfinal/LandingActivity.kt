@@ -10,6 +10,7 @@ import com.example.physiqueaiapkfinal.databinding.ActivityLandingBinding
 import com.example.physiqueaiapkfinal.utils.LoginActivity
 import com.google.firebase.auth.FirebaseAuth
 import android.app.ActivityOptions
+import com.example.physiqueaiapkfinal.RegisterActivity
 
 class LandingActivity : AppCompatActivity() {
 

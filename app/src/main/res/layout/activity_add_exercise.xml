@@ -40,9 +40,10 @@
             android:id="@+id/exerciseName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
             android:hint="Exercise Name"
             android:inputType="textCapWords"
-            android:layout_marginTop="16dp" />
+            android:minHeight="48dp" />
 
         <!-- Exercise Details -->
         <EditText
@@ -60,9 +61,10 @@
             android:id="@+id/exerciseTime"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
             android:hint="Time (e.g., 30s, 1m)"
             android:inputType="text"
-            android:layout_marginTop="8dp" />
+            android:minHeight="48dp" />
 
         <!-- Exercise Level Spinner -->
         <Spinner
