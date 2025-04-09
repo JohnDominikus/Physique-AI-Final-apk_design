@@ -1,21 +1,25 @@
 package com.example.physiqueaiapkfinal
 
+import com.example.physiqueaiapkfinal.BmiCalculatorActivity
 import android.content.Intent
+import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
+import android.view.MenuItem
 import android.view.View
 import android.widget.ImageView
+import android.widget.PopupMenu
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-//import com.example.physiqueaiapkfinal.DietPlannerActivit
 import com.example.physiqueaiapkfinal.utils.LoginActivity
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.card.MaterialCardView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.example.physiqueaiapkfinal.ExerciseActivity
+
 class DashboardActivity : AppCompatActivity() {
 
     private lateinit var auth: FirebaseAuth
@@ -34,41 +38,42 @@ class DashboardActivity : AppCompatActivity() {
         // Setup bottom navigation
         setupBottomNavigation()
 
-        // Setup click listeners for the FrameLayout widgets in the GridLayout
+        // Setup click listeners for the FrameLayout widgets
         setupFrameLayoutClickListeners()
 
         // Setup logout button click listener
         setupLogoutButton()
+
+        // Setup settings icon click listener (assumed id: ivSettings)
+        val ivSettings = findViewById<ImageView>(R.id.ivSettings)
+        ivSettings.setOnClickListener { view ->
+            showSettingsMenu(view)
+        }
     }
 
     /**
-     * Setup the click listeners for the FrameLayout widgets
+     * Setup the click listeners for the FrameLayout widgets.
      */
     private fun setupFrameLayoutClickListeners() {
         findViewById<View>(R.id.btnPosture).setOnClickListener {
             navigateToActivity(PostureActivity::class.java)
         }
-
         findViewById<View>(R.id.btnExercise).setOnClickListener {
-
             navigateToActivity(ExerciseActivity::class.java)
         }
-
         findViewById<View>(R.id.btnDietary).setOnClickListener {
             navigateToActivity(DietPlannerActivity::class.java)
         }
-
         findViewById<View>(R.id.btnTask).setOnClickListener {
             navigateToActivity(TaskActivity::class.java)
         }
-
         findViewById<View>(R.id.btnBMI).setOnClickListener {
             navigateToActivity(BmiCalculatorActivity::class.java)
         }
     }
 
     /**
-     * Setup logout button click listener
+     * Setup logout button click listener.
      */
     private fun setupLogoutButton() {
         val logoutCard = findViewById<MaterialCardView>(R.id.btnLogout)
@@ -85,18 +90,14 @@ class DashboardActivity : AppCompatActivity() {
     }
 
     /**
-     * Setup bottom navigation item selection logic
+     * Setup bottom navigation item selection logic.
      */
     private fun setupBottomNavigation() {
         val bottomNavigation = findViewById<BottomNavigationView>(R.id.bottom_navigation)
-
         bottomNavigation.setOnItemSelectedListener { item ->
             when (item.itemId) {
-                R.id.nav_home -> {
-                    // Already on home, no action needed
-                }
-                // Uncomment when WorkoutExerciseActivity is implemented
-                 R.id.nav_workout -> navigateToActivity(ExerciseActivity::class.java)
+                R.id.nav_home -> { /* Already on home */ }
+                R.id.nav_workout -> navigateToActivity(ExerciseActivity::class.java)
                 R.id.nav_posture -> navigateToActivity(PostureActivity::class.java)
                 R.id.nav_dietary -> navigateToActivity(DietPlannerActivity::class.java)
                 R.id.nav_task -> navigateToActivity(TaskActivity::class.java)
@@ -115,103 +116,138 @@ class DashboardActivity : AppCompatActivity() {
         val ivStar = findViewById<ImageView>(R.id.ivStar)
         val ivVerified = findViewById<ImageView>(R.id.ivVerified)
         val ivMuscles = findViewById<ImageView>(R.id.ivMuscles)
+        val tvBmiStatus = findViewById<TextView>(R.id.tvBmiStatus)
 
-        // Hide all icons initially
         hideIcons(ivStar, ivVerified, ivMuscles)
 
-        val currentUser = auth.currentUser
-
-        if (currentUser != null) {
-            val uid = currentUser.uid
-
-            // Fetch user data from Firestore using UID
-            firestore.collection("userinfo")
-                .document(uid)
-                .get()
-                .addOnSuccessListener { documentSnapshot ->
-                    if (documentSnapshot.exists()) {
-                        // Get user data from Firestore
-                        val firstName = documentSnapshot.getString("personalInfo.firstName") ?: "N/A"
-                        val lastName = documentSnapshot.getString("personalInfo.lastName") ?: "N/A"
-                        val physicalLevel = documentSnapshot.getString("physicalInfo.level") ?: "Beginner"
-
-                        // Set the user name and physical level
-                        tvUserName.text = "$firstName $lastName"
-                        tvPhysicalLevel.text = "Level: $physicalLevel"
-
-                        // Show icons based on level
-                        when (physicalLevel.lowercase()) {
-                            "beginner" -> ivStar.visibility = View.VISIBLE
-                            "intermediate" -> ivVerified.visibility = View.VISIBLE
-                            "advanced" -> ivMuscles.visibility = View.VISIBLE
-                        }
-                    } else {
-                        // Handle the case where the document doesn't exist
-                        tvUserName.text = "User data not found"
-                        tvPhysicalLevel.text = "Level: N/A"
-                    }
-                }
-                .addOnFailureListener { exception ->
-                    Log.e("Dashboard", "Error fetching user data: ${exception.message}")
-                    tvUserName.text = "Error"
-                    tvPhysicalLevel.text = "Unable to fetch data"
-                }
-        } else {
-            Log.e("Dashboard", "No authenticated user found")
-            // Handle case when there's no authenticated user
-            tvUserName.text = "Guest User"
-            tvPhysicalLevel.text = "Level: N/A"
+        val uid = auth.currentUser?.uid ?: run {
+            Log.w("Dashboard", "No authenticated user")
+            startActivity(Intent(this, LoginActivity::class.java))
+            finish()
+            return
         }
+
+        firestore.collection("userinfo").document(uid)
+            .get()
+            .addOnSuccessListener { document ->
+                if (document.exists()) {
+                    // Retrieve physicalInfo
+                    val physicalInfo = document.get("physicalInfo") as? Map<String, Any>
+                    val bodyLevel = physicalInfo?.get("bodyLevel")?.toString()?.lowercase() ?: "beginner"
+                    tvPhysicalLevel.text = "Level: ${bodyLevel.replaceFirstChar { it.uppercase() }}"
+
+                    when (bodyLevel) {
+                        "beginner" -> ivStar.visibility = View.VISIBLE
+                        "intermediate" -> ivVerified.visibility = View.VISIBLE
+                        "advanced" -> ivMuscles.visibility = View.VISIBLE
+                        else -> ivStar.visibility = View.VISIBLE
+                    }
+
+                    // Retrieve personalInfo
+                    val personalInfo = document.get("personalInfo") as? Map<String, Any>
+                    val firstName = personalInfo?.get("firstName")?.toString() ?: ""
+                    val lastName = personalInfo?.get("lastName")?.toString() ?: ""
+                    tvUserName.text = "$firstName $lastName".trim()
+
+                    // Retrieve bmiInfo and update BMI status TextView.
+                    val bmiInfo = document.get("bmiInfo") as? Map<String, Any>
+                    val rawStatus = bmiInfo?.get("status")?.toString()?.trim()?.lowercase() ?: ""
+                    val (statusToDisplay, color) = when (rawStatus) {
+                        "normal" -> Pair("Normal", Color.GREEN)
+                        "overweight" -> Pair("Overweight", Color.RED)
+                        "underweight" -> Pair("Underweight", Color.RED)
+                        "obese" -> Pair("Obese", Color.parseColor("#FFA500")) // Orange
+                        "" -> Pair("N/A", Color.GRAY)
+                        else -> Pair("Unknown", Color.GRAY)
+                    }
+                    tvBmiStatus.apply {
+                        text = "BMI Status: $statusToDisplay"
+                        setTextColor(color)
+                    }
+                } else {
+                    Log.w("Dashboard", "No document found for user $uid")
+                    showDataNotFoundWarning()
+                }
+            }
+            .addOnFailureListener { e ->
+                Log.e("Dashboard", "Firestore fetch failed", e)
+                Toast.makeText(this, "Error loading profile", Toast.LENGTH_SHORT).show()
+            }
     }
 
     /**
-     * Hides all physical level icons.
+     * Hides all provided image views.
      */
     private fun hideIcons(vararg icons: ImageView) {
         icons.forEach { it.visibility = View.GONE }
     }
 
     /**
-     * Show the logout confirmation dialog.
+     * Displays a settings menu (pop-up menu) when ivSettings is clicked.
      */
-    private fun showLogoutConfirmationDialog() {
-        val builder = AlertDialog.Builder(this)
-        builder.setTitle("Logout")
-        builder.setMessage("Do you want to logout?")
-        builder.setCancelable(false)
-
-        builder.setPositiveButton("Yes") { dialog, _ ->
-            logoutUser()
-            dialog.dismiss()
+    private fun showSettingsMenu(anchor: View) {
+        val popup = PopupMenu(this, anchor)
+        popup.menuInflater.inflate(R.menu.settings_menu, popup.menu)
+        popup.setOnMenuItemClickListener { menuItem: MenuItem ->
+            when (menuItem.itemId) {
+                R.id.menu_profile -> {
+                    // Navigate to the ProfileActivity
+                    startActivity(Intent(this, ProfileActivity::class.java))
+                    true
+                }
+                R.id.menu_logout -> {
+                    showLogoutConfirmationDialog()
+                    true
+                }
+                else -> false
+            }
         }
-
-        builder.setNegativeButton("No") { dialog, _ ->
-            dialog.dismiss()
-        }
-
-        builder.show()
+        popup.show()
     }
 
     /**
-     * Logs the user out and clears their session.
+     * Displays a dialog prompting the user to complete their profile.
+     */
+    private fun showDataNotFoundWarning() {
+        AlertDialog.Builder(this)
+            .setTitle("Profile Incomplete")
+            .setMessage("Please complete your profile setup.")
+            .setPositiveButton("Go to Profile") { _, _ ->
+                startActivity(Intent(this, ProfileActivity::class.java))
+            }
+            .setNegativeButton("Cancel", null)
+            .show()
+    }
+
+    /**
+     * Displays a logout confirmation dialog.
+     */
+    private fun showLogoutConfirmationDialog() {
+        AlertDialog.Builder(this)
+            .setTitle("Logout")
+            .setMessage("Do you want to logout?")
+            .setCancelable(false)
+            .setPositiveButton("Yes") { dialog, _ ->
+                logoutUser()
+                dialog.dismiss()
+            }
+            .setNegativeButton("No") { dialog, _ ->
+                dialog.dismiss()
+            }
+            .show()
+    }
+
+    /**
+     * Logs out the user, clears session data, and navigates to the login screen.
      */
     private fun logoutUser() {
-        // Clear Firebase authentication session
         auth.signOut()
-
-        // Clear shared preferences (if you're using it for storing user data)
         val sharedPreferences = getSharedPreferences("USER_DATA", MODE_PRIVATE)
         sharedPreferences.edit().clear().apply()
-
-        // Show a toast
         Toast.makeText(this, "Successfully logged out", Toast.LENGTH_SHORT).show()
-
-        // Navigate back to the login screen
         val intent = Intent(this, LoginActivity::class.java)
         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         startActivity(intent)
-
-        // Finish the current activity so user cannot return to the dashboard
         finish()
     }
 }

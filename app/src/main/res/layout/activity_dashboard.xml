@@ -7,6 +7,18 @@
     android:background="@color/white"
     tools:context=".DashboardActivity">
 
+    <!-- Dashboard Title -->
+    <TextView
+        android:id="@+id/tvDashboardTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Dashboard"
+        android:textSize="24sp"
+        android:textColor="@android:color/black"
+        android:textStyle="bold"
+        android:layout_alignParentTop="true"
+        android:layout_marginBottom="16dp" />
+
     <!-- Profile Section -->
     <LinearLayout
         android:id="@+id/llProfile"
@@ -14,7 +26,8 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:gravity="center_vertical"
-        android:layout_marginBottom="16dp">
+        android:layout_marginBottom="16dp"
+        android:layout_below="@id/tvDashboardTitle">
 
         <ImageView
             android:id="@+id/ivProfile"
@@ -41,10 +54,10 @@
                 android:textStyle="bold" />
 
             <TextView
-                android:id="@+id/tvPhysicalInfo"
+                android:id="@+id/tvBmiStatus"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Weight: 75kg"
+                android:text="BMI: 24.0"
                 android:textSize="14sp"
                 android:textColor="@android:color/darker_gray"
                 android:layout_marginTop="4dp" />
@@ -76,7 +89,6 @@
                     android:layout_height="18dp"
                     android:src="@drawable/verified"
                     android:visibility="gone" />
-
                 <TextView
                     android:id="@+id/tvPhysicalLevel"
                     android:layout_width="wrap_content"
@@ -85,21 +97,20 @@
                     android:textSize="14sp"
                     android:textColor="@color/green"
                     android:layout_marginStart="8dp" />
+
             </LinearLayout>
         </LinearLayout>
 
         <ImageView
             android:id="@+id/ivSettings"
-            android:layout_width="32dp"
-            android:layout_height="32dp"
-            android:layout_marginStart="12dp"
-            android:clickable="true"
-            android:contentDescription="Settings"
-            android:focusable="true"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:src="@drawable/settings"
-            tools:ignore="TouchTargetSizeCheck" />
+            android:contentDescription="Settings" />
+
     </LinearLayout>
 
+    <!-- Welcome Message -->
     <TextView
         android:id="@+id/tvWelcome"
         android:layout_width="match_parent"

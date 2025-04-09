@@ -4,7 +4,10 @@ import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.auth.FirebaseAuth
 
 class ResultActivity : AppCompatActivity() {
 
@@ -12,6 +15,9 @@ class ResultActivity : AppCompatActivity() {
     private lateinit var bmiStatusText: TextView
     private lateinit var saveBmiButton: Button
     private lateinit var backToBmiCalculatorButton: Button
+
+    private val firestore = FirebaseFirestore.getInstance()
+    private val auth = FirebaseAuth.getInstance()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -33,7 +39,7 @@ class ResultActivity : AppCompatActivity() {
 
         // Handle Save BMI button
         saveBmiButton.setOnClickListener {
-            // Implement save BMI functionality here (e.g., save to database or SharedPreferences)
+            saveBmiInfo(bmi, status)
         }
 
         // Handle Back to BMI Calculator button
@@ -41,6 +47,30 @@ class ResultActivity : AppCompatActivity() {
             val intent = Intent(this, BmiCalculatorActivity::class.java)
             startActivity(intent)
             finish()  // Optionally finish this activity to prevent going back to it
+        }
+    }
+
+    private fun saveBmiInfo(bmi: Double, status: String?) {
+        val uid = auth.currentUser?.uid
+        if (uid != null) {
+            val bmiInfo = hashMapOf(
+                "bmi" to bmi,
+                "status" to status,
+                "timestamp" to System.currentTimeMillis()  // Optional timestamp to track when the data was saved
+            )
+
+            // Save to Firestore
+            firestore.collection("userinfo")
+                .document(uid)
+                .update("bmiInfo", bmiInfo)
+                .addOnSuccessListener {
+                    Toast.makeText(this, "BMI info saved!", Toast.LENGTH_SHORT).show()
+                }
+                .addOnFailureListener { e ->
+                    Toast.makeText(this, "Error saving BMI info: $e", Toast.LENGTH_SHORT).show()
+                }
+        } else {
+            Toast.makeText(this, "User not authenticated", Toast.LENGTH_SHORT).show()
         }
     }
 }

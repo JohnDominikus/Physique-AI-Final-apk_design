@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp">
+
+    <!-- User Name -->
+    <TextView
+        android:id="@+id/tvName"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Name: "
+        android:textSize="18sp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent" />
+
+    <!-- Email -->
+    <TextView
+        android:id="@+id/tvEmail"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Email: "
+        android:textSize="16sp"
+        app:layout_constraintTop_toBottomOf="@id/tvName"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        android:layout_marginTop="8dp" />
+
+    <!-- Birthdate -->
+    <TextView
+        android:id="@+id/tvBirthdate"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Birthdate: "
+        android:textSize="16sp"
+        app:layout_constraintTop_toBottomOf="@id/tvEmail"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        android:layout_marginTop="8dp" />
+
+    <!-- Phone -->
+    <TextView
+        android:id="@+id/tvPhone"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Phone: "
+        android:textSize="16sp"
+        app:layout_constraintTop_toBottomOf="@id/tvBirthdate"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        android:layout_marginTop="8dp" />
+
+    <!-- BMI Status -->
+    <TextView
+        android:id="@+id/tvBMIStatus"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="BMI Status: "
+        android:textSize="16sp"
+        app:layout_constraintTop_toBottomOf="@id/tvPhone"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        android:layout_marginTop="8dp" />
+
+    <!-- BMI -->
+    <TextView
+        android:id="@+id/tvBMI"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="BMI: "
+        android:textSize="16sp"
+        app:layout_constraintTop_toBottomOf="@id/tvBMIStatus"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        android:layout_marginTop="8dp" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

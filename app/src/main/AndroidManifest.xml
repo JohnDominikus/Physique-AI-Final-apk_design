@@ -13,7 +13,7 @@
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
         android:icon="@mipmap/ic_launcher"
-        android:label="@string/app_name"
+        android:label="Physique Ai"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Physiqueaiapkfinal">
@@ -32,7 +32,7 @@
         <activity android:name=".RegisterActivity" android:exported="true" />
         <activity android:name=".utils.LoginActivity" android:exported="true" />
         <activity android:name=".DashboardActivity" android:exported="true" />
-
+        <activity android:name=".ProfileActivity" />
         <!-- 🔹 Physical and Medical Activities -->
         <activity android:name=".PhysicalActivity" android:exported="true" />
         <activity android:name=".MedicalActivity" android:exported="true" />
