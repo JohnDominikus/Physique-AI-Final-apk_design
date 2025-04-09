@@ -6,15 +6,43 @@
 ![image](https://github.com/user-attachments/assets/fce801d9-1d5f-4fe0-8e83-80b48b1eb40a)
 
 
-PASTE YOUR  URL   :
+PASTE YOUR  URL   :  https://github.com/JohnDominikus/PhysiqueAIThesisFinal.git
  AND CLONE  IT
 
   ![image](https://github.com/user-attachments/assets/d9f64f32-0fa9-41e5-ada1-d1401b989557)
   
+ PLEASE  DO  NOT USE THE MAIN BRACH  USE  
+
+use  this   
+
+ git brach (lastname)
+ 
+  if  you  have problem  on your git  use  this
+
+  git init
+
+  then
+git config --global user.name "Your Name"
+git config --global user.email "your@email.com"
 
 
+then  if  you want to add your  change  do  this   
 
-  
+git checkout -b (your brach)
+
+adding all   change
+git add .
+
+
+ git commit -m "message of changes"  this is need  to idetify changes 
+
+then  git push origin (brachname)
+
+git push --set-upstream origin (brachname)
+
+
+ then  all set
+
 
   AFTER  MAKE SURE  GRADLE(APP LEVEL TO  SYNC AND   IMPLEMENTATION IS COMPLETE
   
