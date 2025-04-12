@@ -12,7 +12,20 @@
           "package_name": "com.example.physiqueaiapkfinal"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "744004697987-7avnteb6fs4mnof3vhilbh38v3ru77p3.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.physiqueaiapkfinal",
+            "certificate_hash": "b182c5f180678679fcac16068af0fc95e877a330"
+          }
+        },
+        {
+          "client_id": "744004697987-l8qc60880p1aajlf78rirg4f0t35th3v.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyB0vTlCrKJA2Por28T-mIkkXOX3u5LgMaU"
@@ -20,7 +33,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "744004697987-l8qc60880p1aajlf78rirg4f0t35th3v.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }
