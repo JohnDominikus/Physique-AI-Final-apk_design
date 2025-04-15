@@ -2,15 +2,13 @@ package com.example.physiqueaiapkfinal
 
 import android.content.Intent
 import android.content.SharedPreferences
-import android.os.Build
 import android.os.Bundle
 import android.util.Log
+import android.app.ActivityOptions
 import androidx.appcompat.app.AppCompatActivity
 import com.example.physiqueaiapkfinal.databinding.ActivityLandingBinding
 import com.example.physiqueaiapkfinal.utils.LoginActivity
 import com.google.firebase.auth.FirebaseAuth
-import android.app.ActivityOptions
-import com.example.physiqueaiapkfinal.RegisterActivity
 
 class LandingActivity : AppCompatActivity() {
 
@@ -27,26 +25,26 @@ class LandingActivity : AppCompatActivity() {
         // Initialize Firebase Authentication
         auth = FirebaseAuth.getInstance()
 
-        // 🔒 Check if the user is already authenticated
+        // 🔒 Auto-login if user is already authenticated
         if (isUserLoggedIn()) {
             Log.d("LandingActivity", "User already logged in: ${auth.currentUser?.email}")
-            navigateTo(DashboardActivity::class.java)
+            navigateThroughSplash(DashboardActivity::class.java)
             return
         }
 
-        // Handle Sign In button click → Redirect to LoginActivity
+        // Handle Sign In button click
         binding.btnSignIn.setOnClickListener {
-            navigateTo(LoginActivity::class.java)
+            navigateThroughSplash(LoginActivity::class.java)
         }
 
-        // Handle Sign Up button click → Redirect to RegisterActivity
+        // Handle Sign Up button click
         binding.txtSignUp.setOnClickListener {
-            navigateTo(RegisterActivity::class.java)
+            navigateThroughSplash(RegisterActivity::class.java)
         }
     }
 
     /**
-     * Checks if a user is logged in and has a stored UID match
+     * Checks if a user is logged in and their UID matches stored data
      */
     private fun isUserLoggedIn(): Boolean {
         val sharedPreferences: SharedPreferences = getSharedPreferences("USER_DATA", MODE_PRIVATE)
@@ -55,20 +53,22 @@ class LandingActivity : AppCompatActivity() {
     }
 
     /**
-     * Navigates to the specified activity with a fade animation
+     * Navigates to the splash screen and passes the target activity to load after splash
      */
-    private fun navigateTo(activity: Class<*>) {
-        val intent = Intent(this, activity)
+    private fun navigateThroughSplash(targetActivity: Class<*>) {
+        // Create intent for SplashActivity
+        val splashIntent = Intent(this, SplashActivity::class.java)
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            val options = ActivityOptions.makeCustomAnimation(this, android.R.anim.fade_in, android.R.anim.fade_out)
-            startActivity(intent, options.toBundle())
-        } else {
-            startActivity(intent)
-            @Suppress("DEPRECATION")
-            overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
-        }
+        // Pass the target activity name as extra
+        splashIntent.putExtra("TARGET_ACTIVITY", targetActivity.name)
 
-        finish() // Ensures the landing activity is removed from backstack
+        // Add fade-in and fade-out animations
+        val options = ActivityOptions.makeCustomAnimation(this, android.R.anim.fade_in, android.R.anim.fade_out)
+
+        // Start SplashActivity with animation
+        startActivity(splashIntent, options.toBundle())
+
+        // Optionally, remove LandingActivity from the backstack
+        finish()
     }
 }

@@ -61,6 +61,8 @@ dependencies {
     implementation("com.google.android.material:material:1.10.0")
     implementation("com.google.guava:guava:30.1-android")
 
+    //google fonts
+    implementation("androidx.compose.ui:ui-text-google-fonts:1.7.8")
     // CameraX
     implementation("androidx.camera:camera-camera2:1.0.0")
     implementation("androidx.camera:camera-lifecycle:1.0.0")

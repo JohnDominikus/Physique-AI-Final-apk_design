@@ -36,7 +36,7 @@
         <!-- 🔹 Physical and Medical Activities -->
         <activity android:name=".PhysicalActivity" android:exported="true" />
         <activity android:name=".MedicalActivity" android:exported="true" />
-
+        <activity android:name=".SplashActivity" android:exported="true" />
         <activity android:name=".utils.ForgotPasswordActivity" android:exported="true" />
         <activity android:name=".ForgotPasswordNewPasswordActivity" android:exported="true" />
         <!-- 🔹 Functional Activities -->
