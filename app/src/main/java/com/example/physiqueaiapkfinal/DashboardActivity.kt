@@ -1,6 +1,5 @@
 package com.example.physiqueaiapkfinal
 
-import com.example.physiqueaiapkfinal.BmiCalculatorActivity
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
@@ -108,7 +107,7 @@ class DashboardActivity : AppCompatActivity() {
     }
 
     /**
-     * Fetches and displays the logged-in user's information.
+     * Fetches and displays the logged-in user's information in real-time.
      */
     private fun fetchAndDisplayUserInfo() {
         val tvUserName = findViewById<TextView>(R.id.tvUserName)
@@ -127,12 +126,17 @@ class DashboardActivity : AppCompatActivity() {
             return
         }
 
+        // Set up Firestore listener for real-time updates
         firestore.collection("userinfo").document(uid)
-            .get()
-            .addOnSuccessListener { document ->
-                if (document.exists()) {
+            .addSnapshotListener { documentSnapshot, e ->
+                if (e != null) {
+                    Log.e("Dashboard", "Error fetching user info", e)
+                    return@addSnapshotListener
+                }
+
+                if (documentSnapshot != null && documentSnapshot.exists()) {
                     // Retrieve physicalInfo
-                    val physicalInfo = document.get("physicalInfo") as? Map<String, Any>
+                    val physicalInfo = documentSnapshot.get("physicalInfo") as? Map<String, Any>
                     val bodyLevel = physicalInfo?.get("bodyLevel")?.toString()?.lowercase() ?: "beginner"
                     tvPhysicalLevel.text = "Level: ${bodyLevel.replaceFirstChar { it.uppercase() }}"
 
@@ -144,13 +148,13 @@ class DashboardActivity : AppCompatActivity() {
                     }
 
                     // Retrieve personalInfo
-                    val personalInfo = document.get("personalInfo") as? Map<String, Any>
+                    val personalInfo = documentSnapshot.get("personalInfo") as? Map<String, Any>
                     val firstName = personalInfo?.get("firstName")?.toString() ?: ""
                     val lastName = personalInfo?.get("lastName")?.toString() ?: ""
                     tvUserName.text = "$firstName $lastName".trim()
 
                     // Retrieve bmiInfo and update BMI status TextView.
-                    val bmiInfo = document.get("bmiInfo") as? Map<String, Any>
+                    val bmiInfo = documentSnapshot.get("bmiInfo") as? Map<String, Any>
                     val rawStatus = bmiInfo?.get("status")?.toString()?.trim()?.lowercase() ?: ""
                     val (statusToDisplay, color) = when (rawStatus) {
                         "normal" -> Pair("Normal", Color.GREEN)
@@ -168,10 +172,6 @@ class DashboardActivity : AppCompatActivity() {
                     Log.w("Dashboard", "No document found for user $uid")
                     showDataNotFoundWarning()
                 }
-            }
-            .addOnFailureListener { e ->
-                Log.e("Dashboard", "Firestore fetch failed", e)
-                Toast.makeText(this, "Error loading profile", Toast.LENGTH_SHORT).show()
             }
     }
 

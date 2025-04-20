@@ -40,6 +40,13 @@ android {
     buildFeatures {
         viewBinding = true
     }
+    sourceSets {
+        getByName("main") {
+            assets {
+                srcDirs("src\\main\\assets", "src\\main\\assets")
+            }
+        }
+    }
 }
 
 dependencies {
@@ -91,7 +98,7 @@ dependencies {
     // Material & AppCompat (aliases)
     implementation(libs.material)
     implementation(libs.androidx.appcompat)
-
+    implementation ("androidx.core:core:1.6.0 ")
     // Testing
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

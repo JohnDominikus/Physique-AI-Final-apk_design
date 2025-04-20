@@ -397,4 +397,9 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
             Log.d("DatabaseHelper", "All tasks deleted.")
         }
     }
+
+
+
+
+
 }

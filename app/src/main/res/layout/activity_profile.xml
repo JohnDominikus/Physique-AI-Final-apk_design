@@ -4,77 +4,242 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="16dp">
+    android:padding="24dp"
+    android:background="@android:color/white">
 
-    <!-- User Name -->
-    <TextView
-        android:id="@+id/tvName"
+    <!-- Name Display -->
+    <LinearLayout
+        android:id="@+id/nameLayout"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="Name: "
-        android:textSize="18sp"
+        android:orientation="horizontal"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:paddingVertical="8dp">
+
+        <TextView
+            android:id="@+id/tvName"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Name"
+            android:textSize="18sp"
+            android:textColor="#333333"
+            android:fontFamily="sans-serif" />
+
+        <ImageView
+            android:id="@+id/editNameIcon"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@drawable/ic_edit"
+            android:contentDescription="Edit Name"
+            android:layout_marginStart="12dp"
+            app:tint="@android:color/darker_gray" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/editNameLayout"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:visibility="gone"
+        app:layout_constraintTop_toBottomOf="@id/nameLayout"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="8dp">
+
+        <EditText
+            android:id="@+id/editName"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:hint="Enter full name"
+            android:background="@drawable/rounded_edittext"
+            android:textSize="18sp"
+            android:paddingHorizontal="16dp"
+            android:textColor="#333333"
+            android:fontFamily="sans-serif"
+            android:importantForAccessibility="yes"
+            android:contentDescription="Edit Name Field" />
+
+        <ImageView
+            android:id="@+id/saveNameIcon"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@drawable/ic_save"
+            android:contentDescription="Save Name"
+            android:layout_marginStart="12dp"
+            app:tint="@android:color/holo_blue_dark" />
+    </LinearLayout>
 
     <!-- Email -->
     <TextView
         android:id="@+id/tvEmail"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="Email: "
+        android:text="Email"
         android:textSize="16sp"
-        app:layout_constraintTop_toBottomOf="@id/tvName"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        android:layout_marginTop="8dp" />
+        android:textColor="#555555"
+        android:fontFamily="sans-serif"
+        app:layout_constraintTop_toBottomOf="@id/editNameLayout"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="12dp"/>
 
     <!-- Birthdate -->
-    <TextView
-        android:id="@+id/tvBirthdate"
+    <LinearLayout
+        android:id="@+id/birthdateLayout"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="Birthdate: "
-        android:textSize="16sp"
+        android:orientation="horizontal"
         app:layout_constraintTop_toBottomOf="@id/tvEmail"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        android:layout_marginTop="8dp" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="16dp">
+
+        <TextView
+            android:id="@+id/tvBirthdate"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Birthdate"
+            android:textSize="16sp"
+            android:textColor="#555555"
+            android:fontFamily="sans-serif"/>
+
+        <ImageView
+            android:id="@+id/editBirthdateIcon"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@drawable/ic_edit"
+            android:contentDescription="Edit Birthdate"
+            android:layout_marginStart="12dp"
+            app:tint="@android:color/darker_gray" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/editBirthdateLayout"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:visibility="gone"
+        app:layout_constraintTop_toBottomOf="@id/birthdateLayout"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="8dp">
+
+        <EditText
+            android:id="@+id/editBirthdate"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:hint="Select Birthdate"
+            android:focusable="false"
+            android:clickable="true"
+            android:background="@drawable/rounded_edittext"
+            android:textSize="16sp"
+            android:textColor="#333333"
+            android:paddingHorizontal="16dp"/>
+
+        <ImageView
+            android:id="@+id/saveBirthdateIcon"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@drawable/ic_save"
+            android:contentDescription="Save Birthdate"
+            android:layout_marginStart="12dp"
+            app:tint="@android:color/holo_blue_dark"/>
+    </LinearLayout>
 
     <!-- Phone -->
-    <TextView
-        android:id="@+id/tvPhone"
+    <LinearLayout
+        android:id="@+id/phoneLayout"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="Phone: "
-        android:textSize="16sp"
-        app:layout_constraintTop_toBottomOf="@id/tvBirthdate"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        android:layout_marginTop="8dp" />
+        android:orientation="horizontal"
+        app:layout_constraintTop_toBottomOf="@id/editBirthdateLayout"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="16dp">
 
-    <!-- BMI Status -->
+        <TextView
+            android:id="@+id/tvPhone"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Phone"
+            android:textSize="16sp"
+            android:textColor="#555555"
+            android:fontFamily="sans-serif"/>
+
+        <ImageView
+            android:id="@+id/editPhoneIcon"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@drawable/ic_edit"
+            android:contentDescription="Edit Phone"
+            android:layout_marginStart="12dp"
+            app:tint="@android:color/darker_gray"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/editPhoneLayout"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:visibility="gone"
+        app:layout_constraintTop_toBottomOf="@id/phoneLayout"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="8dp">
+
+        <EditText
+            android:id="@+id/editPhone"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:hint="Enter phone number"
+            android:background="@drawable/rounded_edittext"
+            android:textSize="16sp"
+            android:paddingHorizontal="16dp"
+            android:textColor="#333333"/>
+
+        <ImageView
+            android:id="@+id/savePhoneIcon"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@drawable/ic_save"
+            android:contentDescription="Save Phone"
+            android:layout_marginStart="12dp"
+            app:tint="@android:color/holo_blue_dark" />
+    </LinearLayout>
+
+    <!-- BMI -->
     <TextView
         android:id="@+id/tvBMIStatus"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="BMI Status: "
+        android:text="BMI Status"
         android:textSize="16sp"
-        app:layout_constraintTop_toBottomOf="@id/tvPhone"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        android:layout_marginTop="8dp" />
+        android:textColor="#555555"
+        android:fontFamily="sans-serif"
+        app:layout_constraintTop_toBottomOf="@id/editPhoneLayout"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="16dp"/>
 
-    <!-- BMI -->
     <TextView
         android:id="@+id/tvBMI"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:text="BMI: "
         android:textSize="16sp"
+        android:textColor="#555555"
+        android:fontFamily="sans-serif"
         app:layout_constraintTop_toBottomOf="@id/tvBMIStatus"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        android:layout_marginTop="8dp" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="8dp"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
