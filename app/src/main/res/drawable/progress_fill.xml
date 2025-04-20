@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <shape xmlns:android="http://schemas.android.com/apk/res/android">
-    <solid android:color="@color/black"/> <!-- Choose the desired progress bar color -->
+    <solid android:color="@color/green"/> <!-- Choose the desired progress bar color -->
     <corners android:radius="4dp"/> <!-- Optional: rounded corners for the progress bar -->
 </shape>
