@@ -30,14 +30,14 @@
 
         <!-- 🔹 Authentication Activities -->
         <activity android:name=".RegisterActivity" android:exported="true" />
-        <activity android:name=".utils.LoginActivity" android:exported="true" />
+        <activity android:name=".LoginActivity" android:exported="true" />
         <activity android:name=".DashboardActivity" android:exported="true" />
         <activity android:name=".ProfileActivity" />
         <!-- 🔹 Physical and Medical Activities -->
         <activity android:name=".PhysicalActivity" android:exported="true" />
         <activity android:name=".MedicalActivity" android:exported="true" />
         <activity android:name=".SplashActivity" android:exported="true" />
-        <activity android:name=".utils.ForgotPasswordActivity" android:exported="true" />
+        <activity android:name=".ForgotPasswordActivity" android:exported="true" />
         <activity android:name=".ForgotPasswordNewPasswordActivity" android:exported="true" />
         <!-- 🔹 Functional Activities -->
         <activity android:name=".ExerciseActivity" android:exported="true" />

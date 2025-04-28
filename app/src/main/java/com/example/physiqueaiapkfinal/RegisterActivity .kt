@@ -165,12 +165,16 @@ class RegisterActivity : AppCompatActivity() {
                 etPhone.error = "Please enter phone number"
                 false
             }
+            !phone.matches(Regex("^09\\d{9}\$")) -> {
+                etPhone.error = "Phone number must be 11 digits and start with 09"
+                false
+            }
             !android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches() -> {
                 etEmail.error = "Invalid email format"
                 false
             }
-            password.length < 6 -> {
-                etPassword.error = "Password must be at least 6 characters"
+            password.length < 6 -> {  // Changed this line to enforce min 6 characters
+                etPassword.error = "Password must be at least 6 characters long"
                 false
             }
             else -> true

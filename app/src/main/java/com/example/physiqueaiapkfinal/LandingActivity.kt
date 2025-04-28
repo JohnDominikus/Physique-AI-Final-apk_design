@@ -7,7 +7,7 @@ import android.util.Log
 import android.app.ActivityOptions
 import androidx.appcompat.app.AppCompatActivity
 import com.example.physiqueaiapkfinal.databinding.ActivityLandingBinding
-import com.example.physiqueaiapkfinal.utils.LoginActivity
+import com.example.physiqueaiapkfinal.LoginActivity
 import com.google.firebase.auth.FirebaseAuth
 
 class LandingActivity : AppCompatActivity() {

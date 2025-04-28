@@ -33,10 +33,13 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
         const val COLUMN_PASSWORD = "password"
 
         // Physical Info
+        // Constants for database column names
         const val COLUMN_BODY_LEVEL = "body_level"
         const val COLUMN_BODY_CLASSIFICATION = "body_classification"
         const val COLUMN_EXERCISE_ROUTINE = "exercise_routine"
         const val COLUMN_OTHER_INFO = "other_info"
+        const val COLUMN_GYM_MODE = "gym_mode"  // Added Gym Mode column
+
 
         // Medical Activities
         const val COLUMN_ALLERGIES = "allergies"
@@ -73,24 +76,26 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
             db.execSQL(
                 """
                 CREATE TABLE IF NOT EXISTS $TABLE_USERINFO (
-                    $COLUMN_ID INTEGER PRIMARY KEY AUTOINCREMENT,
-                    $COLUMN_FIREBASE_ID TEXT UNIQUE,
-                    $COLUMN_FIRST_NAME TEXT,
-                    $COLUMN_LAST_NAME TEXT,
-                    $COLUMN_BIRTHDATE TEXT,
-                    $COLUMN_PHONE TEXT,
-                    $COLUMN_EMAIL TEXT UNIQUE,
-                    $COLUMN_PASSWORD TEXT,
-                    $COLUMN_BODY_LEVEL TEXT,
-                    $COLUMN_BODY_CLASSIFICATION TEXT,
-                    $COLUMN_EXERCISE_ROUTINE TEXT,
-                    $COLUMN_OTHER_INFO TEXT,
-                    $COLUMN_ALLERGIES TEXT,
-                    $COLUMN_MEDICAL_HISTORY TEXT,
-                    $COLUMN_FRACTURES TEXT,
-                    $COLUMN_OTHER_CONDITIONS TEXT,
-                    $COLUMN_DATE TEXT,
-                    $COLUMN_SYNC_STATUS INTEGER DEFAULT 0
+ $COLUMN_ID INTEGER PRIMARY KEY AUTOINCREMENT,
+         $COLUMN_ID INTEGER PRIMARY KEY AUTOINCREMENT,
+        $COLUMN_FIREBASE_ID TEXT UNIQUE,
+        $COLUMN_FIRST_NAME TEXT,
+        $COLUMN_LAST_NAME TEXT,
+        $COLUMN_BIRTHDATE TEXT,
+        $COLUMN_PHONE TEXT,
+        $COLUMN_EMAIL TEXT UNIQUE,
+        $COLUMN_PASSWORD TEXT,
+        $COLUMN_BODY_LEVEL TEXT,
+        $COLUMN_BODY_CLASSIFICATION TEXT,
+        $COLUMN_EXERCISE_ROUTINE TEXT,
+        $COLUMN_OTHER_INFO TEXT,
+        $COLUMN_GYM_MODE TEXT, -- Add this line for gym mode
+        $COLUMN_ALLERGIES TEXT,
+        $COLUMN_MEDICAL_HISTORY TEXT,
+        $COLUMN_FRACTURES TEXT,
+        $COLUMN_OTHER_CONDITIONS TEXT,
+        $COLUMN_DATE TEXT,
+        $COLUMN_SYNC_STATUS INTEGER DEFAULT 0
                 )
                 """
             )
@@ -297,21 +302,22 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
     }
 
     fun insertOrUpdateUser(
-        firebaseId: String,
+         firebaseId: String,
         firstName: String,
-        lastName: String,
+         lastName: String,
         birthdate: String,
-        phone: String,
-        email: String,
-        password: String,
-        bodyLevel: String? = null,
-        bodyClassification: String? = null,
-        exerciseRoutine: String? = null,
-        otherInfo: String? = null,
-        allergies: String? = null,
-        medicalHistory: String? = null,
-        fractures: String? = null,
-        otherConditions: String? = null
+         phone: String,
+         email: String,
+         password: String,
+         bodyLevel: String? = null,
+         bodyClassification: String? = null,
+         exerciseRoutine: String? = null,
+         otherInfo: String? = null,
+         gymMode: String? = null,  // Added gymMode field
+         allergies: String? = null,
+         medicalHistory: String? = null,
+         fractures: String? = null,
+         otherConditions: String? = null
     ): Long {
         val db = writableDatabase
         var rowId: Long = -1
@@ -351,55 +357,9 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
         return rowId
     }
 
-    fun getUser(email: String): Cursor? {
-        val db = readableDatabase
-        return try {
-            db.rawQuery("SELECT * FROM $TABLE_USERINFO WHERE $COLUMN_EMAIL = ?", arrayOf(email))
-        } catch (e: Exception) {
-            Log.e("DatabaseHelper", "Error retrieving user: ${e.message}")
-            db.close()
-            null
-        }
-    }
-
-    fun getUserIdAndName(email: String): Pair<String?, String?> {
-        val db = readableDatabase
-        val query = "SELECT $COLUMN_FIREBASE_ID, $COLUMN_FIRST_NAME, $COLUMN_LAST_NAME FROM $TABLE_USERINFO WHERE $COLUMN_EMAIL = ?"
-
-        return db.rawQuery(query, arrayOf(email)).use { cursor ->
-            if (cursor.moveToFirst()) {
-                val firebaseId = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_FIREBASE_ID))
-                val fullName = "${cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_FIRST_NAME))} ${cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_LAST_NAME))}"
-                Pair(firebaseId, fullName)
-            } else {
-                Pair(null, null)
-            }
-        }
-    }
-
-    fun clearAllRecords() {
-        writableDatabase.use { db ->
-            db.execSQL("DELETE FROM $TABLE_USERINFO")
-            Log.d("DatabaseHelper", "All records deleted.")
-        }
-    }
-
-    fun clearAllRecordsVideo() {
-        writableDatabase.use { db ->
-            db.execSQL("DELETE FROM $TABLE_VIDEO_EXERCISES")
-            Log.d("DatabaseHelper", "All video records deleted.")
-        }
-    }
-
-    fun clearAllTasks() {
-        writableDatabase.use { db ->
-            db.execSQL("DELETE FROM $TABLE_TASKS")
-            Log.d("DatabaseHelper", "All tasks deleted.")
-        }
     }
 
 
 
 
 
-}

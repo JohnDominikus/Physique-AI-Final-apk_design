@@ -1,5 +1,6 @@
 package com.example.physiqueaiapkfinal
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
@@ -12,12 +13,11 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import com.example.physiqueaiapkfinal.utils.LoginActivity
+import com.example.physiqueaiapkfinal.LoginActivity
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.card.MaterialCardView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
-import com.example.physiqueaiapkfinal.ExerciseActivity
 
 class DashboardActivity : AppCompatActivity() {
 
@@ -109,6 +109,7 @@ class DashboardActivity : AppCompatActivity() {
     /**
      * Fetches and displays the logged-in user's information in real-time.
      */
+    @SuppressLint("SetTextI18n")
     private fun fetchAndDisplayUserInfo() {
         val tvUserName = findViewById<TextView>(R.id.tvUserName)
         val tvPhysicalLevel = findViewById<TextView>(R.id.tvPhysicalLevel)
@@ -136,28 +137,54 @@ class DashboardActivity : AppCompatActivity() {
 
                 if (documentSnapshot != null && documentSnapshot.exists()) {
                     // Retrieve physicalInfo
-                    val physicalInfo = documentSnapshot.get("physicalInfo") as? Map<String, Any>
+                    val physicalInfo = documentSnapshot.get("physicalInfo") as? Map<*, *>
                     val bodyLevel = physicalInfo?.get("bodyLevel")?.toString()?.lowercase() ?: "beginner"
                     tvPhysicalLevel.text = "Level: ${bodyLevel.replaceFirstChar { it.uppercase() }}"
 
                     when (bodyLevel) {
-                        "beginner" -> ivStar.visibility = View.VISIBLE
-                        "intermediate" -> ivVerified.visibility = View.VISIBLE
-                        "advanced" -> ivMuscles.visibility = View.VISIBLE
-                        else -> ivStar.visibility = View.VISIBLE
+                        "beginner" -> {
+                            ivStar.visibility = View.VISIBLE
+                            ivStar.setColorFilter(Color.parseColor("#FFD700"))  // Gold color for beginner
+                            tvPhysicalLevel.text =
+                                "Level: Beginner"  // Update the text for beginner
+                            tvPhysicalLevel.setTextColor(Color.parseColor("#FFD700"))  // Optional: set text color to match the star color
+                        }
+
+                        "intermediate" -> {
+                            ivVerified.visibility = View.VISIBLE
+                            ivVerified.setColorFilter(Color.parseColor("#1E90FF"))  // Dodger Blue for intermediate
+                            tvPhysicalLevel.text =
+                                "Level: Intermediate"  // Update the text for intermediate
+                            tvPhysicalLevel.setTextColor(Color.parseColor("#1E90FF"))  // Optional: set text color to match the verified color
+                        }
+
+                        "advanced" -> {
+                            ivMuscles.visibility = View.VISIBLE
+                            ivMuscles.setColorFilter(Color.parseColor("#32CD32"))  // Lime Green for advanced
+                            tvPhysicalLevel.text =
+                                "Level: Advanced"  // Update the text for advanced
+                            tvPhysicalLevel.setTextColor(Color.parseColor("#32CD32"))  // Optional: set text color to match the muscles color
+                        }
+
+                        else -> {
+                            ivStar.visibility = View.VISIBLE
+                            ivStar.setColorFilter(Color.parseColor("#FFD700"))  // Default to Gold color for "normal" state
+                            tvPhysicalLevel.text = "Level: Normal"  // Default text
+                            tvPhysicalLevel.setTextColor(Color.parseColor("#FFD700"))  // Default text color (Gold)
+                        }
                     }
 
-                    // Retrieve personalInfo
-                    val personalInfo = documentSnapshot.get("personalInfo") as? Map<String, Any>
+                        // Retrieve personalInfo
+                    val personalInfo = documentSnapshot.get("personalInfo") as? Map<*, *>
                     val firstName = personalInfo?.get("firstName")?.toString() ?: ""
                     val lastName = personalInfo?.get("lastName")?.toString() ?: ""
                     tvUserName.text = "$firstName $lastName".trim()
 
                     // Retrieve bmiInfo and update BMI status TextView.
-                    val bmiInfo = documentSnapshot.get("bmiInfo") as? Map<String, Any>
+                    val bmiInfo = documentSnapshot.get("bmiInfo") as? Map<*, *>
                     val rawStatus = bmiInfo?.get("status")?.toString()?.trim()?.lowercase() ?: ""
                     val (statusToDisplay, color) = when (rawStatus) {
-                        "normal" -> Pair("Normal", Color.GREEN)
+                        "normal" -> Pair("Normal", Color.parseColor("#228B22")) // Lime Green
                         "overweight" -> Pair("Overweight", Color.RED)
                         "underweight" -> Pair("Underweight", Color.RED)
                         "obese" -> Pair("Obese", Color.parseColor("#FFA500")) // Orange

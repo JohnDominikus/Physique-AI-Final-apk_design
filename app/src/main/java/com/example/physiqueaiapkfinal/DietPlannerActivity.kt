@@ -4,10 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import android.widget.ImageView
-import android.widget.TextView
-import android.widget.Toast
+import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
 import androidx.recyclerview.widget.DefaultItemAnimator
@@ -54,21 +51,29 @@ class DietPlannerActivity : AppCompatActivity() {
             MealItem("Greek Yogurt with Berries", "Protein-packed snack", 250, 15, "Snack", R.drawable.diet1)
         )
         mealList.addAll(sampleMeals)
-        filteredList.addAll(mealList)
+        filteredList.addAll(sampleMeals)
     }
 
     private fun setupRecyclerView() {
         mealAdapter = MealAdapter(filteredList) { meal ->
             Toast.makeText(this, "${meal.name} added to your plan", Toast.LENGTH_SHORT).show()
         }
-        recyclerMeals.layoutManager = LinearLayoutManager(this)
-        recyclerMeals.adapter = mealAdapter
-        recyclerMeals.itemAnimator = DefaultItemAnimator()
+
+        recyclerMeals.apply {
+            layoutManager = LinearLayoutManager(this@DietPlannerActivity)
+            adapter = mealAdapter
+            itemAnimator = DefaultItemAnimator()
+        }
     }
 
     private fun setupChipGroup() {
-        chipGroupMealType.setOnCheckedChangeListener { _, checkedId ->
-            val selectedMealType = if (checkedId == View.NO_ID) "All" else findViewById<Chip>(checkedId)?.text?.toString() ?: "All"
+        chipGroupMealType.setOnCheckedStateChangeListener { group, checkedIds ->
+            val selectedMealType = if (checkedIds.isEmpty()) {
+                "All"
+            } else {
+                val chipId = checkedIds.first()
+                group.findViewById<Chip>(chipId)?.text?.toString() ?: "All"
+            }
             applyFilters(searchView.query.toString(), selectedMealType)
         }
     }
@@ -76,7 +81,6 @@ class DietPlannerActivity : AppCompatActivity() {
     private fun setupSearchView() {
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?) = false
-
             override fun onQueryTextChange(newText: String?): Boolean {
                 applyFilters(newText ?: "", getSelectedMealType())
                 return true
@@ -94,21 +98,23 @@ class DietPlannerActivity : AppCompatActivity() {
     }
 
     private fun applyFilters(query: String, mealType: String) {
-        filteredList.clear()
-        filteredList.addAll(
-            mealList.filter { meal ->
-                val matchesMealType = mealType == "All" || meal.mealType.equals(mealType, true)
-                val matchesQuery = query.isEmpty() || meal.name.contains(query, true) || meal.description.contains(query, true) || meal.mealType.contains(query, true)
-                matchesMealType && matchesQuery
-            }
-        )
+        filteredList.apply {
+            clear()
+            addAll(mealList.filter { meal ->
+                val matchesType = mealType == "All" || meal.mealType.equals(mealType, ignoreCase = true)
+                val matchesQuery = query.isBlank() || listOf(meal.name, meal.description, meal.mealType)
+                    .any { it.contains(query, ignoreCase = true) }
+                matchesType && matchesQuery
+            })
+        }
         mealAdapter.notifyDataSetChanged()
         updateNutritionSummary()
     }
 
     private fun getSelectedMealType(): String {
-        return chipGroupMealType.checkedChipId.takeIf { it != View.NO_ID }
-            ?.let { chipGroupMealType.findViewById<Chip>(it)?.text.toString() } ?: "All"
+        return chipGroupMealType.checkedChipIds.firstOrNull()?.let {
+            chipGroupMealType.findViewById<Chip>(it)?.text.toString()
+        } ?: "All"
     }
 
     private fun updateNutritionSummary() {
@@ -117,17 +123,17 @@ class DietPlannerActivity : AppCompatActivity() {
         tvNutritionSummary.text = "Meals: ${filteredList.size} | Calories: $totalCalories | Protein: ${totalProtein}g"
     }
 
-    // Data class for MealItem
+    // Data class
     data class MealItem(
         val name: String,
         val description: String,
         val calories: Int,
         val protein: Int,
         val mealType: String,
-        val imageResId: Int // Drawable resource ID instead of URL
+        val imageResId: Int
     )
 
-    // Adapter for RecyclerView
+    // Adapter
     class MealAdapter(
         private val items: List<MealItem>,
         private val onAddClick: (MealItem) -> Unit
@@ -143,20 +149,22 @@ class DietPlannerActivity : AppCompatActivity() {
             private val btnAdd: Button = view.findViewById(R.id.btnAdd)
 
             fun bind(meal: MealItem) {
-                tvTitle.text = meal.name
-                tvDescription.text = meal.description
-                tvCalories.text = "${meal.calories} kcal"
-                tvProtein.text = "${meal.protein}g protein"
-                tvMealType.text = meal.mealType
+                with(meal) {
+                    tvTitle.text = name
+                    tvDescription.text = description
+                    tvCalories.text = "$calories kcal"
+                    tvProtein.text = "$protein g protein"
+                    tvMealType.text = mealType
 
-                Glide.with(itemView.context)
-                    .load(meal.imageResId) // Directly load from drawable resource ID
-                    .apply(RequestOptions()
-                        .placeholder(R.drawable.meal_placeholder) // Placeholder if image is missing
-                        .error(R.drawable.meal_placeholder)) // Error handling
-                    .into(imgMeal)
+                    Glide.with(itemView.context)
+                        .load(imageResId)
+                        .apply(RequestOptions()
+                            .placeholder(R.drawable.meal_placeholder)
+                            .error(R.drawable.meal_placeholder))
+                        .into(imgMeal)
 
-                btnAdd.setOnClickListener { onAddClick(meal) }
+                    btnAdd.setOnClickListener { onAddClick(this) }
+                }
             }
         }
 

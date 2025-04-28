@@ -1,52 +1,52 @@
 package com.example.physiqueaiapkfinal
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.widget.ProgressBar
+import android.view.animation.AnimationSet
+import android.view.animation.ScaleAnimation
 import android.widget.ImageView
-import android.view.animation.AlphaAnimation
+import android.widget.ProgressBar
 import androidx.appcompat.app.AppCompatActivity
 
+@SuppressLint("CustomSplashScreen")
 class SplashActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_splash)
 
-        // Initialize the logo animation
         val logo: ImageView = findViewById(R.id.logoImage)
-        val fadeIn = AlphaAnimation(0f, 1f)
-        fadeIn.duration = 1000 // 1 second fade-in animation
-        logo.startAnimation(fadeIn)
-
-        // ProgressBar setup
         val progressBar: ProgressBar = findViewById(R.id.progressBar)
+
+        // Start breathing animation
+        val scaleUp = ScaleAnimation(
+            1f, 1.1f, // Scale from 100% to 110%
+            1f, 1.1f,
+            ScaleAnimation.RELATIVE_TO_SELF, 0.5f,
+            ScaleAnimation.RELATIVE_TO_SELF, 0.5f
+        )
+        scaleUp.duration = 800
+        scaleUp.repeatMode = ScaleAnimation.REVERSE
+        scaleUp.repeatCount = ScaleAnimation.INFINITE
+        logo.startAnimation(scaleUp)
 
         // Show progress bar
         progressBar.visibility = ProgressBar.VISIBLE
 
-        // Get the target activity from intent extra
-        val targetActivityName = intent.getStringExtra("TARGET_ACTIVITY")
-        val targetActivity: Class<*> = try {
-            Class.forName(targetActivityName ?: "")
+        // Get the target activity class
+        val targetActivity = try {
+            Class.forName(intent.getStringExtra("TARGET_ACTIVITY") ?: "")
         } catch (e: ClassNotFoundException) {
-            e.printStackTrace()
-            DashboardActivity::class.java // Default to DashboardActivity if something goes wrong
+            DashboardActivity::class.java
         }
 
-        // Simulate loading by delaying the activity transition
+        // Navigate after short delay (faster splash)
         Handler(Looper.getMainLooper()).postDelayed({
-            // Navigate to the target activity after the delay
-            val intent = Intent(this, targetActivity)
-            startActivity(intent)
-            finish() // Finish SplashActivity so it doesn't remain in the backstack
-        }, 2000) // 3 seconds delay
-
-        // Hide progress bar after 3 seconds (it will disappear just before transitioning)
-        Handler(Looper.getMainLooper()).postDelayed({
-            progressBar.visibility = ProgressBar.GONE
-        }, 2000) // Hide after 3 seconds to ensure it's visible during the full 3 seconds
+            startActivity(Intent(this, targetActivity))
+            finish()
+        }, 1200) // ~1.2 seconds
     }
 }

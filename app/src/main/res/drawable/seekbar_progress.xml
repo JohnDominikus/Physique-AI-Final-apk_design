@@ -1,12 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
-    <!-- Background (unfilled part of the progress bar) -->
-    <item
-        android:id="@android:id/background"
-        android:drawable="@android:color/darker_gray" />
 
-    <!-- Progress (filled part of the progress bar) -->
     <item
-        android:id="@android:id/progress"
-        android:drawable="@drawable/progress_fill" />
+        android:id="@android:id/background">
+        <shape xmlns:android="http://schemas.android.com/apk/res/android">
+            <solid android:color="#B0B0B0" />
+            <corners android:radius="30dp" />
+            <stroke android:color="#A0A0A0" android:width="2dp" />
+        </shape>
+    </item>
+
+    <item
+        android:id="@android:id/progress">
+        <shape xmlns:android="http://schemas.android.com/apk/res/android">
+            <gradient
+                android:type="linear"
+                android:startColor="#4CAF50"
+                android:endColor="#388E3C"
+                android:angle="0" />
+            <corners android:radius="30dp" />
+        </shape>
+    </item>
+
 </layer-list>

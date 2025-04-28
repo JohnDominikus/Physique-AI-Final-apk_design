@@ -4,86 +4,99 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#FFFFFF"
+    android:background="@color/background_green"
     android:padding="24dp">
 
-    <!-- Title -->
     <TextView
         android:id="@+id/title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="BMI Calculator"
         android:textColor="#1C1F2A"
-        android:textSize="22sp"
+        android:textSize="26sp"
         android:textStyle="bold"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:gravity="center" />
 
-    <!-- Gender Buttons -->
     <LinearLayout
         android:id="@+id/genderLayout"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:gravity="center"
+        android:layout_marginTop="24dp"
         app:layout_constraintTop_toBottomOf="@id/title"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="24dp">
+        android:padding="16dp">
 
         <Button
             android:id="@+id/maleButton"
             android:layout_width="0dp"
-            android:layout_height="80dp"
-            android:layout_weight="1"
+            android:layout_marginEnd="16dp"
+            android:layout_gravity="center"
+            android:backgroundTint="@color/blue"
             android:text="Male"
-            android:textColor="@drawable/gender_text_selector"
+            android:textColor="@android:color/white"
+            android:textSize="18sp"
             android:drawableTop="@drawable/ic_male"
-            android:background="@drawable/gender_button_unselected"
-            android:textStyle="bold" />
-
-        <Space
-            android:layout_width="16dp"
-            android:layout_height="wrap_content" />
+            android:drawablePadding="12dp"
+            android:padding="16dp"
+            android:focusable="false"
+            android:clickable="false"
+            android:layout_weight="1"
+            android:minHeight="120dp"
+            android:minWidth="120dp"
+            android:layout_height="120dp"/>
 
         <Button
             android:id="@+id/femaleButton"
             android:layout_width="0dp"
-            android:layout_height="80dp"
-            android:layout_weight="1"
+            android:layout_gravity="center"
+            android:backgroundTint="@color/girl_pink"
             android:text="Female"
-            android:textColor="@drawable/gender_text_selector"
+            android:textColor="@android:color/white"
+            android:textSize="18sp"
             android:drawableTop="@drawable/ic_female"
-            android:background="@drawable/gender_button_selected"
-            android:textStyle="bold" />
+            android:drawablePadding="12dp"
+            android:padding="16dp"
+            android:focusable="false"
+            android:clickable="false"
+            android:layout_weight="1"
+            android:minHeight="120dp"
+            android:minWidth="120dp"
+            android:layout_height="120dp" />
+
     </LinearLayout>
 
-    <!-- Input Fields (Height, Weight, Age) -->
     <LinearLayout
         android:id="@+id/inputFields"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:orientation="vertical"
+        android:layout_marginTop="32dp"
         app:layout_constraintTop_toBottomOf="@id/genderLayout"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="32dp">
+        app:layout_constraintEnd_toEndOf="parent">
 
-        <!-- Height -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:background="@drawable/container_background"
             android:orientation="vertical"
-            android:layout_marginTop="16dp">
+            android:padding="16dp"
+            android:layout_marginBottom="16dp">
 
             <TextView
-                android:text="Height (cm)"
-                android:textColor="#1C1F2A"
-                android:textSize="14sp"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:text="Height (cm)"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:textColor="#1C1F2A"/>
 
-            <!-- SeekBar with custom design -->
             <SeekBar
                 android:id="@+id/heightSeekBar"
                 android:layout_width="match_parent"
@@ -92,126 +105,128 @@
                 android:progress="170"
                 android:thumb="@drawable/seekbar_thumb"
                 android:progressDrawable="@drawable/seekbar_progress"
-                android:layout_marginTop="8dp"
-                android:background="@drawable/border"
-            />
+                android:layout_marginTop="8dp" />
 
             <TextView
                 android:id="@+id/heightValue"
-                android:text="Height: 170 cm"
-                android:textColor="#1C1F2A"
-                android:textSize="16sp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"/>
+                android:text="Height: 170 cm"
+                android:textSize="16sp"
+                android:layout_marginTop="8dp"
+                android:textColor="#1C1F2A"/>
         </LinearLayout>
 
-        <!-- Weight -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:background="@drawable/container_background"
             android:orientation="vertical"
-            android:layout_marginTop="16dp">
+            android:padding="16dp"
+            android:layout_marginBottom="16dp">
 
             <TextView
-                android:text="Weight (kg)"
-                android:textColor="#1C1F2A"
-                android:textSize="14sp"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:text="Weight (kg)"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:textColor="#1C1F2A"/>
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="50dp"
+                android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:background="@drawable/input_box"
-                android:gravity="center_vertical">
+                android:gravity="center"
+                android:layout_marginTop="8dp">
 
                 <ImageButton
                     android:id="@+id/weightMinus"
-                    android:layout_width="48dp"
-                    android:layout_height="match_parent"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:background="@drawable/circle_button_background"
                     android:src="@drawable/minus"
-                    android:background="@android:color/white"
-                    android:contentDescription="Decrease weight" />
+                    android:contentDescription="Decrease weight"
+                    android:padding="10dp"/>
 
                 <EditText
                     android:id="@+id/weightInput"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
+                    android:layout_width="80dp"
+                    android:layout_height="wrap_content"
+                    android:background="@null"
                     android:gravity="center"
                     android:inputType="numberDecimal"
+                    android:padding="8dp"
                     android:text="50"
-                    android:textColor="#1C1F2A"
-                    android:textSize="18sp"
-                    android:background="@drawable/border"
-                />
+                    android:textSize="20sp"
+                    tools:ignore="TouchTargetSizeCheck" />
 
                 <ImageButton
                     android:id="@+id/weightPlus"
-                    android:layout_width="48dp"
-                    android:layout_height="match_parent"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:background="@drawable/circle_button_background"
                     android:src="@drawable/add"
-                    android:background="@android:color/white"
-                    android:contentDescription="Increase weight" />
+                    android:contentDescription="Increase weight"
+                    android:padding="10dp"/>
             </LinearLayout>
         </LinearLayout>
 
-        <!-- Age -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:background="@drawable/container_background"
             android:orientation="vertical"
-            android:layout_marginTop="16dp">
+            android:padding="16dp">
 
             <TextView
-                android:text="Age"
-                android:textColor="#1C1F2A"
-                android:textSize="14sp"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:text="Age"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:textColor="#1C1F2A"/>
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="50dp"
+                android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:background="@drawable/input_box"
-                android:gravity="center_vertical">
+                android:gravity="center"
+                android:layout_marginTop="8dp">
 
                 <ImageButton
                     android:id="@+id/ageMinus"
-                    android:layout_width="48dp"
-                    android:layout_height="match_parent"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:background="@drawable/circle_button_background"
                     android:src="@drawable/minus"
-                    android:background="@android:color/white"
-                    android:contentDescription="Decrease age" />
+                    android:contentDescription="Decrease age"
+                    android:padding="10dp"/>
 
                 <EditText
                     android:id="@+id/ageInput"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
+                    android:layout_width="80dp"
+                    android:layout_height="wrap_content"
+                    android:background="@null"
                     android:gravity="center"
                     android:inputType="number"
+                    android:padding="8dp"
                     android:text="25"
-                    android:textColor="#1C1F2A"
-                    android:textSize="18sp"
-                    android:background="@drawable/border"
-                />
+                    android:textSize="20sp"
+                    tools:ignore="TouchTargetSizeCheck" />
 
                 <ImageButton
                     android:id="@+id/agePlus"
-                    android:layout_width="48dp"
-                    android:layout_height="match_parent"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:background="@drawable/circle_button_background"
                     android:src="@drawable/add"
-                    android:background="@android:color/white"
-                    android:contentDescription="Increase age" />
+                    android:contentDescription="Increase age"
+                    android:padding="10dp"/>
             </LinearLayout>
         </LinearLayout>
     </LinearLayout>
 
-    <!-- Calculate Button -->
     <Button
         android:id="@+id/calculateButton"
         android:layout_width="0dp"
@@ -224,4 +239,5 @@
         app:layout_constraintTop_toBottomOf="@id/inputFields"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

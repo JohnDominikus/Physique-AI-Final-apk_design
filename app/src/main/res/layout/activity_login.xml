@@ -4,9 +4,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#FFFFFF"
-    tools:context=".utils.LoginActivity">
+    tools:context=".LoginActivity">
 
-    <!-- Back Button -->
     <ImageView
         android:id="@+id/btnBack"
         android:layout_width="36dp"
@@ -14,60 +13,59 @@
         android:layout_margin="16dp"
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
-        android:src="@android:drawable/ic_menu_revert"
+        android:src="@drawable/back"
         android:contentDescription="Back"
         app:tint="#000000" />
 
-    <!-- Scroll Content -->
     <ScrollView
-        android:layout_below="@id/btnBack"
+        android:id="@+id/scrollView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_below="@id/btnBack"
         android:fillViewport="true"
-        android:padding="24dp">
+        android:padding="32dp">
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:gravity="center"
-            android:layout_gravity="center">
+            android:gravity="center_horizontal">
 
-            <!-- Logo -->
             <ImageView
                 android:id="@+id/ivLogo"
-                android:layout_width="100dp"
-                android:layout_height="100dp"
+                android:layout_width="120dp"
+                android:layout_height="120dp"
+                android:layout_marginBottom="24dp"
                 android:src="@drawable/physiqueailogo"
-                android:layout_marginBottom="16dp"
                 android:contentDescription="Logo" />
 
-            <!-- Welcome Text -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="WELCOME BACK"
+                android:text="Physique AI"
                 android:textStyle="bold"
-                android:textSize="20sp"
-                android:textColor="#000000"
+                android:textSize="28sp"
+                android:textColor="#333333"
                 android:layout_marginBottom="8dp" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Sign in now to get access to personalized workouts and achieve your fitness goals."
-                android:textSize="14sp"
+                android:text="Welcome to Physique AI your ."
+                android:textSize="16sp"
                 android:gravity="center"
+                android:textAlignment="center"
                 android:textColor="#7F8C8D"
-                android:layout_marginBottom="24dp" />
+                android:layout_marginBottom="32dp"
+                android:lineSpacingExtra="4dp" />
 
-            <!-- Email Field -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:background="@drawable/rounded_edittext_bg"
-                android:padding="12dp"
+                android:paddingHorizontal="16dp"
+                android:paddingVertical="12dp"
                 android:layout_marginBottom="16dp"
                 android:gravity="center_vertical">
 
@@ -75,47 +73,49 @@
                     android:layout_width="20dp"
                     android:layout_height="20dp"
                     android:src="@drawable/ic_email"
-                    android:layout_marginEnd="8dp" />
+                    android:layout_marginEnd="12dp" />
 
                 <EditText
                     android:id="@+id/etEmail"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_width="0dp"
+                    android:layout_height="48dp"
+                    android:layout_weight="1"
                     android:background="@null"
                     android:hint="Email Address"
                     android:inputType="textEmailAddress"
-                    android:textColor="@color/black"
+                    android:textColor="#000000"
                     android:textColorHint="#999999"
+                    android:textSize="14sp"
                     tools:ignore="TouchTargetSizeCheck" />
             </LinearLayout>
 
-            <!-- Password Field -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:background="@drawable/rounded_edittext_bg"
-                android:padding="12dp"
-                android:layout_marginBottom="8dp"
+                android:paddingHorizontal="16dp"
+                android:paddingVertical="12dp"
+                android:layout_marginBottom="16dp"
                 android:gravity="center_vertical">
 
                 <ImageView
                     android:layout_width="20dp"
                     android:layout_height="20dp"
                     android:src="@drawable/key"
-                    android:layout_marginEnd="8dp" />
+                    android:layout_marginEnd="12dp" />
 
                 <EditText
                     android:id="@+id/etPassword"
                     android:layout_width="0dp"
-                    android:layout_height="wrap_content"
+                    android:layout_height="48dp"
                     android:layout_weight="1"
                     android:background="@null"
                     android:hint="Password"
                     android:inputType="textPassword"
                     android:textColor="#000000"
                     android:textColorHint="#999999"
-                    tools:ignore="TouchTargetSizeCheck" />
+                    android:textSize="14sp" />
 
                 <ImageView
                     android:id="@+id/passwordToggle"
@@ -123,53 +123,64 @@
                     android:layout_height="24dp"
                     android:src="@drawable/ic_eye"
                     android:layout_marginStart="8dp"
+                    app:tint="#66BB6A"
                     android:contentDescription="Toggle Password Visibility" />
             </LinearLayout>
 
-            <!-- Remember Me and Forgot Password -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:layout_marginBottom="16dp"
-                >
+                android:gravity="center_vertical"
+                android:layout_marginBottom="16dp">
 
                 <CheckBox
                     android:id="@+id/cbRememberMe"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Remember me"
-                    android:textColor="#000000" />
+                    android:textColor="#333333"
+                    android:textSize="14sp" />
 
                 <TextView
                     android:id="@+id/tvForgotPassword"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Forgot Password?"
-                    android:textColor="#7CFC00"
-                    android:textStyle="bold" />
+                    android:textColor="#007BFF"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:layout_alignParentEnd="true" />
             </LinearLayout>
 
-            <!-- Sign In Button -->
+            <TextView
+                android:id="@+id/tvRegister"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Don't have an account? Register"
+                android:textColor="#007BFF"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:gravity="center"
+                android:layout_marginBottom="32dp" />
+
             <Button
                 android:id="@+id/btnLogin"
                 android:layout_width="match_parent"
                 android:layout_height="48dp"
                 android:text="SIGN IN"
-                android:textStyle="bold"
                 android:textColor="#FFFFFF"
                 android:textSize="16sp"
-                android:background="@drawable/rounded_button_bg"
+                android:textStyle="bold"
+                android:backgroundTint="#66BB6A"
                 android:layout_marginBottom="24dp" />
 
-            <!-- Divider with lines -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:gravity="center"
-                android:layout_marginBottom="16dp"
-                android:layout_marginTop="8dp">
+                android:gravity="center_vertical"
+                android:layout_marginBottom="32dp">
 
                 <View
                     android:layout_width="0dp"
@@ -193,25 +204,23 @@
                     android:layout_marginStart="8dp" />
             </LinearLayout>
 
-            <!-- Social Buttons -->
-            <LinearLayout
+            <Button
+                android:id="@+id/btnGoogle"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center"
-                android:layout_marginBottom="24dp"
-                android:weightSum="4">
+                android:layout_height="48dp"
+                android:text="Continue with Google"
+                android:textColor="#000000"
+                android:textSize="14sp"
+                android:backgroundTint="@android:color/white"
+                app:strokeColor="#66BB6A"
+                app:strokeWidth="2dp"
+                app:cornerRadius="50dp"
+                app:icon="@drawable/google"
+                app:iconTint="@null"
+                app:iconGravity="textStart"
+                app:iconPadding="12dp"
+                android:layout_marginBottom="32dp" />
 
-                <ImageView
-                    android:id="@+id/btnGoogle"
-                    android:layout_width="48dp"
-                    android:layout_height="48dp"
-                    android:layout_margin="8dp"
-                    android:layout_weight="1"
-                    android:src="@drawable/google"
-                    android:background="@null"
-                    android:contentDescription="Google" />
-            </LinearLayout>
         </LinearLayout>
     </ScrollView>
 </RelativeLayout>

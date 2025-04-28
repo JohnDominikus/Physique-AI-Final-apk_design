@@ -16,7 +16,7 @@
             android:id="@+id/btnBack"
             android:layout_width="48dp"
             android:layout_height="48dp"
-            android:src="@drawable/home"
+            android:src="@drawable/back"
             android:contentDescription="Back Button"
             android:background="?android:attr/selectableItemBackgroundBorderless"
             android:layout_alignParentStart="true"
@@ -41,8 +41,8 @@
             <!-- Logo -->
             <ImageView
                 android:id="@+id/logo"
-                android:layout_width="120dp"
-                android:layout_height="120dp"
+                android:layout_width="80dp"
+                android:layout_height="80dp"
                 android:src="@drawable/physiqueailogo"
                 android:contentDescription="App Logo"
                 android:layout_marginBottom="16dp"/>
@@ -71,6 +71,7 @@
                     android:id="@+id/etFirstName"
                     android:layout_width="match_parent"
                     android:layout_height="48dp"
+                    android:background="@drawable/rounded_edittext_bg"
                     android:hint="First Name"
                     android:importantForAccessibility="yes"
                     android:inputType="textPersonName" />
@@ -89,6 +90,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="48dp"
                     android:hint="Last Name"
+
+                    android:background="@drawable/rounded_edittext_bg"
                     android:importantForAccessibility="yes"
                     android:inputType="textPersonName" />
             </com.google.android.material.textfield.TextInputLayout>
@@ -100,13 +103,15 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
                 app:hintAnimationEnabled="true">
+
                 <TextView
                     android:id="@+id/tvBirthdate"
                     android:layout_width="match_parent"
                     android:layout_height="48dp"
                     android:hint="Select Birthdate"
+                    android:background="@drawable/rounded_edittext_bg"
                     android:gravity="start|center_vertical"
-                    android:textColor="#4E342E"
+                    android:textColor="@color/black"
                     android:textSize="16sp"
                     android:importantForAccessibility="yes"
                     android:contentDescription="Birthdate Picker" />
@@ -125,6 +130,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="48dp"
                     android:hint="Phone Number"
+                    android:background="@drawable/rounded_edittext_bg"
                     android:importantForAccessibility="yes"
                     android:inputType="phone" />
             </com.google.android.material.textfield.TextInputLayout>
@@ -136,11 +142,13 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
                 app:hintAnimationEnabled="true">
+
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/etEmail"
                     android:layout_width="match_parent"
                     android:layout_height="48dp"
                     android:hint="Email"
+                    android:background="@drawable/rounded_edittext_bg"
                     android:importantForAccessibility="yes"
                     android:inputType="textEmailAddress" />
             </com.google.android.material.textfield.TextInputLayout>
@@ -158,6 +166,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="48dp"
                     android:hint="Password"
+                    android:background="@drawable/rounded_edittext_bg"
                     android:importantForAccessibility="yes"
                     android:inputType="textPassword" />
             </com.google.android.material.textfield.TextInputLayout>
@@ -169,7 +178,7 @@
                 android:layout_height="48dp"
                 android:text="Next"
                 android:textSize="16sp"
-                android:backgroundTint="@color/blue"
+                android:backgroundTint="@color/green"
                 android:textColor="@android:color/white"
                 app:cornerRadius="8dp"
                 android:importantForAccessibility="yes"

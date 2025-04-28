@@ -1,5 +1,6 @@
 package com.example.physiqueaiapkfinal
 
+import android.annotation.SuppressLint
 import android.app.DatePickerDialog
 import android.os.Bundle
 import android.view.View
@@ -176,6 +177,7 @@ class ProfileActivity : AppCompatActivity() {
         }
     }
 
+    @SuppressLint("SetTextI18n", "DefaultLocale")
     private fun fetchUserInfoRealtime() {
         firestore.collection("userinfo").document(uid!!)
             .addSnapshotListener { doc, error ->

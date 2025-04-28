@@ -28,36 +28,54 @@
         <color name="green_pressed">#388E3C</color>
         <color name="green_focused">#66BB6A</color>
 
-    <color name="logo_background">#767676</color> <!-- Example color -->
+
+    <!-- Primary Colors -->
 
 
 
+    <!-- Background and Surface Colors -->
+    <color name="colorBackground">#FFFFFF</color> <!-- White -->
+    <color name="colorSurface">#FFFFFF</color> <!-- White -->
+
+    <!-- Chip Colors -->
+
+
+    <!-- Text Colors -->
+    <color name="textColorPrimary">#212121</color> <!-- Primary text color -->
+    <color name="textColorSecondary">#757575</color> <!-- Secondary text color -->
+
+
+    <color name="light_gray">#F1F1F1</color>
+
+    <color name="dark_gray">#666666</color>
+
+
+    <color name="colorAccent">#03DAC5</color>
+    <color name="card_background">#FAFAFA</color>
 
     <color name="Male">#3F51B5</color> <!-- Example color -->
     <color name="Female">#E91E63</color>
 
+    <color name="chip_background_color">#FF6200EE</color> <!-- Purple color example -->
 
-
-
-
-        <color name="colorPrimaryDark">#3700B3</color>
-        <color name="colorAccent">#03DAC5</color>
-
-        <!-- Additional colors -->
-        <color name="chip_high_protein">#4CAF50</color>
-        <color name="chip_low_carb">#2196F3</color>
-        <color name="chip_vegan">#FF9800</color>
-        <color name="text_white">#FFFFFF</color>
 
     <color name="chip_stroke_color">#BDBDBD</color> <!-- Light gray stroke color -->
 
     <!-- Background color for the chip when not selected -->
-    <color name="chip_background_color">#FFFFFF</color> <!-- White background -->
+
 
     <!-- Selected background color for the chip -->
     <color name="chip_selected_background_color">#E0E0E0</color>
 
+    <!-- Primary and Secondary Colors -->
 
+    <color name="colorPrimaryVariant">#3700B3</color>
+    <color name="colorSecondary">#03DAC5</color>
+
+    <!-- Chip Background and Stroke -->
+
+    <color name="colorChipStroke">#0097A7</color> <!-- Dark blue stroke -->
+    <color name="colorChipBackground">#E0F7FA</color>
     <color name="nav_item_active_color">#009688</color> <!-- Teal color for active items -->
     <color name="nav_item_inactive_color">#B0B0B0</color> <!-- Light grey for inactive icons -->
 
@@ -72,4 +90,13 @@
 
     <!-- Text color for active items -->
     <color name="nav_item_selected_text">#FFFFFF</color> <!-- White text for active items -->
+
+    <color name="background_green">#E6F4EA</color> <!-- light green -->
+    <color name="boy_blue">#4A90E2</color>
+    <color name="girl_pink">#FF69B4</color>
+
+
+    <color name="primaryText">#1C1F2A</color>
+    <color name="buttonGreenStart">#66BB6A</color>
+    <color name="buttonGreenEnd">#43A047</color>
     </resources>

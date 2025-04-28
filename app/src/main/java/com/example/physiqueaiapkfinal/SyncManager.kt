@@ -16,8 +16,8 @@ import kotlinx.coroutines.tasks.await
 
 class SyncManager(context: Context, workerParams: WorkerParameters) : Worker(context, workerParams) {
 
-    private val firestore = FirebaseFirestore.getInstance()
-    private val dbHelper = DatabaseHelper(context)
+    private val firestore: FirebaseFirestore = FirebaseFirestore.getInstance()
+    private val dbHelper: DatabaseHelper = DatabaseHelper(context)
 
     override fun doWork(): Result {
         return try {
@@ -32,45 +32,46 @@ class SyncManager(context: Context, workerParams: WorkerParameters) : Worker(con
         }
     }
 
-    // 🚀 SYNC FROM LOCAL TO FIRESTORE
     private fun syncAllData() {
         syncUserInfo()
         syncTasks()
     }
 
     private fun syncUserInfo() {
-        val cursor = dbHelper.getUnsyncedRecords()  // Assumes this method is implemented
-        cursor?.use { safeCursor ->
-            while (safeCursor.moveToNext()) {
-                val docId = safeCursor.getStringOrNull(safeCursor.getColumnIndex(DatabaseHelper.COLUMN_FIREBASE_ID))
-                    ?: continue
+        val cursor = dbHelper.getUnsyncedRecords()
+        cursor.use { safeCursor ->
+            if (safeCursor != null) {
+                while (safeCursor.moveToNext()) {
+                    val docId = safeCursor.getStringOrNull(safeCursor.getColumnIndex(DatabaseHelper.COLUMN_FIREBASE_ID))
+                        ?: continue
 
-                val personalInfo = extractPersonalInfo(safeCursor)
-                val physicalInfo = extractPhysicalInfo(safeCursor)
-                val medicalInfo = extractMedicalInfo(safeCursor)
+                    val personalInfo = extractPersonalInfo(safeCursor)
+                    val physicalInfo = extractPhysicalInfo(safeCursor)
+                    val medicalInfo = extractMedicalInfo(safeCursor)
 
-                val data = hashMapOf(
-                    "personalInfo" to personalInfo,
-                    "physicalInfo" to physicalInfo,
-                    "medicalInfo" to medicalInfo
-                )
+                    val data = hashMapOf(
+                        "personalInfo" to personalInfo,
+                        "physicalInfo" to physicalInfo,
+                        "medicalInfo" to medicalInfo
+                    )
 
-                firestore.collection("userinfo").document(docId)
-                    .set(data)
-                    .addOnSuccessListener {
-                        dbHelper.markAsSynced(docId)  // Assumes this method is implemented
-                        Log.d("SyncManager", "User record $docId synced.")
-                    }
-                    .addOnFailureListener { e ->
-                        Log.e("SyncManager", "User sync failed: ${e.message}")
-                    }
+                    firestore.collection("userinfo").document(docId)
+                        .set(data)
+                        .addOnSuccessListener {
+                            dbHelper.markAsSynced(docId)
+                            Log.d("SyncManager", "User record $docId synced.")
+                        }
+                        .addOnFailureListener { e ->
+                            Log.e("SyncManager", "User sync failed: ${e.message}")
+                        }
+                }
             }
         }
     }
 
     private fun syncTasks() {
-        val taskCursor = dbHelper.getAllTasks()  // Assumes this method is implemented
-        taskCursor?.use { cursor ->
+        val taskCursor = dbHelper.getAllTasks()
+        taskCursor.use { cursor ->
             while (cursor.moveToNext()) {
                 val taskId = cursor.getStringOrNull(cursor.getColumnIndex(DatabaseHelper.COLUMN_TASK_ID)) ?: continue
                 val firebaseUserId = cursor.getStringOrNull(cursor.getColumnIndex(DatabaseHelper.COLUMN_FIREBASE_ID)) ?: continue
@@ -79,10 +80,9 @@ class SyncManager(context: Context, workerParams: WorkerParameters) : Worker(con
                     "firebase_id" to firebaseUserId,
                     "task_name" to (cursor.getStringOrNull(cursor.getColumnIndex(DatabaseHelper.COLUMN_TASK_NAME)) ?: ""),
                     "task_workout_type" to (cursor.getStringOrNull(cursor.getColumnIndex(DatabaseHelper.COLUMN_TASK_WORKOUT_TYPE)) ?: ""),
-                    "is_completed" to (cursor.getColumnIndex(COLUMN_TASK_COMPLETED).takeIf { it != -1 }?.let { cursor.getInt(it) == 0 } ?: false),
+                    "is_completed" to (cursor.getColumnIndex(COLUMN_TASK_COMPLETED).takeIf { it != -1 }?.let { cursor.getInt(it) == 1 } ?: false),
                     "task_datetime" to (cursor.getStringOrNull(cursor.getColumnIndex(DatabaseHelper.COLUMN_TASK_DATE)) ?: "")
                 )
-
 
                 firestore.collection("tasks").document(taskId)
                     .set(taskData)
@@ -96,7 +96,6 @@ class SyncManager(context: Context, workerParams: WorkerParameters) : Worker(con
         }
     }
 
-    // 🔄 SYNC FROM FIRESTORE TO LOCAL SQLITE
     private fun syncCloudToLocal() {
         CoroutineScope(Dispatchers.IO).launch {
             try {
@@ -158,7 +157,7 @@ class SyncManager(context: Context, workerParams: WorkerParameters) : Worker(con
                 val values = ContentValues().apply {
                     put(DatabaseHelper.COLUMN_TASK_ID, doc.id)
                     put(DatabaseHelper.COLUMN_FIREBASE_ID, data["firebase_id"]?.toString() ?: "")
-                    put(DatabaseHelper.COLUMN_TASK_NAME, data["title"]?.toString() ?: "")
+                    put(DatabaseHelper.COLUMN_TASK_NAME, data["task_name"]?.toString() ?: "")
                     put(DatabaseHelper.COLUMN_TASK_WORKOUT_TYPE, data["task_workout_type"]?.toString() ?: "")
                     put(COLUMN_TASK_COMPLETED, if ((data["is_completed"] as? Boolean) == true) 1 else 0)
                     put(DatabaseHelper.COLUMN_TASK_DATE, data["task_datetime"]?.toString() ?: "")
@@ -182,12 +181,10 @@ class SyncManager(context: Context, workerParams: WorkerParameters) : Worker(con
         }
     }
 
-    // 🔧 Cursor Safe Getter
     private fun Cursor.getStringOrNull(index: Int): String? {
         return if (index != -1 && !isNull(index)) getString(index) else null
     }
 
-    // 👤 Extractors
     private fun extractPersonalInfo(cursor: Cursor): Map<String, Any> = mapOf(
         "firstName" to (cursor.getStringOrNull(cursor.getColumnIndex(DatabaseHelper.COLUMN_FIRST_NAME)) ?: ""),
         "lastName" to (cursor.getStringOrNull(cursor.getColumnIndex(DatabaseHelper.COLUMN_LAST_NAME)) ?: ""),
@@ -200,8 +197,10 @@ class SyncManager(context: Context, workerParams: WorkerParameters) : Worker(con
         "bodyLevel" to (cursor.getStringOrNull(cursor.getColumnIndex(DatabaseHelper.COLUMN_BODY_LEVEL)) ?: ""),
         "bodyClassification" to (cursor.getStringOrNull(cursor.getColumnIndex(DatabaseHelper.COLUMN_BODY_CLASSIFICATION)) ?: ""),
         "exerciseRoutine" to (cursor.getStringOrNull(cursor.getColumnIndex(DatabaseHelper.COLUMN_EXERCISE_ROUTINE)) ?: ""),
-        "otherInfo" to (cursor.getStringOrNull(cursor.getColumnIndex(DatabaseHelper.COLUMN_OTHER_INFO)) ?: "")
+        "otherInfo" to (cursor.getStringOrNull(cursor.getColumnIndex(DatabaseHelper.COLUMN_OTHER_INFO)) ?: ""),
+        "gymMode" to (cursor.getStringOrNull(cursor.getColumnIndex(DatabaseHelper.COLUMN_GYM_MODE)) ?: "") // Added gymMode
     )
+
 
     private fun extractMedicalInfo(cursor: Cursor): Map<String, Any> = mapOf(
         "allergies" to (cursor.getStringOrNull(cursor.getColumnIndex(DatabaseHelper.COLUMN_ALLERGIES)) ?: ""),

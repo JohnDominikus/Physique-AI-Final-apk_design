@@ -7,7 +7,6 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
@@ -23,12 +22,12 @@ class MedicalActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_medical)
 
-        // ✅ Initialize Firebase and SQLite
+        // Initialize Firebase and SQLite
         auth = FirebaseAuth.getInstance()
         firestore = FirebaseFirestore.getInstance()
         sqliteHelper = DatabaseHelper(this)
 
-        // ✅ Retrieve the user ID from the previous activity
+        // Retrieve the user ID from the previous activity
         userId = intent.getStringExtra("userId") ?: ""
 
         if (userId.isEmpty()) {
@@ -37,7 +36,7 @@ class MedicalActivity : AppCompatActivity() {
             return
         }
 
-        // ✅ Initialize UI elements
+        // Initialize UI elements
         val editAllergies = findViewById<EditText>(R.id.editAllergies)
         val editMedicalHistory = findViewById<EditText>(R.id.editMedicalHistory)
         val editFractures = findViewById<EditText>(R.id.editFractures)
@@ -45,10 +44,10 @@ class MedicalActivity : AppCompatActivity() {
         val btnBack = findViewById<Button>(R.id.btnBack)
         val btnSubmit = findViewById<Button>(R.id.btnSubmit)
 
-        // ✅ Navigate back to the previous screen
+        // Navigate back to the previous screen
         btnBack.setOnClickListener { finish() }
 
-        // ✅ Submit medical information
+        // Submit medical information
         btnSubmit.setOnClickListener {
             val allergies = editAllergies.text.toString().trim()
             val medicalHistory = editMedicalHistory.text.toString().trim()
@@ -60,20 +59,20 @@ class MedicalActivity : AppCompatActivity() {
         }
     }
 
-    // ✅ Save medical information to Firestore and SQLite
+    // Save medical information to Firestore and SQLite
     private fun saveMedicalInformation(
         allergies: String,
         medicalHistory: String,
         fractures: String,
         otherConditions: String
     ) {
-        // 🔥 Check if all fields are empty
+        // Check if all fields are empty
         if (allergies.isEmpty() && medicalHistory.isEmpty() && fractures.isEmpty() && otherConditions.isEmpty()) {
             Toast.makeText(this, "Please fill at least one field", Toast.LENGTH_SHORT).show()
             return
         }
 
-        // ✅ Prepare data for Firestore
+        // Prepare data for Firestore
         val medicalData = mapOf(
             "allergies" to allergies,
             "medicalHistory" to medicalHistory,
@@ -85,25 +84,26 @@ class MedicalActivity : AppCompatActivity() {
             "medicalInfo" to medicalData
         )
 
-        // ✅ Save to Firestore
+        // Save to Firestore
         firestore.collection("userinfo").document(userId)
             .set(firestoreData, SetOptions.merge())
             .addOnSuccessListener {
                 Log.d("Firestore", "Medical info saved successfully in Firestore")
 
-                // ✅ Save to SQLite
+                // Save to SQLite
                 val rowId = sqliteHelper.insertOrUpdateUser(
                     firebaseId = userId,
-                    firstName = "",
+                    firstName = "", // Can be filled from another screen if needed
                     lastName = "",
                     birthdate = "",
                     phone = "",
                     email = "",
                     password = "",
-                    bodyLevel = null,
+                    bodyLevel = "",  // You can later add physical info here
                     bodyClassification = null,
                     exerciseRoutine = null,
                     otherInfo = null,
+                    gymMode = null,
                     allergies = allergies,
                     medicalHistory = medicalHistory,
                     fractures = fractures,
@@ -113,7 +113,7 @@ class MedicalActivity : AppCompatActivity() {
                 if (rowId != -1L) {
                     Toast.makeText(this, "Medical info saved successfully!", Toast.LENGTH_SHORT).show()
 
-                    // 🚀 Navigate to `DashboardActivity`
+                    // Navigate to DashboardActivity
                     val intent = Intent(this, DashboardActivity::class.java)
                     startActivity(intent)
                     finish()

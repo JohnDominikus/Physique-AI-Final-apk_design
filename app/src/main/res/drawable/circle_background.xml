@@ -4,9 +4,9 @@
         android:shape="oval">
 
         <solid android:color="@color/secondaryColor" />
-        <size android:width="60dp" android:height="60dp" />
+        <!-- Increased the size to make the circle bigger to account for padding -->
+        <size android:width="76dp" android:height="76dp" />
         <stroke android:width="2dp" android:color="@color/primaryColor" />
 
     </shape>
-
 </selector>

@@ -1,284 +1,330 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.core.widget.NestedScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="16dp"
     android:background="@color/white"
     tools:context=".DashboardActivity">
 
-    <!-- Dashboard Title -->
-    <TextView
-        android:id="@+id/tvDashboardTitle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Dashboard"
-        android:textSize="24sp"
-        android:textColor="@android:color/black"
-        android:textStyle="bold"
-        android:layout_alignParentTop="true"
-        android:layout_marginBottom="16dp" />
-
-    <!-- Profile Section -->
-    <LinearLayout
-        android:id="@+id/llProfile"
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center_vertical"
-        android:layout_marginBottom="16dp"
-        android:layout_below="@id/tvDashboardTitle">
+        android:padding="16dp"
+        android:background="@color/white">
 
-        <ImageView
-            android:id="@+id/ivProfile"
-            android:layout_width="70dp"
-            android:layout_height="70dp"
-            android:src="@drawable/profile"
-            android:contentDescription="@string/profile_image_description"
-            android:background="@drawable/circle_background"
-            android:layout_marginEnd="12dp" />
-
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:orientation="vertical">
-
-            <TextView
-                android:id="@+id/tvUserName"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="John Doe"
-                android:textSize="20sp"
-                android:textColor="@android:color/black"
-                android:textStyle="bold" />
-
-            <TextView
-                android:id="@+id/tvBmiStatus"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="BMI: 24.0"
-                android:textSize="14sp"
-                android:textColor="@android:color/darker_gray"
-                android:layout_marginTop="4dp" />
-
-            <LinearLayout
-                android:id="@+id/llPhysicalLevel"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_marginTop="4dp">
-
-                <ImageView
-                    android:id="@+id/ivStar"
-                    android:layout_width="18dp"
-                    android:layout_height="18dp"
-                    android:src="@drawable/star"
-                    android:visibility="gone" />
-
-                <ImageView
-                    android:id="@+id/ivVerified"
-                    android:layout_width="18dp"
-                    android:layout_height="18dp"
-                    android:src="@drawable/verified"
-                    android:visibility="gone" />
-
-                <ImageView
-                    android:id="@+id/ivMuscles"
-                    android:layout_width="18dp"
-                    android:layout_height="18dp"
-                    android:src="@drawable/verified"
-                    android:visibility="gone" />
-                <TextView
-                    android:id="@+id/tvPhysicalLevel"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Level: Beginner"
-                    android:textSize="14sp"
-                    android:textColor="@color/green"
-                    android:layout_marginStart="8dp" />
-
-            </LinearLayout>
-        </LinearLayout>
-
-        <ImageView
-            android:id="@+id/ivSettings"
+        <!-- Dashboard Title -->
+        <TextView
+            android:id="@+id/tvDashboardTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:contentDescription="Settings"
-            android:src="@drawable/settings" />
+            android:text="Dashboard"
+            android:textSize="24sp"
+            android:textColor="@android:color/black"
+            android:textStyle="bold"
+            android:layout_alignParentTop="true"
+            android:layout_marginBottom="16dp" />
 
-    </LinearLayout>
-
-    <!-- Welcome Message -->
-    <TextView
-        android:id="@+id/tvWelcome"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Welcome! Let's start your fitness journey!"
-        android:textSize="16sp"
-        android:textColor="@android:color/darker_gray"
-        android:layout_below="@id/llProfile"
-        android:layout_marginBottom="24dp" />
-
-    <GridLayout
-        android:id="@+id/gridWidgets"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/tvWelcome"
-        android:layout_marginBottom="16dp"
-        android:layout_centerHorizontal="true"
-        android:columnCount="2"
-        android:rowCount="3">
-
-        <!-- All CardWidgets below using MaterialCardView -->
-
-        <com.google.android.material.card.MaterialCardView
-            android:id="@+id/btnPosture"
-            android:layout_width="0dp"
-            android:layout_height="150dp"
-            android:layout_margin="12dp"
-            android:layout_columnWeight="1"
-            app:cardCornerRadius="12dp"
-            app:cardElevation="4dp"
-            android:backgroundTint="@color/blue"
-            app:strokeColor="@android:color/white"
-            app:strokeWidth="2dp"
-            android:clickable="true"
-            android:focusable="true">
+        <!-- Profile Section -->
+        <LinearLayout
+            android:id="@+id/llProfile"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="16dp"
+            android:layout_below="@id/tvDashboardTitle">
 
             <ImageView
-                android:layout_width="64dp"
-                android:layout_height="64dp"
-                android:layout_gravity="center"
-                android:src="@drawable/pose"
-                android:contentDescription="AI Posture"
-                app:tint="@color/white" />
-        </com.google.android.material.card.MaterialCardView>
+                android:id="@+id/ivProfile"
+                android:layout_width="70dp"
+                android:layout_height="70dp"
+                android:src="@drawable/profile"
+                android:contentDescription="@string/profile_image_description"
+                android:background="@drawable/circle_background"
+            android:layout_marginEnd="12dp" />
 
-        <com.google.android.material.card.MaterialCardView
-            android:id="@+id/btnExercise"
-            android:layout_width="0dp"
-            android:layout_height="150dp"
-            android:layout_margin="12dp"
-            android:layout_columnWeight="1"
-            app:cardCornerRadius="12dp"
-            app:cardElevation="4dp"
-            android:backgroundTint="@color/black"
-            app:strokeColor="@android:color/white"
-            app:strokeWidth="2dp"
-            android:clickable="true"
-            android:focusable="true">
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
 
-            <ImageView
-                android:layout_width="64dp"
-                android:layout_height="64dp"
-                android:layout_gravity="center"
-                android:src="@drawable/excercise"
-                android:contentDescription="Exercise"
-                app:tint="@color/white" />
-        </com.google.android.material.card.MaterialCardView>
+                <TextView
+                    android:id="@+id/tvUserName"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="John Doe"
+                    android:textSize="20sp"
+                    android:textColor="@android:color/black"
+                    android:textStyle="bold" />
 
-        <com.google.android.material.card.MaterialCardView
-            android:id="@+id/btnDietary"
-            android:layout_width="0dp"
-            android:layout_height="150dp"
-            android:layout_margin="12dp"
-            android:layout_columnWeight="1"
-            app:cardCornerRadius="12dp"
-            app:cardElevation="4dp"
-            android:backgroundTint="@color/green"
-            app:strokeColor="@android:color/white"
-            app:strokeWidth="2dp"
-            android:clickable="true"
-            android:focusable="true">
+                <TextView
+                    android:id="@+id/tvBmiStatus"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="BMI: 24.0"
+                    android:textSize="14sp"
+                    android:textColor="@android:color/darker_gray"
+                    android:layout_marginTop="4dp" />
 
-            <ImageView
-                android:layout_width="64dp"
-                android:layout_height="64dp"
-                android:layout_gravity="center"
-                android:src="@drawable/dietary"
-                android:contentDescription="Dietary"
-                app:tint="@color/white" />
-        </com.google.android.material.card.MaterialCardView>
+                <LinearLayout
+                    android:id="@+id/llPhysicalLevel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginTop="4dp">
 
-        <com.google.android.material.card.MaterialCardView
-            android:id="@+id/btnTask"
-            android:layout_width="0dp"
-            android:layout_height="150dp"
-            android:layout_margin="12dp"
-            android:layout_columnWeight="1"
-            app:cardCornerRadius="12dp"
-            app:cardElevation="4dp"
-            android:backgroundTint="@color/orange"
-            app:strokeColor="@android:color/white"
-            app:strokeWidth="2dp"
-            android:clickable="true"
-            android:focusable="true">
+                    <ImageView
+                        android:id="@+id/ivStar"
+                        android:layout_width="18dp"
+                        android:layout_height="18dp"
+                        android:src="@drawable/star"
+                        android:visibility="gone" />
 
-            <ImageView
-                android:layout_width="64dp"
-                android:layout_height="64dp"
-                android:layout_gravity="center"
-                android:src="@drawable/task"
-                android:contentDescription="Task"
-                app:tint="@color/white" />
-        </com.google.android.material.card.MaterialCardView>
+                    <ImageView
+                        android:id="@+id/ivVerified"
+                        android:layout_width="18dp"
+                        android:layout_height="18dp"
+                        android:src="@drawable/verified"
+                        android:visibility="gone" />
 
-        <com.google.android.material.card.MaterialCardView
-            android:id="@+id/btnBMI"
-            android:layout_width="0dp"
-            android:layout_height="150dp"
-            android:layout_margin="12dp"
-            android:layout_columnWeight="1"
-            app:cardCornerRadius="12dp"
-            app:cardElevation="4dp"
-            android:backgroundTint="@color/violet"
-            app:strokeColor="@android:color/white"
-            app:strokeWidth="2dp"
-            android:clickable="true"
-            android:focusable="true">
+                    <ImageView
+                        android:id="@+id/ivMuscles"
+                        android:layout_width="18dp"
+                        android:layout_height="18dp"
+                        android:src="@drawable/verified"
+                        android:visibility="gone" />
+                    <TextView
+                        android:id="@+id/tvPhysicalLevel"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Level: Beginner"
+                        android:textSize="14sp"
+                        android:textColor="@color/green"
+                        android:layout_marginStart="8dp" />
+
+                </LinearLayout>
+            </LinearLayout>
 
             <ImageView
-                android:layout_width="64dp"
-                android:layout_height="64dp"
-                android:layout_gravity="center"
-                android:src="@drawable/bmi"
-                android:contentDescription="BMI"
-                app:tint="@color/white" />
-        </com.google.android.material.card.MaterialCardView>
+                android:id="@+id/ivSettings"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:contentDescription="Settings"
+                android:src="@drawable/settings" />
 
-        <com.google.android.material.card.MaterialCardView
-            android:id="@+id/btnLogout"
-            android:layout_width="0dp"
-            android:layout_height="150dp"
-            android:layout_margin="12dp"
-            android:layout_columnWeight="1"
-            app:cardCornerRadius="12dp"
-            app:cardElevation="4dp"
-            android:backgroundTint="@color/red"
-            app:strokeColor="@android:color/white"
-            app:strokeWidth="2dp"
-            android:clickable="false"
-            android:focusable="false" >
+        </LinearLayout>
 
-            <ImageView
-                android:layout_width="64dp"
-                android:layout_height="64dp"
-                android:layout_gravity="center"
-                android:src="@drawable/logout"
-                android:contentDescription="Logout"
-                app:tint="@color/white" />
-        </com.google.android.material.card.MaterialCardView>
+        <!-- Welcome Message -->
+        <TextView
+            android:id="@+id/tvWelcome"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Welcome! Let's start your fitness journey!"
+            android:textSize="16sp"
+            android:textColor="@android:color/darker_gray"
+            android:layout_below="@id/llProfile"
+            android:layout_marginBottom="24dp" />
 
-    </GridLayout>
+        <!-- To-Do List Box -->
+        <LinearLayout
+            android:id="@+id/llTodoList"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_below="@id/tvWelcome"
+            android:background="@color/light_gray"
+            android:padding="12dp"
+            android:layout_marginBottom="16dp">
 
-    <com.google.android.material.bottomnavigation.BottomNavigationView
-        android:id="@+id/bottom_navigation"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:background="?android:attr/windowBackground"
-        app:menu="@menu/bottom_navigation_menu" />
+            <TextView
+                android:id="@+id/tvTodoTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="To-Do List"
+                android:textSize="18sp"
+                android:textColor="@android:color/black"
+                android:textStyle="bold"
+                android:layout_marginBottom="8dp" />
 
-</RelativeLayout>
+            <!-- Placeholder text for To-Do list -->
+            <TextView
+                android:id="@+id/tvTodoContent"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="1. Buy groceries\n2. Finish workout plan\n3. Check email"
+                android:textSize="14sp"
+                android:textColor="@android:color/darker_gray"
+                android:layout_below="@id/tvWelcome"
+            android:layout_marginTop="16dp" />    <!-- Adjust margin to your preference -->
+        </LinearLayout>
+
+        <!-- GridLayout for Widgets (Posture, BMI, Exercise, Task, etc.) -->
+        <GridLayout
+            android:id="@+id/gridWidgets"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/llTodoList"
+            android:layout_marginBottom="16dp"
+            android:layout_centerHorizontal="true"
+            android:columnCount="2"
+            android:rowCount="3">
+
+            <!-- Material Card for Posture -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/btnPosture"
+                android:layout_width="0dp"
+                android:layout_height="150dp"
+                android:layout_margin="12dp"
+                android:layout_columnWeight="1"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="4dp"
+                android:backgroundTint="@color/blue"
+                app:strokeColor="@android:color/white"
+                app:strokeWidth="2dp"
+                android:clickable="true"
+                android:focusable="true">
+
+                <ImageView
+                    android:layout_width="64dp"
+                    android:layout_height="64dp"
+                    android:layout_gravity="center"
+                    android:src="@drawable/pose"
+                    android:contentDescription="AI Posture"
+                    app:tint="@color/white" />
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Material Card for Exercise -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/btnExercise"
+                android:layout_width="0dp"
+                android:layout_height="150dp"
+                android:layout_margin="12dp"
+                android:layout_columnWeight="1"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="4dp"
+                android:backgroundTint="@color/black"
+                app:strokeColor="@android:color/white"
+                app:strokeWidth="2dp"
+                android:clickable="true"
+                android:focusable="true">
+
+                <ImageView
+                    android:layout_width="64dp"
+                    android:layout_height="64dp"
+                    android:layout_gravity="center"
+                    android:src="@drawable/excercise"
+                    android:contentDescription="Exercise"
+                    app:tint="@color/white" />
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Material Card for Dietary -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/btnDietary"
+                android:layout_width="0dp"
+                android:layout_height="150dp"
+                android:layout_margin="12dp"
+                android:layout_columnWeight="1"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="4dp"
+                android:backgroundTint="@color/green"
+                app:strokeColor="@android:color/white"
+                app:strokeWidth="2dp"
+                android:clickable="true"
+                android:focusable="true">
+
+                <ImageView
+                    android:layout_width="64dp"
+                    android:layout_height="64dp"
+                    android:layout_gravity="center"
+                    android:src="@drawable/dietary"
+                    android:contentDescription="Dietary"
+                    app:tint="@color/white" />
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Material Card for Task -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/btnTask"
+                android:layout_width="0dp"
+                android:layout_height="150dp"
+                android:layout_margin="12dp"
+                android:layout_columnWeight="1"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="4dp"
+                android:backgroundTint="@color/orange"
+                app:strokeColor="@android:color/white"
+                app:strokeWidth="2dp"
+                android:clickable="true"
+                android:focusable="true">
+
+                <ImageView
+                    android:layout_width="64dp"
+                    android:layout_height="64dp"
+                    android:layout_gravity="center"
+                    android:src="@drawable/task"
+                    android:contentDescription="Task"
+                    app:tint="@color/white" />
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Material Card for BMI -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/btnBMI"
+                android:layout_width="0dp"
+                android:layout_height="150dp"
+                android:layout_margin="12dp"
+                android:layout_columnWeight="1"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="4dp"
+                android:backgroundTint="@color/violet"
+                app:strokeColor="@android:color/white"
+                app:strokeWidth="2dp"
+                android:clickable="true"
+                android:focusable="true">
+
+                <ImageView
+                    android:layout_width="64dp"
+                    android:layout_height="64dp"
+                    android:layout_gravity="center"
+                    android:src="@drawable/bmi"
+                    android:contentDescription="BMI"
+                    app:tint="@color/white" />
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Material Card for Logout -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/btnLogout"
+                android:layout_width="0dp"
+                android:layout_height="150dp"
+                android:layout_margin="12dp"
+                android:layout_columnWeight="1"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="4dp"
+                android:backgroundTint="@color/red"
+                app:strokeColor="@android:color/white"
+                app:strokeWidth="2dp"
+                android:clickable="false"
+                android:focusable="false">
+
+                <ImageView
+                    android:layout_width="64dp"
+                    android:layout_height="64dp"
+                    android:layout_gravity="center"
+                    android:src="@drawable/logout"
+                    android:contentDescription="Logout"
+                    app:tint="@color/white" />
+            </com.google.android.material.card.MaterialCardView>
+
+        </GridLayout>
+
+        <!-- Bottom Navigation -->
+        <com.google.android.material.bottomnavigation.BottomNavigationView
+            android:id="@+id/bottom_navigation"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:background="?android:attr/windowBackground"
+            app:menu="@menu/bottom_navigation_menu" />
+
+    </RelativeLayout>
+</androidx.core.widget.NestedScrollView>

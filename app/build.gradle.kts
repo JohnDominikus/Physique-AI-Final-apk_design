@@ -79,15 +79,15 @@ dependencies {
     implementation(libs.androidx.camera.view)
 
     // Lifecycle & Fragment
-    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.4.0")
-    implementation("androidx.fragment:fragment-ktx:1.4.0")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.7")
+    implementation("androidx.fragment:fragment-ktx:1.8.6")
 
     // Media3
     implementation(libs.androidx.media3.common.ktx)
 
     // Glide
-    implementation("com.github.bumptech.glide:glide:4.12.0")
-    annotationProcessor("com.github.bumptech.glide:compiler:4.12.0")
+    implementation("com.github.bumptech.glide:glide:4.16.0")
+    annotationProcessor("com.github.bumptech.glide:compiler:4.16.0")
 
     // Navigation & Layout
     implementation(libs.androidx.navigation.fragment.ktx)
@@ -98,7 +98,7 @@ dependencies {
     // Material & AppCompat (aliases)
     implementation(libs.material)
     implementation(libs.androidx.appcompat)
-    implementation ("androidx.core:core:1.6.0 ")
+    implementation (libs.androidx.core)
     // Testing
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

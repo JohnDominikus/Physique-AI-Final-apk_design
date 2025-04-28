@@ -34,7 +34,7 @@
             android:text="All"
             android:checked="true"
             style="@style/Widget.MaterialComponents.Chip.Choice"
-            app:chipBackgroundColor="@color/chip_background_color" />
+            app:chipBackgroundColor="@color/green" />
 
         <com.google.android.material.chip.Chip
             android:id="@+id/chipBreakfast"
@@ -42,7 +42,7 @@
             android:layout_height="wrap_content"
             android:text="Breakfast"
             style="@style/Widget.MaterialComponents.Chip.Choice"
-            app:chipBackgroundColor="@color/chip_background_color" />
+            app:chipBackgroundColor="@color/green" />
 
         <com.google.android.material.chip.Chip
             android:id="@+id/chipLunch"
@@ -50,7 +50,7 @@
             android:layout_height="wrap_content"
             android:text="Lunch"
             style="@style/Widget.MaterialComponents.Chip.Choice"
-            app:chipBackgroundColor="@color/chip_background_color" />
+            app:chipBackgroundColor="@color/green" />
 
         <com.google.android.material.chip.Chip
             android:id="@+id/chipDinner"
@@ -58,7 +58,7 @@
             android:layout_height="wrap_content"
             android:text="Dinner"
             style="@style/Widget.MaterialComponents.Chip.Choice"
-            app:chipBackgroundColor="@color/chip_background_color" />
+            app:chipBackgroundColor="@color/green" />
 
         <com.google.android.material.chip.Chip
             android:id="@+id/chipSnack"
@@ -66,7 +66,7 @@
             android:layout_height="wrap_content"
             android:text="Snack"
             style="@style/Widget.MaterialComponents.Chip.Choice"
-            app:chipBackgroundColor="@color/chip_background_color" />
+            app:chipBackgroundColor="@color/green" />
     </com.google.android.material.chip.ChipGroup>
 
     <!-- Nutrition summary with better styling -->
@@ -104,7 +104,7 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:clipToPadding="false"
+        android:clipToPadding="true"
         android:paddingTop="8dp"
         android:paddingBottom="8dp" />
 

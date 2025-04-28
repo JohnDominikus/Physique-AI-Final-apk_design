@@ -1,8 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Solid background color -->
     <solid android:color="#f0f0f0"/>
-    <corners android:radius="8dp"/>
+
+    <!-- Rounded corners for a modern look -->
+    <corners android:radius="12dp"/>
+
+    <!-- Green border with a subtle gradient effect -->
     <stroke
-        android:color="#c0c0c0"
-    android:width="1dp"/>
+        android:color="#4CAF50"
+    android:width="2dp"/>
+
+    <!-- Optional shadow effect for a modern appearance -->
+    <padding
+        android:left="4dp"
+        android:top="4dp"
+        android:right="4dp"
+        android:bottom="4dp"/>
 </shape>

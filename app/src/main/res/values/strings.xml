@@ -1,35 +1,52 @@
 <resources>
-    <string name="app_name">physiqueaiapkfinal</string>
+    <!-- App Info -->
+    <string name="app_name">Physique AI</string>
     <string name="action_settings">Settings</string>
-    <!-- Strings used for fragments for navigation -->
+
+    <!-- Navigation -->
     <string name="first_fragment_label">First Fragment</string>
     <string name="second_fragment_label">Second Fragment</string>
     <string name="next">Next</string>
     <string name="previous">Previous</string>
+    <string name="view_pager_description">Swipe left or right to switch between Browse Meals and My Meal Plan</string>
 
-
-        <string name="select_birthdate">Select Birthdate</string>
-        <string name="fill_all_fields">Please fill all fields properly</string>
-        <string name="registration_successful">Registration Successful!</string>
-        <string name="failed_to_save_locally">Failed to save user data locally</string>
-        <string name="failed_to_save_firestore">Failed to save user data to Firestore</string>
-        <string name="failed_to_retrieve_user_id">Failed to retrieve user ID.</string>
-        <string name="registration_failed">Registration failed: %s</string>
-
-
-
-    <string name="profile_image_description">User profile image</string>
+    <!-- User Registration -->
+    <string name="select_birthdate">Select Birthdate</string>
+    <string name="fill_all_fields">Please fill all fields properly</string>
+    <string name="registration_successful">Registration Successful!</string>
+    <string name="failed_to_save_locally">Failed to save user data locally</string>
+    <string name="failed_to_save_firestore">Failed to save user data to Firestore</string>
+    <string name="failed_to_retrieve_user_id">Failed to retrieve user ID</string>
+    <string name="registration_failed">Registration failed: %s</string>
     <string name="welcome_message">Welcome, %s!</string>
-    <string name="video_thumbnail">Video thumbnail</string>
+    <string name="profile_image_description">User profile image</string>
 
-
+    <!-- Meal Planning -->
     <string name="meal_image">Meal image</string>
     <string name="meal_image_description">Image of the meal</string>
     <string name="add_to_plan">Add to Plan</string>
     <string name="search_meals_hint">Search for meals</string>
-    <string name="add_meal" />
-    <string name="nutrition_summary_default" />
-    <string name="view_pager_description">Swipe left or right to switch between Browse Meals and My Meal Plan</string>
+    <string name="add_meal">Add Meal</string>
+    <string name="nutrition_summary_default">Nutrition summary</string>
 
+    <!-- Tasks -->
+    <string name="today_tasks_message">Your tasks today: %d</string>
+    <string name="add_task_title">Add Task</string>
+    <string name="add">Add</string>
+    <string name="cancel">Cancel</string>
+    <string name="enter_exercise_details">Please enter exercise details</string>
+    <string name="task_added_success">Task added successfully</string>
+    <string name="task_add_failed">Failed to add task</string>
+    <string name="task_delete_failed">Failed to delete task</string>
+    <string name="task_update_failed">Failed to update task</string>
+    <string name="load_tasks_error">Failed to load tasks: %s</string>
 
+    <!-- Video -->
+    <string name="video_thumbnail">Video thumbnail</string>
+
+    <!-- Plurals -->
+    <plurals name="task_count">
+        <item quantity="one">%d Task</item>
+        <item quantity="other">%d Tasks</item>
+    </plurals>
 </resources>

@@ -8,7 +8,6 @@ import androidx.drawerlayout.widget.DrawerLayout
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.navigation.NavigationView
 
-// MainActivity.kt
 class MainActivity : AppCompatActivity() {
 
     private lateinit var drawerLayout: DrawerLayout
@@ -32,7 +31,7 @@ class MainActivity : AppCompatActivity() {
             drawerLayout.openDrawer(GravityCompat.START)
         }
 
-        // Handle NavigationView item clicks
+        // Handle NavigationView item clicks (drawer menu)
         val navView = findViewById<NavigationView>(R.id.navView)
         navView.setNavigationItemSelectedListener { menuItem ->
             when (menuItem.itemId) {
@@ -60,9 +59,9 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        // Handle BottomNavigationView item clicks
+        // Handle BottomNavigationView item clicks (updated to avoid deprecated method)
         val bottomNavigationView = findViewById<BottomNavigationView>(R.id.bottomNavigationView)
-        bottomNavigationView.setOnNavigationItemSelectedListener { menuItem ->
+        bottomNavigationView.setOnItemSelectedListener { menuItem ->
             when (menuItem.itemId) {
                 R.id.nav_home -> {
                     // Handle home click
