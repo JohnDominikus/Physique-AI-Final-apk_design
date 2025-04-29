@@ -1,44 +1,26 @@
 {
   "project_info": {
-    "project_number": "744004697987",
-    "project_id": "final-central-db-for-physique",
-    "storage_bucket": "final-central-db-for-physique.firebasestorage.app"
+    "project_number": "27702021149",
+    "project_id": "physique-ai-database-final",
+    "storage_bucket": "physique-ai-database-final.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:744004697987:android:adaf721fe676cb7d5000b6",
+        "mobilesdk_app_id": "1:27702021149:android:fb4bc044a09f5947474af4",
         "android_client_info": {
           "package_name": "com.example.physiqueaiapkfinal"
         }
       },
-      "oauth_client": [
-        {
-          "client_id": "744004697987-7avnteb6fs4mnof3vhilbh38v3ru77p3.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.example.physiqueaiapkfinal",
-            "certificate_hash": "b182c5f180678679fcac16068af0fc95e877a330"
-          }
-        },
-        {
-          "client_id": "744004697987-l8qc60880p1aajlf78rirg4f0t35th3v.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
+      "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyB0vTlCrKJA2Por28T-mIkkXOX3u5LgMaU"
+          "current_key": "AIzaSyBPN6XbMGo_5tDq2lFq_3pjspV1vqCMOX0"
         }
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": [
-            {
-              "client_id": "744004697987-l8qc60880p1aajlf78rirg4f0t35th3v.apps.googleusercontent.com",
-              "client_type": 3
-            }
-          ]
+          "other_platform_oauth_client": []
         }
       }
     }
