@@ -103,11 +103,10 @@ class ProfileActivity : AppCompatActivity() {
                 .setTitle("Confirm Save")
                 .setMessage("Save this name?\n\n$displayFormatted")
                 .setPositiveButton("Yes") { _, _ ->
-                    firestore.collection("userinfo").document(uid!!)
-                        .update(
-                            "personalInfo.firstName", firstName,
-                            "personalInfo.lastName", lastName
-                        )
+                    firestore.collection("userinfo").document(uid!!).update(
+                        "personalInfo.firstName", firstName,
+                        "personalInfo.lastName", lastName
+                    )
                         .addOnSuccessListener {
                             Toast.makeText(this, "Name updated", Toast.LENGTH_SHORT).show()
                             editNameLayout.visibility = View.GONE
@@ -122,7 +121,6 @@ class ProfileActivity : AppCompatActivity() {
 
         editBirthdateIcon.setOnClickListener {
             editBirthdateLayout.visibility = View.VISIBLE
-
             val cal = Calendar.getInstance()
             DatePickerDialog(this, { _, y, m, d ->
                 val dateStr = "${(m + 1).toString().padStart(2, '0')}/${d.toString().padStart(2, '0')}/$y"
@@ -133,8 +131,7 @@ class ProfileActivity : AppCompatActivity() {
         saveBirthdateIcon.setOnClickListener {
             val birthdate = editBirthdate.text.toString().trim()
 
-            firestore.collection("userinfo").document(uid!!)
-                .update("personalInfo.birthdate", birthdate)
+            firestore.collection("userinfo").document(uid!!).update("personalInfo.birthdate", birthdate)
                 .addOnSuccessListener {
                     Toast.makeText(this, "Birthdate updated", Toast.LENGTH_SHORT).show()
                     editBirthdateLayout.visibility = View.GONE
@@ -147,7 +144,6 @@ class ProfileActivity : AppCompatActivity() {
 
         savePhoneIcon.setOnClickListener {
             var phone = editPhone.text.toString().trim()
-
             phone = when {
                 phone.startsWith("09") && phone.length == 11 -> "+63${phone.substring(1)}"
                 phone.startsWith("9") && phone.length == 10 -> "+63$phone"
@@ -162,8 +158,7 @@ class ProfileActivity : AppCompatActivity() {
                 .setTitle("Confirm Save")
                 .setMessage("Save this number?\n\n$phone")
                 .setPositiveButton("Yes") { _, _ ->
-                    firestore.collection("userinfo").document(uid!!)
-                        .update("personalInfo.phone", phone)
+                    firestore.collection("userinfo").document(uid!!).update("personalInfo.phone", phone)
                         .addOnSuccessListener {
                             Toast.makeText(this, "Phone updated", Toast.LENGTH_SHORT).show()
                             editPhoneLayout.visibility = View.GONE
@@ -179,43 +174,43 @@ class ProfileActivity : AppCompatActivity() {
 
     @SuppressLint("SetTextI18n", "DefaultLocale")
     private fun fetchUserInfoRealtime() {
-        firestore.collection("userinfo").document(uid!!)
-            .addSnapshotListener { doc, error ->
-                if (error != null) {
-                    Toast.makeText(this, "Error: ${error.message}", Toast.LENGTH_SHORT).show()
-                    return@addSnapshotListener
-                }
-
-                if (doc != null && doc.exists()) {
-                    val personal = doc.get("personalInfo") as? Map<*, *> ?: return@addSnapshotListener
-                    val firstName = personal["firstName"]?.toString() ?: ""
-                    val lastName = personal["lastName"]?.toString() ?: ""
-                    val email = personal["email"]?.toString() ?: "N/A"
-                    val birthdate = personal["birthdate"]?.toString() ?: "N/A"
-                    val phone = personal["phone"]?.toString() ?: "N/A"
-
-                    tvName.text = "Name: $firstName $lastName"
-                    tvEmail.text = "Email: $email"
-                    tvBirthdate.text = "Birthdate: $birthdate"
-                    tvPhone.text = "Phone: $phone"
-
-                    val bmiInfo = doc.get("bmiInfo") as? Map<*, *> ?: emptyMap<String, String>()
-                    val bmiStatus = bmiInfo["status"]?.toString()?.replaceFirstChar { it.uppercase() } ?: "N/A"
-                    val bmiValue = bmiInfo["bmi"]?.toString()?.toDoubleOrNull()?.let { String.format("%.1f", it) } ?: "N/A"
-
-                    tvBMIStatus.text = "BMI Status: $bmiStatus"
-                    tvBMI.text = "BMI: $bmiValue"
-
-                    tvBMIStatus.setTextColor(
-                        when (bmiStatus.lowercase()) {
-                            "normal" -> getColor(R.color.teal_700)
-                            "overweight" -> getColor(android.R.color.holo_orange_light)
-                            "underweight" -> getColor(android.R.color.holo_blue_light)
-                            "obese" -> getColor(android.R.color.holo_red_dark)
-                            else -> getColor(android.R.color.darker_gray)
-                        }
-                    )
-                }
+        firestore.collection("userinfo").document(uid!!).addSnapshotListener { doc, error ->
+            if (error != null) {
+                Toast.makeText(this, "Error: ${error.message}", Toast.LENGTH_SHORT).show()
+                return@addSnapshotListener
             }
+
+            if (doc != null && doc.exists()) {
+                val personal = doc.get("personalInfo") as? Map<*, *> ?: return@addSnapshotListener
+                val firstName = personal["firstName"]?.toString() ?: ""
+                val lastName = personal["lastName"]?.toString() ?: ""
+                val email = personal["email"]?.toString() ?: "N/A"
+                val birthdate = personal["birthdate"]?.toString() ?: "N/A"
+                val phone = personal["phone"]?.toString() ?: "N/A"
+
+                tvName.text = "Name: $firstName $lastName"
+                tvEmail.text = "Email: $email"
+                tvBirthdate.text = "Birthdate: $birthdate"
+                tvPhone.text = "Phone: $phone"
+
+                // Fetch BMI information and display
+                val bmiInfo = doc.get("bmiInfo") as? Map<*, *> ?: emptyMap<String, String>()
+                val bmiStatus = bmiInfo["status"]?.toString()?.replaceFirstChar { it.uppercase() } ?: "N/A"
+                val bmiValue = bmiInfo["bmi"]?.toString()?.toDoubleOrNull()?.let { String.format("%.1f", it) } ?: "N/A"
+
+                tvBMIStatus.text = "BMI Status: $bmiStatus"
+                tvBMI.text = "BMI: $bmiValue"
+
+                tvBMIStatus.setTextColor(
+                    when (bmiStatus.lowercase()) {
+                        "normal" -> getColor(R.color.teal_700)
+                        "overweight" -> getColor(android.R.color.holo_orange_light)
+                        "underweight" -> getColor(android.R.color.holo_blue_light)
+                        "obese" -> getColor(android.R.color.holo_red_dark)
+                        else -> getColor(android.R.color.darker_gray)
+                    }
+                )
+            }
+        }
     }
 }

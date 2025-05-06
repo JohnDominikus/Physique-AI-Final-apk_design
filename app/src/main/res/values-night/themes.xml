@@ -1,7 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Base application theme. -->
-    <style name="Base.Theme.Physiqueaiapkfinal" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Customize your dark theme here. -->
-        <!-- <item name="colorPrimary">@color/my_dark_primary</item> -->
+
+    <style name="AppTheme.Light.NoNight" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <item name="android:forceDarkAllowed">false</item> <!-- Prevents auto dark mode -->
+        <item name="backgroundTint">@color/white</item>
+        <!-- Any other custom color overrides -->
     </style>
 </resources>

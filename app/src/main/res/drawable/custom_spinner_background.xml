@@ -8,7 +8,7 @@
 
     <!-- Green border with a subtle gradient effect -->
     <stroke
-        android:color="#4CAF50"
+        android:color="@color/black"
     android:width="2dp"/>
 
     <!-- Optional shadow effect for a modern appearance -->

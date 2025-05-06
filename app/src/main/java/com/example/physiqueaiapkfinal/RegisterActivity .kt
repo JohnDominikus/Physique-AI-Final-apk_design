@@ -5,7 +5,6 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.widget.ImageButton
-import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.button.MaterialButton
@@ -20,12 +19,11 @@ class RegisterActivity : AppCompatActivity() {
 
     private lateinit var auth: FirebaseAuth
     private lateinit var firestore: FirebaseFirestore
-    private lateinit var dbHelper: DatabaseHelper
 
     // UI elements
     private lateinit var etFirstName: TextInputEditText
     private lateinit var etLastName: TextInputEditText
-    private lateinit var tvBirthdate: TextView
+    private lateinit var tvBirthdate: TextInputEditText
     private lateinit var etPhone: TextInputEditText
     private lateinit var etEmail: TextInputEditText
     private lateinit var etPassword: TextInputEditText
@@ -36,26 +34,28 @@ class RegisterActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_register)
 
-        // Initialize Firebase and SQLite
+        // Initialize Firebase
         auth = FirebaseAuth.getInstance()
         firestore = FirebaseFirestore.getInstance()
-        dbHelper = DatabaseHelper(this)
 
         // Initialize UI elements
         initViews()
 
-        // Set default birthdate text
-        tvBirthdate.text = getString(R.string.select_birthdate)
+        // Set default birthdate
+        tvBirthdate.setText(getString(R.string.select_birthdate))
+        tvBirthdate.inputType = android.text.InputType.TYPE_NULL
 
-        // Back button action - goes to LandingActivity
+        // DatePicker listeners
+        tvBirthdate.setOnClickListener { showDatePicker() }
+        tvBirthdate.setOnFocusChangeListener { _, hasFocus ->
+            if (hasFocus) showDatePicker()
+        }
+
+        // Navigation
         btnBack.setOnClickListener {
             navigateToLandingActivity()
         }
 
-        // Birthdate picker
-        tvBirthdate.setOnClickListener { showDatePicker() }
-
-        // Register button action
         btnRegister.setOnClickListener {
             registerUser()
         }
@@ -80,7 +80,6 @@ class RegisterActivity : AppCompatActivity() {
         finish()
     }
 
-    // DatePicker Dialog
     private fun showDatePicker() {
         val calendar = Calendar.getInstance()
         val year = calendar.get(Calendar.YEAR)
@@ -94,7 +93,7 @@ class RegisterActivity : AppCompatActivity() {
                 }
                 format(cal.time)
             }
-            tvBirthdate.text = formattedDate
+            tvBirthdate.setText(formattedDate)
         }, year, month, day)
 
         datePicker.datePicker.maxDate = System.currentTimeMillis()
@@ -113,14 +112,14 @@ class RegisterActivity : AppCompatActivity() {
             return
         }
 
-        btnRegister.isEnabled = false // Prevent double clicks
+        btnRegister.isEnabled = false
 
         auth.createUserWithEmailAndPassword(email, password)
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
                     val user = auth.currentUser
                     user?.let {
-                        saveUserToFirestoreAndLocal(
+                        saveUserToFirestore(
                             it.uid,
                             firstName,
                             lastName,
@@ -139,7 +138,6 @@ class RegisterActivity : AppCompatActivity() {
             }
     }
 
-    // Input Validation
     private fun validateInput(
         firstName: String,
         lastName: String,
@@ -173,7 +171,7 @@ class RegisterActivity : AppCompatActivity() {
                 etEmail.error = "Invalid email format"
                 false
             }
-            password.length < 6 -> {  // Changed this line to enforce min 6 characters
+            password.length < 6 -> {
                 etPassword.error = "Password must be at least 6 characters long"
                 false
             }
@@ -181,8 +179,7 @@ class RegisterActivity : AppCompatActivity() {
         }
     }
 
-    // Save User Data to Firestore and SQLite
-    private fun saveUserToFirestoreAndLocal(
+    private fun saveUserToFirestore(
         uid: String,
         firstName: String,
         lastName: String,
@@ -190,66 +187,28 @@ class RegisterActivity : AppCompatActivity() {
         phone: String,
         email: String
     ) {
+        val formatter = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+        val birthdateObj = formatter.parse(birthdate)
+
         val userData = hashMapOf(
             "personalInfo" to hashMapOf(
                 "firstName" to firstName,
                 "lastName" to lastName,
-                "birthdate" to birthdate,
+                "birthdate" to birthdateObj,
                 "phone" to phone,
                 "email" to email
             )
         )
 
-        // Save to Firestore
         firestore.collection("userinfo").document(uid)
             .set(userData, SetOptions.merge())
             .addOnSuccessListener {
-                // Save to local SQLite
-                if (saveToLocalDatabase(uid, firstName, lastName, birthdate, phone, email)) {
-                    navigateToPhysicalActivity(uid, birthdate)
-                } else {
-                    btnRegister.isEnabled = true
-                }
+                navigateToPhysicalActivity(uid, birthdate)
             }
             .addOnFailureListener { e ->
                 showError("Firestore error: ${e.message}")
                 btnRegister.isEnabled = true
             }
-    }
-
-    // Save to Local SQLite Database
-    private fun saveToLocalDatabase(
-        uid: String,
-        firstName: String,
-        lastName: String,
-        birthdate: String,
-        phone: String,
-        email: String
-    ): Boolean {
-        return try {
-            val db = dbHelper.writableDatabase
-
-            val values = android.content.ContentValues().apply {
-                put("firebase_id", uid)
-                put("first_name", firstName)
-                put("last_name", lastName)
-                put("birthdate", birthdate)
-                put("phone", phone)
-                put("email", email)
-                put("date", System.currentTimeMillis().toString())
-                put("is_synced", 0)
-            }
-
-            db.insertWithOnConflict(
-                DatabaseHelper.TABLE_USERINFO,
-                null,
-                values,
-                android.database.sqlite.SQLiteDatabase.CONFLICT_REPLACE
-            ) != -1L
-        } catch (e: Exception) {
-            showError("Local database error: ${e.message}")
-            false
-        }
     }
 
     private fun navigateToPhysicalActivity(uid: String, birthdate: String) {
@@ -262,14 +221,8 @@ class RegisterActivity : AppCompatActivity() {
         }
     }
 
-    // Error Display Helper
     private fun showError(message: String) {
         Log.e("RegisterActivity", message)
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
-    }
-
-    override fun onDestroy() {
-        dbHelper.close()
-        super.onDestroy()
     }
 }

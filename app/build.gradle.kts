@@ -10,8 +10,8 @@ android {
 
     defaultConfig {
         applicationId = "com.example.physiqueaiapkfinal"
-        minSdk = 29
-        targetSdk = 34
+        minSdk = 28
+        targetSdk = 33
         versionCode = 1
         versionName = "1.0"
 
@@ -94,6 +94,8 @@ dependencies {
     implementation(libs.androidx.navigation.ui.ktx)
     implementation(libs.androidx.constraintlayout)
     implementation(libs.androidx.work.runtime.ktx)
+    implementation ("androidx.cardview:cardview:1.0.0")
+    implementation ("com.google.android.material:material:1.6.0")
 
     // Material & AppCompat (aliases)
     implementation(libs.material)

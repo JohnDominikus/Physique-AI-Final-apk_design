@@ -1,154 +1,149 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="24dp"
     android:fillViewport="true"
-    tools:context=".PhysicalActivity">
+    android:padding="24dp"
+    tools:context=".PhysicalActivity"
+    android:background="@color/white"> <!-- Set background to a solid white color -->
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:gravity="center_horizontal"
-        android:padding="16dp">
+        android:padding="16dp"
+        android:baselineAligned="false">
 
-        <!-- Back Button -->
-        <Button
+        <!-- Back Icon aligned to top-left -->
+        <ImageButton
             android:id="@+id/btnBackToNext"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_gravity="start"
             android:layout_marginBottom="24dp"
-        android:padding="14dp"
-            android:backgroundTint="#4CAF50"
-        android:text="← Back"
-        android:textColor="@android:color/white"
-        android:textSize="16sp"
-        android:fontFamily="sans-serif-medium"
-        android:elevation="4dp"
-        android:layout_gravity="center"/>
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="Back"
+            android:src="@drawable/back"
+            app:tint="@android:color/black"
+            tools:ignore="TouchTargetSizeCheck" />
 
-        <!-- Title -->
+        <!-- Centered Title -->
         <TextView
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Physical Classification"
             android:textSize="28sp"
             android:textStyle="bold"
             android:layout_marginBottom="24dp"
-            android:textColor="@android:color/black"
-            android:fontFamily="sans-serif-light"
-            android:textAlignment="center"/>
+            android:textColor="@color/black"
+            android:fontFamily="sans-serif-condensed"
+            android:textAlignment="center" />
 
-        <!-- Body Level Spinner -->
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Body Level:"
             android:textSize="20sp"
             android:layout_marginBottom="8dp"
-            android:textColor="@android:color/black"
-            android:fontFamily="sans-serif-medium"/>
+            android:textColor="@color/black"
+            android:fontFamily="sans-serif-medium" />
 
         <Spinner
             android:id="@+id/spinnerBodyLevel"
             android:layout_width="match_parent"
             android:layout_height="60dp"
-            android:spinnerMode="dropdown"
             android:layout_marginBottom="20dp"
             android:background="@drawable/custom_spinner_background"
-            android:elevation="2dp"/>
+            android:elevation="4dp"
+            android:spinnerMode="dropdown" />
 
-        <!-- Body Classification Spinner -->
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Body Classification:"
             android:textSize="20sp"
             android:layout_marginBottom="8dp"
-            android:textColor="@android:color/black"
-            android:fontFamily="sans-serif-medium"/>
+            android:textColor="@color/black"
+            android:fontFamily="sans-serif-medium" />
 
         <Spinner
             android:id="@+id/spinnerBodyClassification"
             android:layout_width="match_parent"
             android:layout_height="60dp"
-            android:spinnerMode="dropdown"
             android:layout_marginBottom="20dp"
             android:background="@drawable/custom_spinner_background"
-            android:elevation="2dp"/>
+            android:elevation="4dp"
+            android:spinnerMode="dropdown" />
 
-        <!-- Exercise Routine Spinner -->
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Exercise Routine:"
             android:textSize="20sp"
             android:layout_marginBottom="8dp"
-            android:textColor="@android:color/black"
-            android:fontFamily="sans-serif-medium"/>
+            android:textColor="@color/black"
+            android:fontFamily="sans-serif-medium" />
 
         <Spinner
             android:id="@+id/spinnerExercise"
             android:layout_width="match_parent"
             android:layout_height="60dp"
-            android:spinnerMode="dropdown"
             android:layout_marginBottom="20dp"
             android:background="@drawable/custom_spinner_background"
-            android:elevation="2dp"/>
+            android:elevation="4dp"
+            android:spinnerMode="dropdown" />
 
-        <!-- Other Gym Info Spinner -->
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Other Gym Info:"
             android:textSize="20sp"
             android:layout_marginBottom="8dp"
-            android:textColor="@android:color/black"
-            android:fontFamily="sans-serif-medium"/>
+            android:textColor="@color/black"
+            android:fontFamily="sans-serif-medium" />
 
         <Spinner
             android:id="@+id/spinnerOthers"
             android:layout_width="match_parent"
             android:layout_height="60dp"
-            android:spinnerMode="dropdown"
             android:layout_marginBottom="20dp"
             android:background="@drawable/custom_spinner_background"
-            android:elevation="2dp"/>
+            android:elevation="4dp"
+            android:spinnerMode="dropdown" />
 
-        <!-- Gym Mode Spinner (Updated label) -->
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Gym Mode:"
             android:textSize="20sp"
             android:layout_marginBottom="8dp"
-            android:textColor="@android:color/black"
-            android:fontFamily="sans-serif-medium"/>
+            android:textColor="@color/black"
+            android:fontFamily="sans-serif-medium" />
 
         <Spinner
             android:id="@+id/spinnerGymMode"
             android:layout_width="match_parent"
             android:layout_height="60dp"
-            android:spinnerMode="dropdown"
             android:layout_marginBottom="40dp"
             android:background="@drawable/custom_spinner_background"
-            android:elevation="2dp"/>
+            android:elevation="4dp"
+            android:spinnerMode="dropdown" />
 
-        <!-- Next Button -->
+        <!-- Modern Button with updated style -->
         <Button
             android:id="@+id/btnNext"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Next →"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
             android:backgroundTint="@android:color/holo_blue_dark"
+            android:text="Next →"
             android:textColor="@android:color/white"
-            android:padding="14dp"
             android:textSize="16sp"
+            android:elevation="8dp"
             android:fontFamily="sans-serif-medium"
-            android:elevation="4dp"
-            android:layout_gravity="center"/>
-
+            android:padding="14dp"
+            android:layout_marginTop="16dp"
+            android:layout_gravity="center" />
     </LinearLayout>
 </ScrollView>

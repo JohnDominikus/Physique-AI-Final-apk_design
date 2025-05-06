@@ -1,161 +1,156 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="16dp"
+    android:padding="24dp"
     android:fillViewport="true"
+    android:background="@android:color/white"
     tools:context=".MedicalActivity">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:gravity="center_horizontal"
-        android:padding="8dp">
+        android:padding="16dp"
+        android:baselineAligned="false">
 
-        <!-- Back Button -->
-        <androidx.appcompat.widget.AppCompatButton
+        <!-- Back Icon aligned to top-left -->
+        <ImageButton
             android:id="@+id/btnBack"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="← Back"
-            android:textSize="20sp"
-            android:textColor="@android:color/white"
-            android:background="@drawable/button_background"
-            android:paddingHorizontal="24dp"
-            android:paddingVertical="12dp"
-            android:layout_marginBottom="16dp" />
+            android:layout_gravity="start"
+            android:layout_marginBottom="24dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="Back"
+            android:src="@drawable/back"
+            app:tint="@android:color/black"
+            tools:ignore="TouchTargetSizeCheck" />
 
-        <!-- Title -->
+        <!-- Centered Title -->
         <TextView
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Medical Information"
-            android:textSize="22sp"
+            android:text="Gym Medical Information"
+            android:textSize="28sp"
             android:textStyle="bold"
+            android:layout_marginBottom="24dp"
             android:textColor="@android:color/black"
-            android:layout_marginBottom="16dp" />
+            android:fontFamily="sans-serif-condensed"
+            android:textAlignment="center" />
 
-        <!-- Condition -->
+        <!-- Condition Label and Spinner -->
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Condition:"
-            android:textSize="18sp"
-            android:layout_marginBottom="4dp" />
+            android:text="Condition"
+            android:textSize="20sp"
+            android:layout_marginBottom="8dp"
+            android:textColor="@android:color/black"
+            android:fontFamily="sans-serif-medium" />
 
-        <EditText
-            android:id="@+id/editCondition"
+        <!-- Medication Label and Spinner -->
+        <Spinner
+            android:id="@+id/spinnerCondition"
             android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:hint="Enter condition"
-            android:inputType="text"
-            android:background="@drawable/rounded_edittext_bg"
-            android:padding="12dp"
-            android:layout_marginBottom="16dp" />
+            android:layout_height="60dp"
+            android:layout_marginBottom="20dp"
+            android:background="@drawable/custom_spinner_background"
+            android:elevation="4dp"
+            android:spinnerMode="dropdown"
+            android:textColor="@android:color/black" />
 
-        <!-- Medication -->
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Medication:"
-            android:textSize="18sp"
-            android:layout_marginBottom="4dp" />
+            android:text="Medication"
+            android:textSize="20sp"
+            android:layout_marginBottom="8dp"
+            android:textColor="@android:color/black"
+            android:fontFamily="sans-serif-medium" />
 
-        <EditText
-            android:id="@+id/editMedication"
+        <Spinner
+            android:id="@+id/spinnerMedication"
             android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:hint="Enter medication"
-            android:inputType="text"
-            android:background="@drawable/rounded_edittext_bg"
-            android:padding="12dp"
-            android:layout_marginBottom="16dp" />
+            android:layout_height="60dp"
+            android:layout_marginBottom="20dp"
+            android:background="@drawable/custom_spinner_background"
+            android:elevation="4dp"
+            android:spinnerMode="dropdown" />
 
-        <!-- Allergies -->
+        <!-- Allergies Label and Spinner -->
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Allergies:"
-            android:textSize="18sp"
-            android:layout_marginBottom="4dp" />
+            android:text="Allergies"
+            android:textSize="20sp"
+            android:layout_marginBottom="8dp"
+            android:textColor="@android:color/black"
+            android:fontFamily="sans-serif-medium" />
 
-        <EditText
-            android:id="@+id/editAllergies"
+        <Spinner
+            android:id="@+id/spinnerAllergies"
             android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:hint="Enter allergies"
-            android:inputType="text"
-            android:background="@drawable/rounded_edittext_bg"
-            android:padding="12dp"
-            android:layout_marginBottom="16dp" />
+            android:layout_height="60dp"
+            android:layout_marginBottom="20dp"
+            android:background="@drawable/custom_spinner_background"
+            android:elevation="4dp"
+            android:spinnerMode="dropdown" />
 
-        <!-- Medical History -->
+        <!-- Fractures Label and Spinner -->
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Medical History:"
-            android:textSize="18sp"
-            android:layout_marginBottom="4dp" />
+            android:text="Fractures"
+            android:textSize="20sp"
+            android:layout_marginBottom="8dp"
+            android:textColor="@android:color/black"
+            android:fontFamily="sans-serif-medium" />
 
-        <!-- Fractures -->
+        <Spinner
+            android:id="@+id/spinnerFractures"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:layout_marginBottom="20dp"
+            android:background="@drawable/custom_spinner_background"
+            android:elevation="4dp"
+            android:spinnerMode="dropdown" />
+
+        <!-- Other Conditions Label and Spinner -->
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Fractures:"
-            android:textSize="18sp"
-            android:layout_marginBottom="4dp" />
+            android:text="Other Conditions"
+            android:textSize="20sp"
+            android:layout_marginBottom="8dp"
+            android:textColor="@android:color/black"
+            android:fontFamily="sans-serif-medium" />
 
-        <EditText
-            android:id="@+id/editFractures"
+        <Spinner
+            android:id="@+id/spinnerOtherConditions"
             android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:hint="Enter fractures"
-            android:inputType="text"
-            android:background="@drawable/rounded_edittext_bg"
-            android:padding="12dp"
-            android:layout_marginBottom="16dp" />
-
-        <!-- Other Conditions -->
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Other Conditions:"
-            android:textSize="18sp"
-            android:layout_marginBottom="4dp" />
-
-        <EditText
-            android:id="@+id/editMedicalHistory"
-            android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:hint="Enter medical history"
-            android:inputType="text"
-            android:background="@drawable/custom_edittext_background"
-            android:padding="12dp"
-            android:layout_marginBottom="16dp" />
-
-        <EditText
-            android:id="@+id/editOtherConditions"
-            android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:hint="Enter other conditions"
-            android:inputType="text"
-            android:background="@drawable/rounded_edittext_bg"
-            android:padding="12dp"
-            android:layout_marginBottom="24dp" />
+            android:layout_height="60dp"
+            android:layout_marginBottom="40dp"
+            android:background="@drawable/custom_spinner_background"
+            android:elevation="4dp"
+            android:spinnerMode="dropdown" />
 
         <!-- Submit Button -->
-        <androidx.appcompat.widget.AppCompatButton
+        <Button
             android:id="@+id/btnSubmit"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:backgroundTint="@android:color/holo_green_dark"
             android:text="Submit"
             android:textColor="@android:color/white"
-            android:backgroundTint="@android:color/holo_blue_dark"
-            android:paddingHorizontal="24dp"
-            android:paddingVertical="12dp"
-            android:layout_marginTop="16dp" />
+            android:textSize="16sp"
+            android:elevation="8dp"
+            android:fontFamily="sans-serif-medium"
+            android:padding="14dp"
+            android:layout_marginTop="16dp"
+            android:layout_gravity="center" />
 
     </LinearLayout>
-</androidx.core.widget.NestedScrollView>
+</ScrollView>

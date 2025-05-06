@@ -5,7 +5,9 @@
 
         <!-- Border color -->
         <item name="chipStrokeColor">@color/chip_stroke_color</item> <!-- Border color -->
-
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorOnPrimary">@color/white</item>
+        <item name="android:windowBackground">@color/white</item>
         <!-- Border width -->
         <item name="chipStrokeWidth">1dp</item> <!-- Border thickness -->
 

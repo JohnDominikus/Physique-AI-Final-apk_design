@@ -35,7 +35,7 @@
                 android:id="@+id/ivLogo"
                 android:layout_width="120dp"
                 android:layout_height="120dp"
-                android:layout_marginBottom="24dp"
+                android:layout_marginBottom="16dp"
                 android:src="@drawable/physiqueailogo"
                 android:contentDescription="Logo" />
 
@@ -45,27 +45,27 @@
                 android:text="Physique AI"
                 android:textStyle="bold"
                 android:textSize="28sp"
-                android:textColor="#333333"
-                android:layout_marginBottom="8dp" />
+                android:textColor="#212121"
+                android:layout_marginBottom="4dp" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Welcome to Physique AI your ."
+                android:text="Welcome to Physique AI — your smart fitness companion."
                 android:textSize="16sp"
+                android:textColor="#7F8C8D"
                 android:gravity="center"
                 android:textAlignment="center"
-                android:textColor="#7F8C8D"
-                android:layout_marginBottom="32dp"
+                android:layout_marginBottom="24dp"
                 android:lineSpacingExtra="4dp" />
 
+            <!-- Email Input -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:background="@drawable/rounded_edittext_bg"
-                android:paddingHorizontal="16dp"
-                android:paddingVertical="12dp"
+                android:padding="12dp"
                 android:layout_marginBottom="16dp"
                 android:gravity="center_vertical">
 
@@ -83,19 +83,18 @@
                     android:background="@null"
                     android:hint="Email Address"
                     android:inputType="textEmailAddress"
-                    android:textColor="#000000"
-                    android:textColorHint="#999999"
-                    android:textSize="14sp"
-                    tools:ignore="TouchTargetSizeCheck" />
+                    android:textColor="#FFFFFF"
+                    android:textColorHint="#B0B0B0"
+                    android:textSize="14sp" />
             </LinearLayout>
 
+            <!-- Password Input -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:background="@drawable/rounded_edittext_bg"
-                android:paddingHorizontal="16dp"
-                android:paddingVertical="12dp"
+                android:padding="12dp"
                 android:layout_marginBottom="16dp"
                 android:gravity="center_vertical">
 
@@ -113,8 +112,8 @@
                     android:background="@null"
                     android:hint="Password"
                     android:inputType="textPassword"
-                    android:textColor="#000000"
-                    android:textColorHint="#999999"
+                    android:textColor="#FFFFFF"
+                    android:textColorHint="#B0B0B0"
                     android:textSize="14sp" />
 
                 <ImageView
@@ -123,36 +122,52 @@
                     android:layout_height="24dp"
                     android:src="@drawable/ic_eye"
                     android:layout_marginStart="8dp"
-                    app:tint="#66BB6A"
-                    android:contentDescription="Toggle Password Visibility" />
+                    android:contentDescription="Toggle Password"
+                    app:tint="@color/white" />
             </LinearLayout>
 
+            <!-- Remember + Forgot -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:gravity="center_vertical"
+                android:weightSum="2"
                 android:layout_marginBottom="16dp">
 
                 <CheckBox
                     android:id="@+id/cbRememberMe"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_weight="1"
                     android:text="Remember me"
-                    android:textColor="#333333"
+                    android:textColor="#333"
                     android:textSize="14sp" />
 
                 <TextView
                     android:id="@+id/tvForgotPassword"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_weight="1"
                     android:text="Forgot Password?"
                     android:textColor="#007BFF"
                     android:textSize="14sp"
-                    android:textStyle="bold"
-                    android:layout_alignParentEnd="true" />
+                    android:textStyle="bold" />
             </LinearLayout>
 
+
+            <!-- Login Button -->
+            <Button
+                android:id="@+id/btnLogin"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:text="SIGN IN"
+                android:textColor="#FFFFFF"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:backgroundTint="#66BB6A"
+                android:layout_marginBottom="16dp" />
+
+            <!-- Register -->
             <TextView
                 android:id="@+id/tvRegister"
                 android:layout_width="wrap_content"
@@ -164,63 +179,49 @@
                 android:gravity="center"
                 android:layout_marginBottom="32dp" />
 
-            <Button
-                android:id="@+id/btnLogin"
-                android:layout_width="match_parent"
-                android:layout_height="48dp"
-                android:text="SIGN IN"
-                android:textColor="#FFFFFF"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                android:backgroundTint="#66BB6A"
-                android:layout_marginBottom="24dp" />
-
+            <!-- Divider -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:layout_marginBottom="32dp">
+                android:gravity="center"
+                android:layout_marginBottom="24dp">
 
                 <View
                     android:layout_width="0dp"
                     android:layout_height="1dp"
                     android:layout_weight="1"
-                    android:background="#CCCCCC"
+                    android:background="#CCC"
                     android:layout_marginEnd="8dp" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="or continue with"
-                    android:textColor="#999999"
+                    android:textColor="#999"
                     android:textSize="14sp" />
 
                 <View
                     android:layout_width="0dp"
                     android:layout_height="1dp"
                     android:layout_weight="1"
-                    android:background="#CCCCCC"
+                    android:background="#CCC"
                     android:layout_marginStart="8dp" />
             </LinearLayout>
 
+            <!-- Google Login -->
             <Button
                 android:id="@+id/btnGoogle"
                 android:layout_width="match_parent"
                 android:layout_height="48dp"
                 android:text="Continue with Google"
-                android:textColor="#000000"
+                android:textColor="#000"
                 android:textSize="14sp"
-                android:backgroundTint="@android:color/white"
-                app:strokeColor="#66BB6A"
-                app:strokeWidth="2dp"
-                app:cornerRadius="50dp"
-                app:icon="@drawable/google"
-                app:iconTint="@null"
-                app:iconGravity="textStart"
-                app:iconPadding="12dp"
-                android:layout_marginBottom="32dp" />
-
+                android:backgroundTint="#FFFFFF"
+                android:elevation="2dp"
+                android:drawableStart="@drawable/google"
+                android:drawablePadding="12dp"
+                android:layout_marginBottom="16dp" />
         </LinearLayout>
     </ScrollView>
 </RelativeLayout>

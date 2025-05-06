@@ -31,7 +31,7 @@
 
     <!-- Tasks -->
     <string name="today_tasks_message">Your tasks today: %d</string>
-    <string name="add_task_title">Add Task</string>
+    <string name="add_task">Add Task</string>
     <string name="add">Add</string>
     <string name="cancel">Cancel</string>
     <string name="enter_exercise_details">Please enter exercise details</string>
@@ -41,8 +41,20 @@
     <string name="task_update_failed">Failed to update task</string>
     <string name="load_tasks_error">Failed to load tasks: %s</string>
 
+    <string name="task_name_hint">Task Name</string>
+    <string name="task_type_hint">Task Type</string>
+    <string name="task_name">Name: %1$s</string>
+    <string name="task_type">Type: %1$s</string>
+    <string name="delete">Delete</string>
+
     <!-- Video -->
     <string name="video_thumbnail">Video thumbnail</string>
+    <string name="movement_detected">Movement detected!</string>
+    <string name="timer_finished">Timer finished!</string>
+    <string name="detection_started">Movement detection started!</string>
+    <string name="default_timer_text">00:00</string>
+    <string name="camera_denied">Camera permission denied</string>
+    <string name="back">← Back</string>
 
     <!-- Plurals -->
     <plurals name="task_count">

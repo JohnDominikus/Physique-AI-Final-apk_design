@@ -5,6 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="16dp"
+    android:background="@android:color/white"
     tools:context=".RegisterActivity">
 
     <RelativeLayout
@@ -16,177 +17,159 @@
             android:id="@+id/btnBack"
             android:layout_width="48dp"
             android:layout_height="48dp"
-            android:src="@drawable/back"
-            android:contentDescription="Back Button"
-            android:background="?android:attr/selectableItemBackgroundBorderless"
             android:layout_alignParentStart="true"
-            android:layout_marginTop="16dp"
-            android:layout_marginStart="16dp"
-            android:visibility="visible"
             android:layout_alignParentTop="true"
-            app:tint="@color/black" />
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:background="@android:color/transparent"
+            android:contentDescription="back_button"
+            android:scaleType="centerInside"
+            android:src="@drawable/back"
+            app:tint="@android:color/black" />
 
-        <!-- Registration Container -->
+        <!-- Registration Form Container -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:gravity="center_horizontal"
             android:layout_below="@id/btnBack"
-            android:layout_marginTop="32dp"
+            android:layout_marginTop="16dp"
+            android:gravity="center_horizontal"
+            android:padding="24dp"
             android:background="@drawable/container_background"
-            android:padding="16dp"
-            android:elevation="4dp">
+            android:elevation="6dp">
 
             <!-- Logo -->
             <ImageView
                 android:id="@+id/logo"
-                android:layout_width="80dp"
-                android:layout_height="80dp"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
                 android:src="@drawable/physiqueailogo"
-                android:contentDescription="App Logo"
-                android:layout_marginBottom="16dp"/>
+                android:layout_marginBottom="16dp"
+                android:contentDescription="app_logo" />
 
-            <!-- Registration Title (Centered) -->
+            <!-- Title -->
             <TextView
                 android:id="@+id/tvRegisterTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Registration"
-                android:textSize="24sp"
+                android:textSize="26sp"
                 android:textStyle="bold"
                 android:textColor="@color/colorPrimary"
-                android:gravity="center"
-                android:layout_marginBottom="32dp" />
+                android:layout_marginBottom="32dp"
+                android:gravity="center" />
 
-            <!-- First Name Input -->
+            <!-- First Name -->
             <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/tilFirstName"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
-                app:hintAnimationEnabled="true">
+                android:hint="First Name">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/etFirstName"
                     android:layout_width="match_parent"
-                    android:layout_height="48dp"
-                    android:background="@drawable/rounded_edittext_bg"
-                    android:hint="First Name"
-                    android:importantForAccessibility="yes"
-                    android:inputType="textPersonName" />
+                    android:layout_height="wrap_content"
+                    android:textSize="16sp"
+                    android:inputType="textPersonName"
+                    android:textColor="@android:color/black" />
             </com.google.android.material.textfield.TextInputLayout>
 
-            <!-- Last Name Input -->
+            <!-- Last Name -->
             <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/tilLastName"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
-                app:hintAnimationEnabled="true">
+                android:hint="Last Name">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/etLastName"
                     android:layout_width="match_parent"
-                    android:layout_height="48dp"
-                    android:hint="Last Name"
-
-                    android:background="@drawable/rounded_edittext_bg"
-                    android:importantForAccessibility="yes"
-                    android:inputType="textPersonName" />
+                    android:layout_height="wrap_content"
+                    android:textSize="16sp"
+                    android:inputType="textPersonName"
+                    android:textColor="@android:color/black" />
             </com.google.android.material.textfield.TextInputLayout>
 
-            <!-- Birthdate Input -->
+            <!-- Birthdate -->
             <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/tilBirthdate"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
-                app:hintAnimationEnabled="true">
+                android:hint="Birthdate">
 
-                <TextView
+                <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/tvBirthdate"
                     android:layout_width="match_parent"
-                    android:layout_height="48dp"
-                    android:hint="Select Birthdate"
-                    android:background="@drawable/rounded_edittext_bg"
-                    android:gravity="start|center_vertical"
-                    android:textColor="@color/black"
+                    android:layout_height="wrap_content"
                     android:textSize="16sp"
-                    android:importantForAccessibility="yes"
-                    android:contentDescription="Birthdate Picker" />
+                    android:focusable="false"
+                    android:clickable="true"
+                    android:inputType="none"
+                    android:drawableEnd="@drawable/ic_calendar"
+                    android:textColor="@android:color/black" />
             </com.google.android.material.textfield.TextInputLayout>
 
-            <!-- Phone Input -->
+            <!-- Phone Number -->
             <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/tilPhone"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
-                app:hintAnimationEnabled="true">
+                android:hint="Phone Number">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/etPhone"
                     android:layout_width="match_parent"
-                    android:layout_height="48dp"
-                    android:hint="Phone Number"
-                    android:background="@drawable/rounded_edittext_bg"
-                    android:importantForAccessibility="yes"
-                    android:inputType="phone" />
+                    android:layout_height="wrap_content"
+                    android:textSize="16sp"
+                    android:inputType="phone"
+                    android:textColor="@android:color/black" />
             </com.google.android.material.textfield.TextInputLayout>
 
-            <!-- Email Input -->
+            <!-- Email -->
             <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/tilEmail"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
-                app:hintAnimationEnabled="true">
+                android:hint="Email">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/etEmail"
                     android:layout_width="match_parent"
-                    android:layout_height="48dp"
-                    android:hint="Email"
-                    android:background="@drawable/rounded_edittext_bg"
-                    android:importantForAccessibility="yes"
-                    android:inputType="textEmailAddress" />
+                    android:layout_height="wrap_content"
+                    android:textSize="16sp"
+                    android:inputType="textEmailAddress"
+                    android:textColor="@android:color/black" />
             </com.google.android.material.textfield.TextInputLayout>
 
-            <!-- Password Input -->
+            <!-- Password -->
             <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/tilPassword"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="32dp"
-                app:hintAnimationEnabled="true">
+                android:layout_marginBottom="24dp"
+                android:hint="Password">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/etPassword"
                     android:layout_width="match_parent"
-                    android:layout_height="48dp"
-                    android:hint="Password"
-                    android:background="@drawable/rounded_edittext_bg"
-                    android:importantForAccessibility="yes"
-                    android:inputType="textPassword" />
+                    android:layout_height="wrap_content"
+                    android:textSize="16sp"
+                    android:inputType="textPassword"
+                    android:textColor="@android:color/black" />
             </com.google.android.material.textfield.TextInputLayout>
 
-            <!-- Next Button -->
+            <!-- Register Button -->
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnRegister"
                 android:layout_width="match_parent"
-                android:layout_height="48dp"
+                android:layout_height="wrap_content"
                 android:text="Next"
-                android:textSize="16sp"
+                android:textSize="18sp"
                 android:backgroundTint="@color/green"
                 android:textColor="@android:color/white"
-                app:cornerRadius="8dp"
-                android:importantForAccessibility="yes"
-                android:contentDescription="Next Button"
-                android:layout_marginTop="16dp" />
+                app:cornerRadius="12dp" />
 
         </LinearLayout>
-
     </RelativeLayout>
-
 </ScrollView>

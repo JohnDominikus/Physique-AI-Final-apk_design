@@ -2,7 +2,6 @@ package com.example.physiqueaiapkfinal
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.auth.FirebaseAuth
@@ -13,8 +12,12 @@ class PhysicalActivity : AppCompatActivity() {
 
     private lateinit var auth: FirebaseAuth
     private lateinit var firestore: FirebaseFirestore
-    private lateinit var dbHelper: DatabaseHelper
     private lateinit var email: String
+
+    companion object {
+        private const val TAG = "PhysicalActivity"
+        private const val DEFAULT_SELECT = "Select"
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -22,7 +25,6 @@ class PhysicalActivity : AppCompatActivity() {
 
         auth = FirebaseAuth.getInstance()
         firestore = FirebaseFirestore.getInstance()
-        dbHelper = DatabaseHelper(this)
         email = intent.getStringExtra("email").orEmpty()
 
         val spinnerBodyLevel = findViewById<Spinner>(R.id.spinnerBodyLevel)
@@ -30,12 +32,17 @@ class PhysicalActivity : AppCompatActivity() {
         val spinnerExercise = findViewById<Spinner>(R.id.spinnerExercise)
         val spinnerOthers = findViewById<Spinner>(R.id.spinnerOthers)
         val spinnerGymMode = findViewById<Spinner>(R.id.spinnerGymMode)
-        val btnBack = findViewById<Button>(R.id.btnBackToNext)
+
+        val btnBackToNext: ImageButton = findViewById(R.id.btnBackToNext)
         val btnNext = findViewById<Button>(R.id.btnNext)
 
-        setupSpinners()
+        setupSpinner(spinnerBodyLevel, arrayOf(DEFAULT_SELECT, "Beginner", "Intermediate", "Advanced"))
+        setupSpinner(spinnerBodyClassification, arrayOf(DEFAULT_SELECT, "Endomorph", "Mesomorph", "Ectomorph"))
+        setupSpinner(spinnerExercise, arrayOf(DEFAULT_SELECT, "Strength", "Cardio", "Flexibility", "Mixed"))
+        setupSpinner(spinnerOthers, arrayOf(DEFAULT_SELECT, "Gym member", "Home workout", "Personal trainer", "Other"))
+        setupSpinner(spinnerGymMode, arrayOf(DEFAULT_SELECT, "Vegetarian", "Keto", "High protein", "No preference"))
 
-        btnBack.setOnClickListener { finish() }
+        btnBackToNext.setOnClickListener { finish() }
 
         btnNext.setOnClickListener {
             val bodyLevel = spinnerBodyLevel.selectedItem.toString()
@@ -44,37 +51,23 @@ class PhysicalActivity : AppCompatActivity() {
             val otherInfo = spinnerOthers.selectedItem.toString()
             val gymMode = spinnerGymMode.selectedItem.toString()
 
-            if (validateSelection(bodyLevel, bodyClassification, exerciseRoutine)) {
-                savePhysicalInfo(bodyLevel, bodyClassification, exerciseRoutine, otherInfo, gymMode)
-            } else {
-                Toast.makeText(this, "Please fill all required fields", Toast.LENGTH_SHORT).show()
+            if (!isValidSelection(bodyLevel, bodyClassification, exerciseRoutine)) {
+                showToast("Please fill all required fields")
+                return@setOnClickListener
             }
+
+            savePhysicalInfo(bodyLevel, bodyClassification, exerciseRoutine, otherInfo, gymMode)
         }
     }
 
-    private fun setupSpinners() {
-        val bodyLevels = arrayOf("Select", "Beginner", "Intermediate", "Advanced")
-        val classifications = arrayOf("Select", "Endomorph", "Mesomorph", "Ectomorph")
-        val exerciseRoutines = arrayOf("Select", "Strength", "Cardio", "Flexibility", "Mixed")
-        val others = arrayOf("Select", "Gym member", "Home workout", "Personal trainer", "Other")
-        val gymModes = arrayOf("Select", "Vegetarian", "Keto", "High protein", "No preference")
-
-        setupSpinner(R.id.spinnerBodyLevel, bodyLevels)
-        setupSpinner(R.id.spinnerBodyClassification, classifications)
-        setupSpinner(R.id.spinnerExercise, exerciseRoutines)
-        setupSpinner(R.id.spinnerOthers, others)
-        setupSpinner(R.id.spinnerGymMode, gymModes)
-    }
-
-    private fun setupSpinner(spinnerId: Int, items: Array<String>) {
-        val spinner = findViewById<Spinner>(spinnerId)
+    private fun setupSpinner(spinner: Spinner, items: Array<String>) {
         val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, items)
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         spinner.adapter = adapter
     }
 
-    private fun validateSelection(bodyLevel: String, bodyClassification: String, exerciseRoutine: String): Boolean {
-        return bodyLevel != "Select" && bodyClassification != "Select" && exerciseRoutine != "Select"
+    private fun isValidSelection(vararg selections: String): Boolean {
+        return selections.none { it == DEFAULT_SELECT }
     }
 
     private fun savePhysicalInfo(
@@ -85,33 +78,42 @@ class PhysicalActivity : AppCompatActivity() {
         gymMode: String
     ) {
         val userId = auth.currentUser?.uid
-
-        if (userId != null) {
-            val physicalInfo = hashMapOf(
-                "bodyLevel" to bodyLevel,
-                "bodyClassification" to bodyClassification,
-                "exerciseRoutine" to exerciseRoutine,
-                "otherInfo" to otherInfo,
-                "gymMode" to gymMode
-            )
-
-            firestore.collection("userinfo").document(userId)
-                .set(mapOf("physicalInfo" to physicalInfo), SetOptions.merge())
-                .addOnSuccessListener {
-                    Log.d("Firestore", "Physical info saved")
-
-                    // Navigate to next screen
-                    val intent = Intent(this, MedicalActivity::class.java)
-                    intent.putExtra("userId", userId)
-                    startActivity(intent)
-                    finish()
-                }
-                .addOnFailureListener { e ->
-                    Log.e("FirestoreError", "Failed to save: ${e.message}")
-                    Toast.makeText(this, "Failed to save data", Toast.LENGTH_SHORT).show()
-                }
-        } else {
-            Toast.makeText(this, "User not authenticated", Toast.LENGTH_SHORT).show()
+        if (userId == null) {
+            showToast("User not authenticated")
+            return
         }
+
+        val physicalInfo = mapOf(
+            "bodyLevel" to bodyLevel,
+            "bodyClassification" to bodyClassification,
+            "exerciseRoutine" to exerciseRoutine,
+            "otherInfo" to otherInfo,
+            "gymMode" to gymMode
+        )
+
+        firestore.collection("userinfo").document(userId)
+            .set(mapOf("physicalInfo" to physicalInfo), SetOptions.merge())
+            .addOnSuccessListener {
+                navigateToMedicalActivity(userId)
+            }
+            .addOnFailureListener { e ->
+                showToast("Failed to save data: ${e.message}")
+            }
+    }
+
+    private fun navigateToMedicalActivity(userId: String) {
+        try {
+            startActivity(Intent(this, MedicalActivity::class.java).apply {
+                putExtra("userId", userId)
+                putExtra("email", email)
+            })
+            finish()
+        } catch (e: Exception) {
+            showToast("Failed to open next screen.\nCheck:\n1. MedicalActivity exists\n2. It's declared in AndroidManifest.xml")
+        }
+    }
+
+    private fun showToast(message: String) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
     }
 }

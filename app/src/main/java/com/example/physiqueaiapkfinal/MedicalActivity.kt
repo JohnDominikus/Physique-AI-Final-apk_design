@@ -2,10 +2,7 @@ package com.example.physiqueaiapkfinal
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
-import android.widget.Button
-import android.widget.EditText
-import android.widget.Toast
+import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
@@ -15,21 +12,17 @@ class MedicalActivity : AppCompatActivity() {
 
     private lateinit var auth: FirebaseAuth
     private lateinit var firestore: FirebaseFirestore
-    private lateinit var sqliteHelper: DatabaseHelper
     private lateinit var userId: String
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_medical)
 
-        // Initialize Firebase and SQLite
         auth = FirebaseAuth.getInstance()
         firestore = FirebaseFirestore.getInstance()
-        sqliteHelper = DatabaseHelper(this)
 
-        // Retrieve the user ID from the previous activity
+        // Get the userId from the Intent extra
         userId = intent.getStringExtra("userId") ?: ""
-
         if (userId.isEmpty()) {
             Toast.makeText(this, "User ID not found!", Toast.LENGTH_SHORT).show()
             finish()
@@ -37,94 +30,89 @@ class MedicalActivity : AppCompatActivity() {
         }
 
         // Initialize UI elements
-        val editAllergies = findViewById<EditText>(R.id.editAllergies)
-        val editMedicalHistory = findViewById<EditText>(R.id.editMedicalHistory)
-        val editFractures = findViewById<EditText>(R.id.editFractures)
-        val editOtherConditions = findViewById<EditText>(R.id.editOtherConditions)
-        val btnBack = findViewById<Button>(R.id.btnBack)
+        val btnBack = findViewById<ImageButton>(R.id.btnBack) // Change to ImageButton
         val btnSubmit = findViewById<Button>(R.id.btnSubmit)
+        val spinnerCondition = findViewById<Spinner>(R.id.spinnerCondition)
+        val spinnerMedication = findViewById<Spinner>(R.id.spinnerMedication)
+        val spinnerAllergies = findViewById<Spinner>(R.id.spinnerAllergies)
+        val spinnerFractures = findViewById<Spinner>(R.id.spinnerFractures)
+        val spinnerOtherConditions = findViewById<Spinner>(R.id.spinnerOtherConditions)
 
-        // Navigate back to the previous screen
-        btnBack.setOnClickListener { finish() }
+        // Spinner data
+        val conditionItems = arrayOf("None", "Asthma", "Heart Condition", "Diabetes", "Joint Pain", "Back Pain", "Other")
+        val medicationItems = arrayOf("None", "Blood Pressure Meds", "Insulin", "Pain Reliever", "Muscle Relaxants", "Other")
+        val allergyItems = arrayOf("None", "Peanuts", "Dust", "Pollen", "Medication Allergy", "Other")
+        val fractureItems = arrayOf("None", "Arm", "Leg", "Shoulder", "Back", "Other")
+        val otherConditionItems = arrayOf("None", "Chronic Fatigue", "Dizziness", "Post-Surgery", "Recent Illness", "Other")
 
-        // Submit medical information
+        // Function to set the data for spinners
+        fun setSpinner(spinner: Spinner, items: Array<String>) {
+            val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, items)
+            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+            spinner.adapter = adapter
+        }
+
+        // Set up the spinners
+        setSpinner(spinnerCondition, conditionItems)
+        setSpinner(spinnerMedication, medicationItems)
+        setSpinner(spinnerAllergies, allergyItems)
+        setSpinner(spinnerFractures, fractureItems)
+        setSpinner(spinnerOtherConditions, otherConditionItems)
+
+        // Back button click listener to navigate back
+        btnBack.setOnClickListener {
+            finish()
+        }
+
+        // Submit button click listener to save medical information
         btnSubmit.setOnClickListener {
-            val allergies = editAllergies.text.toString().trim()
-            val medicalHistory = editMedicalHistory.text.toString().trim()
-            val fractures = editFractures.text.toString().trim()
-            val otherConditions = editOtherConditions.text.toString().trim()
+            // Get selected values from spinners
+            val condition = spinnerCondition.selectedItem.toString()
+            val medication = spinnerMedication.selectedItem.toString()
+            val allergies = spinnerAllergies.selectedItem.toString()
+            val fractures = spinnerFractures.selectedItem.toString()
+            val otherConditions = spinnerOtherConditions.selectedItem.toString()
 
-            // Save data
-            saveMedicalInformation(allergies, medicalHistory, fractures, otherConditions)
+            // Check if any condition is selected
+            if (listOf(condition, medication, allergies, fractures, otherConditions).all { it == "None" }) {
+                Toast.makeText(this, "Please select at least one condition", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            // Save the selected information
+            saveMedicalInformation(condition, medication, allergies, fractures, otherConditions)
         }
     }
 
-    // Save medical information to Firestore and SQLite
+    // Method to save the medical information to Firestore
     private fun saveMedicalInformation(
+        condition: String,
+        medication: String,
         allergies: String,
-        medicalHistory: String,
         fractures: String,
         otherConditions: String
     ) {
-        // Check if all fields are empty
-        if (allergies.isEmpty() && medicalHistory.isEmpty() && fractures.isEmpty() && otherConditions.isEmpty()) {
-            Toast.makeText(this, "Please fill at least one field", Toast.LENGTH_SHORT).show()
-            return
-        }
-
-        // Prepare data for Firestore
+        // Prepare data for saving
         val medicalData = mapOf(
+            "condition" to condition,
+            "medication" to medication,
             "allergies" to allergies,
-            "medicalHistory" to medicalHistory,
             "fractures" to fractures,
             "otherConditions" to otherConditions
         )
 
-        val firestoreData = mapOf(
-            "medicalInfo" to medicalData
-        )
+        val firestoreData = mapOf("medicalInfo" to medicalData)
 
-        // Save to Firestore
+        // Save data to Firestore
         firestore.collection("userinfo").document(userId)
-            .set(firestoreData, SetOptions.merge())
+            .set(firestoreData, SetOptions.merge()) // Merge with existing data
             .addOnSuccessListener {
-                Log.d("Firestore", "Medical info saved successfully in Firestore")
-
-                // Save to SQLite
-                val rowId = sqliteHelper.insertOrUpdateUser(
-                    firebaseId = userId,
-                    firstName = "", // Can be filled from another screen if needed
-                    lastName = "",
-                    birthdate = "",
-                    phone = "",
-                    email = "",
-                    password = "",
-                    bodyLevel = "",  // You can later add physical info here
-                    bodyClassification = null,
-                    exerciseRoutine = null,
-                    otherInfo = null,
-                    gymMode = null,
-                    allergies = allergies,
-                    medicalHistory = medicalHistory,
-                    fractures = fractures,
-                    otherConditions = otherConditions
-                )
-
-                if (rowId != -1L) {
-                    Toast.makeText(this, "Medical info saved successfully!", Toast.LENGTH_SHORT).show()
-
-                    // Navigate to DashboardActivity
-                    val intent = Intent(this, DashboardActivity::class.java)
-                    startActivity(intent)
-                    finish()
-
-                } else {
-                    Toast.makeText(this, "Failed to save medical info in SQLite", Toast.LENGTH_SHORT).show()
-                }
+                Toast.makeText(this, "Medical info saved successfully!", Toast.LENGTH_SHORT).show()
+                startActivity(Intent(this, DashboardActivity::class.java)) // Redirect to Dashboard
+                finish()
             }
             .addOnFailureListener { e ->
-                Log.e("Firestore", "Error saving medical info: ${e.message}")
-                Toast.makeText(this, "Failed to save medical info to Firestore", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Failed to save medical info to Firestore: ${e.message}", Toast.LENGTH_SHORT).show()
             }
     }
 }

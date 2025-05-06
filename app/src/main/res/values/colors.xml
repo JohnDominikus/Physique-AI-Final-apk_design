@@ -9,7 +9,9 @@
     <color name="secondaryColor">#03DAC5</color>
     <color name="primaryColor">#6200EE</color>
     <color name="primary">#6200EE</color>
-
+    <color name="green_primary">#2E7D32</color> <!-- Dark green -->
+    <color name="green_secondary">#66BB6A</color> <!-- Light green -->
+    <color name="colorOutline">#A5D6A7</color> <!-- Outline color -->
     <color name="black">#000000</color>
     <color name="blue">#2196F3</color>
     <color name="green">#4CAF50</color>
@@ -29,7 +31,12 @@
         <color name="green_focused">#66BB6A</color>
 
 
-    <!-- Primary Colors -->
+    <color name="colorHint">#A0A0A0</color> <!-- Change this to your desired hint color -->
+    <color name="backgroundColor">#FFFFFF</color>
+    <color name="textColor">#000000</color>
+    <color name="hintColor">#888888</color>
+    <color name="buttonColor">#3F51B5</color>
+
 
 
 

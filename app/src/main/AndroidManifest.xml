@@ -2,9 +2,11 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.physiqueaiapkfinal">
 
-    <!-- 🔹 Required for Firebase Authentication & Firestore -->
+    <!-- 🔹 Required Permissions -->
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.INTERNET" />
+
+    <!-- 🔹 Camera Features -->
     <uses-feature android:name="android.hardware.camera" android:required="true" />
     <uses-feature android:name="android.hardware.camera.any" android:required="true" />
 
@@ -28,29 +30,24 @@
             </intent-filter>
         </activity>
 
-        <!-- 🔹 Authentication Activities -->
+        <!-- 🔹 Auth Activities -->
         <activity android:name=".RegisterActivity" android:exported="true" />
         <activity android:name=".LoginActivity" android:exported="true" />
-        <activity android:name=".DashboardActivity" android:exported="true" />
-        <activity android:name=".ProfileActivity" />
-        <!-- 🔹 Physical and Medical Activities -->
-        <activity android:name=".PhysicalActivity" android:exported="true" />
-        <activity android:name=".MedicalActivity" android:exported="true" />
-        <activity android:name=".SplashActivity" android:exported="true" />
         <activity android:name=".ForgotPasswordActivity" android:exported="true" />
         <activity android:name=".ForgotPasswordNewPasswordActivity" android:exported="true" />
-        <!-- 🔹 Functional Activities -->
+
+        <!-- 🔹 Main Functional Activities -->
+        <activity android:name=".DashboardActivity" android:exported="true" />
+        <activity android:name=".ProfileActivity" android:exported="false" />
+        <activity android:name=".PhysicalActivity" android:exported="true" />
+        <activity android:name=".MedicalActivity" android:exported="true" />
         <activity android:name=".ExerciseActivity" android:exported="true" />
         <activity android:name=".PostureActivity" android:exported="true" />
         <activity android:name=".DietPlannerActivity" android:exported="true" />
         <activity android:name=".TaskActivity" android:exported="true" />
         <activity android:name=".BmiCalculatorActivity" android:exported="true" />
         <activity android:name=".ResultActivity" android:exported="true" />
-
-
+        <activity android:name=".SplashActivity" android:exported="true" />
 
     </application>
-
-
-
 </manifest>
