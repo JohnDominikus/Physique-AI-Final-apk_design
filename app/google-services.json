@@ -1,13 +1,13 @@
 {
   "project_info": {
-    "project_number": "27702021149",
-    "project_id": "physique-ai-database-final",
-    "storage_bucket": "physique-ai-database-final.firebasestorage.app"
+    "project_number": "212441003962",
+    "project_id": "physique-ai-final-central-data",
+    "storage_bucket": "physique-ai-final-central-data.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:27702021149:android:fb4bc044a09f5947474af4",
+        "mobilesdk_app_id": "1:212441003962:android:5c09f9e62b2321324a4f83",
         "android_client_info": {
           "package_name": "com.example.physiqueaiapkfinal"
         }
@@ -15,7 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyBPN6XbMGo_5tDq2lFq_3pjspV1vqCMOX0"
+          "current_key": "AIzaSyCGXpYYGtpuqRPXz9km_Ng_KjajCysko8w"
         }
       ],
       "services": {
