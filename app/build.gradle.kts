@@ -67,6 +67,7 @@ dependencies {
     implementation("androidx.cardview:cardview:1.0.0")
     implementation("com.google.android.material:material:1.10.0")
     implementation("com.google.guava:guava:30.1-android")
+    implementation("com.github.bumptech.glide:glide:4.15.1")
 
     //google fonts
     implementation("androidx.compose.ui:ui-text-google-fonts:1.7.8")
@@ -87,6 +88,8 @@ dependencies {
 
     // Glide
     implementation("com.github.bumptech.glide:glide:4.16.0")
+    implementation(libs.androidx.recyclerview)
+    implementation(libs.androidx.material3.android)
     annotationProcessor("com.github.bumptech.glide:compiler:4.16.0")
 
     // Navigation & Layout

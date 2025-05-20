@@ -58,7 +58,7 @@ class DashboardActivity : AppCompatActivity() {
             navigateToActivity(PostureActivity::class.java)
         }
         findViewById<View>(R.id.btnExercise).setOnClickListener {
-            navigateToActivity(ExerciseActivity::class.java)
+            navigateToActivity(WorkoutActivity::class.java)
         }
         findViewById<View>(R.id.btnDietary).setOnClickListener {
             navigateToActivity(DietPlannerActivity::class.java)
@@ -96,7 +96,7 @@ class DashboardActivity : AppCompatActivity() {
         bottomNavigation.setOnItemSelectedListener { item ->
             when (item.itemId) {
                 R.id.nav_home -> { /* Already on home */ }
-                R.id.nav_workout -> navigateToActivity(ExerciseActivity::class.java)
+                R.id.nav_workout -> navigateToActivity(WorkoutActivity::class.java)
                 R.id.nav_posture -> navigateToActivity(PostureActivity::class.java)
                 R.id.nav_dietary -> navigateToActivity(DietPlannerActivity::class.java)
                 R.id.nav_task -> navigateToActivity(TaskActivity::class.java)

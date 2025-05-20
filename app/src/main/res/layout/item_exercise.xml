@@ -1,118 +1,55 @@
-<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal"
+    android:padding="8dp"
+    android:background="?android:attr/colorBackgroundFloating"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    card_view:cardCornerRadius="12dp"
-    card_view:cardElevation="6dp"
-    android:layout_margin="8dp">
+    android:layout_height="wrap_content">
+
+    <ImageView
+        android:id="@+id/itemThumbnail"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:layout_gravity="center_vertical"
+        android:scaleType="centerCrop"
+        android:contentDescription="gif"/>
 
     <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:clickable="true"
-        android:focusable="true"
-        android:background="?attr/selectableItemBackground">
+        android:layout_width="0dp"
+        android:layout_weight="1"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp">
 
-        <!-- FrameLayout for Thumbnail and Play Icon -->
-        <FrameLayout
-            android:layout_width="match_parent"
-            android:layout_height="200dp">
-
-            <ImageView
-                android:id="@+id/imgThumbnail"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:scaleType="centerCrop"
-                android:contentDescription="@string/video_thumbnail"
-                android:src="@drawable/strength_thumb" /> <!-- Default placeholder -->
-
-            <!-- Play Icon in the Center -->
-            <ImageView
-                android:id="@+id/imgPlayIcon"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:layout_gravity="center"
-                android:src="@android:drawable/ic_media_play"
-                android:alpha="0.8"
-                card_view:tint="#FFFFFF" />
-        </FrameLayout>
-
-        <!-- Title and other text details -->
         <TextView
-            android:id="@+id/tvTitle"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Video Title"
-            android:textSize="16sp"
+            android:id="@+id/itemName"
             android:textStyle="bold"
-            android:textColor="@android:color/black"
-            android:padding="8dp" />
+            android:textSize="18sp"
+            android:textColor="?android:attr/textColorPrimary"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
 
         <TextView
-            android:id="@+id/tvDescription"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Video Description"
-            android:textSize="12sp"
-            android:textColor="#888888"
-            android:paddingStart="8dp"
-            android:paddingBottom="8dp" />
+            android:id="@+id/itemReps"
+            android:textColor="?android:attr/textColorSecondary"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
 
-        <!-- Body Level as a label with green background -->
         <TextView
-            android:id="@+id/tvBodyLevel"
+            android:id="@+id/itemTimer"
+            android:textColor="?android:attr/textColorSecondary"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:background="#4CAF50"
-            android:paddingStart="8dp"
-            android:paddingTop="4dp"
-            android:paddingEnd="8dp"
-            android:paddingBottom="4dp"
-            android:text="Body Level: Beginner"
-            android:textColor="#263238"
-            android:textSize="12sp" />
+            android:layout_height="wrap_content" />
 
-        <!-- User Level as a label with blue background -->
         <TextView
-            android:id="@+id/tvUserLevel"
+            android:id="@+id/itemDifficulty"
+            android:textColor="?android:attr/textColorSecondary"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:background="#2196F3"
-            android:paddingStart="8dp"
-            android:paddingTop="4dp"
-            android:paddingEnd="8dp"
-            android:paddingBottom="4dp"
-            android:text="User Level: Beginner"
-            android:textColor="#212121"
-            android:textSize="12sp" />
-
-        <!-- Workout Type as a label with orange background -->
-        <TextView
-            android:id="@+id/tvWorkoutType"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:background="#FF9800"
-            android:paddingStart="8dp"
-            android:paddingTop="4dp"
-            android:paddingEnd="8dp"
-            android:paddingBottom="4dp"
-            android:text="Workout Type: Strength"
-            android:textColor="#424242"
-            android:textSize="12sp" />
-
-        <!-- Add Button to select and save the item -->
-        <Button
-            android:id="@+id/btnAdd"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginTop="8dp"
-            android:background="#4CAF50"
-            android:text="Add"
-            android:textColor="#263238" />
+            android:layout_height="wrap_content" />
     </LinearLayout>
-</androidx.cardview.widget.CardView>
+
+    <Button
+        android:id="@+id/btnAdd"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Start"/>
+</LinearLayout>

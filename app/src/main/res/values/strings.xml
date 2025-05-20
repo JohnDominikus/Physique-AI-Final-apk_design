@@ -55,6 +55,10 @@
     <string name="default_timer_text">00:00</string>
     <string name="camera_denied">Camera permission denied</string>
     <string name="back">← Back</string>
+    <string name="select_level">Select Level</string>
+    <string name="search_workouts">Search workouts</string>
+    <string name="select_type">Select Type</string>
+    <string name="start">START</string>
 
     <!-- Plurals -->
     <plurals name="task_count">
