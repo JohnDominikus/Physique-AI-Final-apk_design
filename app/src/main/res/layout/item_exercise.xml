@@ -1,9 +1,11 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="horizontal"
-    android:padding="8dp"
-    android:background="?android:attr/colorBackgroundFloating"
+    android:padding="12dp"
+    android:background="@color/cardBg"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="8dp"
+    android:elevation="2dp">
 
     <ImageView
         android:id="@+id/itemThumbnail"
@@ -11,6 +13,7 @@
         android:layout_height="64dp"
         android:layout_gravity="center_vertical"
         android:scaleType="centerCrop"
+        android:background="@drawable/rounded_bg"
         android:contentDescription="gif"/>
 
     <LinearLayout
@@ -18,31 +21,31 @@
         android:layout_width="0dp"
         android:layout_weight="1"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp">
+        android:layout_marginStart="12dp">
 
         <TextView
             android:id="@+id/itemName"
             android:textStyle="bold"
             android:textSize="18sp"
-            android:textColor="?android:attr/textColorPrimary"
+            android:textColor="@color/alwaysBlack"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
 
         <TextView
             android:id="@+id/itemReps"
-            android:textColor="?android:attr/textColorSecondary"
+            android:textColor="@color/alwaysBlack"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
 
         <TextView
             android:id="@+id/itemTimer"
-            android:textColor="?android:attr/textColorSecondary"
+            android:textColor="@color/alwaysBlack"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
 
         <TextView
             android:id="@+id/itemDifficulty"
-            android:textColor="?android:attr/textColorSecondary"
+            android:textColor="@color/alwaysBlack"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
     </LinearLayout>
@@ -51,5 +54,7 @@
         android:id="@+id/btnAdd"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Start"/>
+        android:text="Start"
+        android:textColor="@color/alwaysBlack"
+        android:backgroundTint="@color/primary"/>
 </LinearLayout>
