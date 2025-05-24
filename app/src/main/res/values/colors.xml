@@ -106,4 +106,13 @@
     <color name="primaryText">#1C1F2A</color>
     <color name="buttonGreenStart">#66BB6A</color>
     <color name="buttonGreenEnd">#43A047</color>
+
+
+    <color name="alwaysBlack">#000000</color>
+<color name="alwaysWhite">#FFFFFF</color>
+<color name="cardBg">#F5F5F5</color>
+
+<color name="primaryDark">#1565C0</color>
+<color name="accent">#FF4081</color>
+
     </resources>

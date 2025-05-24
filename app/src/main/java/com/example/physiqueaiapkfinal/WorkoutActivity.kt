@@ -1,5 +1,6 @@
 package com.example.physiqueaiapkfinal
 
+import Exercise
 import android.content.Intent
 import android.os.Bundle
 import android.widget.*
@@ -10,22 +11,6 @@ import com.bumptech.glide.Glide
 import com.google.firebase.FirebaseApp
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
-
-data class Exercise(
-    val id: String = "",
-    val name: String = "",
-    val description: String = "",
-    val difficulty: String = "",
-    val equipment: String = "",
-    val gif_url: String = "",
-    val instructions: String = "",
-    val muscle_groups: String = "",
-    val reps: String = "",
-    val safety_warning: String = "",
-    val target: String = "",
-    val thumbmail: String = "",
-    val timer: Long = 0
-)
 
 class WorkoutActivity : AppCompatActivity() {
 
@@ -88,13 +73,22 @@ class WorkoutActivity : AppCompatActivity() {
                     return@addSnapshotListener
                 }
                 exerciseList.clear()
+                var hadError = false
                 if (result != null) {
                     for (doc in result) {
-                        val ex = doc.toObject(Exercise::class.java).copy(id = doc.id)
-                        exerciseList.add(ex)
+                        try {
+                            val ex = doc.toObject(Exercise::class.java)?.copy(id = doc.id)
+                            if (ex != null) exerciseList.add(ex)
+                        } catch (e: Exception) {
+                            hadError = true
+                            e.printStackTrace()
+                        }
                     }
                 }
                 filterExercises()
+                if (hadError) {
+                    Toast.makeText(this, "Some exercises could not be loaded.", Toast.LENGTH_SHORT).show()
+                }
             }
     }
 
@@ -102,12 +96,13 @@ class WorkoutActivity : AppCompatActivity() {
         val query = searchEditText.text.toString().trim().lowercase()
         filteredList.clear()
         filteredList.addAll(exerciseList.filter { ex ->
-            val matchesSearch = ex.name.lowercase().contains(query)
+            val matchesSearch = (ex.name ?: "").lowercase().contains(query)
+            val groups = (ex.muscle_groups ?: "").lowercase()
             val matchesCategory = when (category) {
                 "All" -> true
-                "Strength" -> ex.muscle_groups.lowercase().contains("chest") || ex.muscle_groups.lowercase().contains("arms")
-                "Cardio" -> ex.muscle_groups.lowercase().contains("cardio")
-                "Others" -> !(ex.muscle_groups.lowercase().contains("chest") || ex.muscle_groups.lowercase().contains("arms") || ex.muscle_groups.lowercase().contains("cardio"))
+                "Strength" -> groups.contains("chest") || groups.contains("arms")
+                "Cardio" -> groups.contains("cardio")
+                "Others" -> !(groups.contains("chest") || groups.contains("arms") || groups.contains("cardio"))
                 else -> true
             }
             matchesSearch && matchesCategory
@@ -142,13 +137,13 @@ class WorkoutActivity : AppCompatActivity() {
 
         override fun onBindViewHolder(holder: ExerciseViewHolder, position: Int) {
             val ex = exercises[position]
-            holder.name.text = ex.name
-            holder.reps.text = ex.reps
-            holder.timer.text = "${ex.timer}s"
-            holder.difficulty.text = ex.difficulty
+            holder.name.text = ex.name ?: ""
+            holder.reps.text = ex.reps ?: ""
+            holder.timer.text = "${ex.timer ?: 0}s"
+            holder.difficulty.text = ex.difficulty ?: ""
             Glide.with(holder.itemView.context)
                 .asGif()
-                .load(ex.thumbmail)
+                .load(ex.thumbmail ?: "")
                 .into(holder.thumbnail)
             holder.startBtn.setOnClickListener { onItemClick(ex) }
             holder.itemView.setOnClickListener { onItemClick(ex) }

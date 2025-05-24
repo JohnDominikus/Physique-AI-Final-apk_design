@@ -6,7 +6,7 @@ import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import com.bumptech.glide.Glide
 import com.google.firebase.firestore.FirebaseFirestore
-
+import Exercise
 class ExerciseDetailActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -32,19 +32,19 @@ class ExerciseDetailActivity : AppCompatActivity() {
             .document(exerciseId)
             .addSnapshotListener { doc, _ ->
                 val ex = doc?.toObject(Exercise::class.java) ?: return@addSnapshotListener
-                nameText.text = ex.name
-                descText.text = ex.description
-                instructionsText.text = ex.instructions
-                repsText.text = "Reps: ${ex.reps}"
-                timerText.text = "Timer: ${ex.timer}s"
-                difficultyText.text = "Difficulty: ${ex.difficulty}"
-                muscleText.text = "Muscle Groups: ${ex.muscle_groups}"
-                safetyText.text = "Warning: ${ex.safety_warning}"
-                equipmentText.text = "Equipment: ${ex.equipment}"
-                targetText.text = "Target: ${ex.target}"
+                nameText.text = ex.name ?: ""
+                descText.text = ex.description ?: ""
+                instructionsText.text = ex.instructions ?: ""
+                repsText.text = "Reps: ${ex.reps ?: ""}"
+                timerText.text = "Timer: ${ex.timer ?: 0}s"
+                difficultyText.text = "Difficulty: ${ex.difficulty ?: ""}"
+                muscleText.text = "Muscle Groups: ${ex.muscle_groups ?: ""}"
+                safetyText.text = "Warning: ${ex.safety_warning ?: ""}"
+                equipmentText.text = "Equipment: ${ex.equipment ?: ""}"
+                targetText.text = "Target: ${ex.target ?: ""}"
                 Glide.with(this)
                     .asGif()
-                    .load(ex.gif_url)
+                    .load(ex.gif_url ?: "")
                     .into(gifImage)
             }
 
