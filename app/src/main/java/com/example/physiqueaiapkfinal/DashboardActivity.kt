@@ -58,13 +58,13 @@ class DashboardActivity : AppCompatActivity() {
             navigateToActivity(PostureActivity::class.java)
         }
         findViewById<View>(R.id.btnExercise).setOnClickListener {
-            navigateToActivity(WorkoutActivity::class.java)
+            navigateToActivity(WorkoutListActivity::class.java)
         }
         findViewById<View>(R.id.btnDietary).setOnClickListener {
-            navigateToActivity(DietPlannerActivity::class.java)
+            navigateToActivity( RecipeListActivity::class.java)
         }
         findViewById<View>(R.id.btnTask).setOnClickListener {
-            navigateToActivity(TaskActivity::class.java)
+            //navigateToActivity(TaskActivity::class.java)
         }
         findViewById<View>(R.id.btnBMI).setOnClickListener {
             navigateToActivity(BmiCalculatorActivity::class.java)
@@ -96,10 +96,10 @@ class DashboardActivity : AppCompatActivity() {
         bottomNavigation.setOnItemSelectedListener { item ->
             when (item.itemId) {
                 R.id.nav_home -> { /* Already on home */ }
-                R.id.nav_workout -> navigateToActivity(WorkoutActivity::class.java)
+               R.id.nav_workout -> navigateToActivity(LikedWorkoutsActivity::class.java)
                 R.id.nav_posture -> navigateToActivity(PostureActivity::class.java)
-                R.id.nav_dietary -> navigateToActivity(DietPlannerActivity::class.java)
-                R.id.nav_task -> navigateToActivity(TaskActivity::class.java)
+                R.id.nav_dietary -> navigateToActivity( RecipeListActivity::class.java)
+              //  R.id.nav_task -> navigateToActivity(TaskActivity::class.java)
                 else -> Log.e("Dashboard", "Unknown menu item selected")
             }
             true

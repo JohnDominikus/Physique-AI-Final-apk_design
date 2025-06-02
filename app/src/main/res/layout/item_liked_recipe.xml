@@ -9,7 +9,7 @@
     android:gravity="center_vertical">
 
     <ImageView
-        android:id="@+id/recipeImage"
+        android:id="@+id/likedRecipeImage"
         android:layout_width="60dp"
         android:layout_height="60dp"
         android:scaleType="centerCrop"
@@ -24,7 +24,7 @@
         android:orientation="vertical">
 
         <TextView
-            android:id="@+id/recipeName"
+            android:id="@+id/likedRecipeName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Recipe Name"
@@ -33,7 +33,7 @@
             android:textStyle="bold" />
 
         <TextView
-            android:id="@+id/recipeDietaryTags"
+            android:id="@+id/likedRecipeDietaryTags"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Dietary Tag"
@@ -41,7 +41,7 @@
             android:textSize="14sp" />
 
         <TextView
-            android:id="@+id/mealType"
+            android:id="@+id/likedMealType"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Meal Type"
@@ -50,18 +50,19 @@
 
     </LinearLayout>
 
-    <ImageView
-        android:id="@+id/infoIcon"
+    <Button
+        android:id="@+id/viewRecipeButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@android:drawable/ic_menu_info_details"
-        android:contentDescription="Info" />
+        android:text="VIEW RECIPE"
+        android:layout_marginEnd="8dp"/>
 
-    <ImageView
-        android:id="@+id/heartIcon"
+    <ImageButton
+        android:id="@+id/removeRecipeButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@drawable/fav"
-        android:contentDescription="Like" />
+        android:background="@android:color/transparent"
+        android:contentDescription="Remove"
+        app:srcCompat="@android:drawable/ic_menu_close_clear_cancel" />
 
 </LinearLayout>

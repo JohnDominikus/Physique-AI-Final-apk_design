@@ -42,14 +42,35 @@
         <activity android:name=".ProfileActivity" android:exported="false" />
         <activity android:name=".PhysicalActivity" android:exported="true" />
         <activity android:name=".MedicalActivity" android:exported="true" />
-        <activity android:name=".WorkoutActivity" android:exported="true" />
+        <activity android:name=".WorkoutListActivity" android:exported="true" />
         <activity android:name=".PostureActivity" android:exported="true" />
-        <activity android:name=".DietPlannerActivity" android:exported="true" />
-        <activity android:name=".TaskActivity" android:exported="true" />
+
+
         <activity android:name=".BmiCalculatorActivity" android:exported="true" />
         <activity android:name=".ResultActivity" android:exported="true" />
         <activity android:name=".SplashActivity" android:exported="true" />
         <activity android:name=".ExerciseDetailActivity" android:exported="true" />
+
+
+        <activity android:name=".RecipeListActivity"
+            android:exported="false">
+            <!-- Optional: Add an intent-filter here if this is a main entry point -->
+        </activity>
+        <activity android:name=".RecipeDetailActivity"
+            android:exported="false">
+        </activity>
+        <activity android:name=".LikedRecipesActivity"
+            android:exported="false">
+        </activity>
+
+        <activity android:name=".WorkoutDetailActivity"
+            android:exported="false">
+        </activity>
+        <activity android:name=".LikedWorkoutsActivity"
+            android:exported="false">
+        </activity>
+
+
 
     </application>
 </manifest>

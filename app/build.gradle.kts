@@ -90,6 +90,7 @@ dependencies {
     implementation("com.github.bumptech.glide:glide:4.16.0")
     implementation(libs.androidx.recyclerview)
     implementation(libs.androidx.material3.android)
+    implementation(libs.androidx.animation.core.android)
     annotationProcessor("com.github.bumptech.glide:compiler:4.16.0")
 
     // Navigation & Layout

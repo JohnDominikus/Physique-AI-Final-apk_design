@@ -1,0 +1,79 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="horizontal"
+    android:padding="16dp"
+    android:gravity="center_vertical"
+    android:background="?android:attr/selectableItemBackground">
+
+    <!-- Workout Thumbnail -->
+    <ImageView
+        android:id="@+id/likedWorkoutImage"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_marginEnd="16dp"
+        android:scaleType="centerCrop"
+        android:contentDescription="@string/workout_image"
+        app:srcCompat="@android:drawable/sym_def_app_icon" />
+
+    <!-- Workout Info Section -->
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/likedWorkoutName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Workout Name"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:textColor="@android:color/black" />
+
+        <TextView
+            android:id="@+id/likedWorkoutTarget"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Target Muscle Group"
+            android:textSize="14sp"
+            android:textColor="@android:color/darker_gray" />
+
+        <TextView
+            android:id="@+id/likedWorkoutDifficulty"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Difficulty"
+            android:textSize="14sp"
+            android:textColor="@android:color/darker_gray" />
+
+        <TextView
+            android:id="@+id/likedWorkoutEquipment"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Equipment"
+            android:textSize="14sp"
+            android:textColor="@android:color/darker_gray" />
+    </LinearLayout>
+
+    <!-- Action Buttons -->
+    <Button
+        android:id="@+id/viewWorkoutButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="View"
+        android:layout_marginEnd="8dp" />
+
+    <ImageButton
+        android:id="@+id/removeWorkoutButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@android:drawable/ic_delete"
+        android:contentDescription="@string/remove_from_liked"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:padding="8dp"
+        tools:ignore="TouchTargetSizeCheck" />
+</LinearLayout>

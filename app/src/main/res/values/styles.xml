@@ -125,5 +125,11 @@
         </style>
 
 
+    <string name="difficulty_label">Difficulty: %1$s</string>
+    <string name="target_label">Target: %1$s</string>
+    <string name="muscle_groups_label">Muscle Groups: %1$s</string>
+    <string name="safety_warning_label">Safety Warning: %1$s</string>
+    <string name="reps_label">Reps: %1$s</string>
+    <string name="no_description">No description available.</string>
 
 </resources>

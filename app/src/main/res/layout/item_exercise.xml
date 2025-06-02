@@ -1,60 +1,57 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="horizontal"
-    android:padding="12dp"
-    android:background="@color/cardBg"
+    android:padding="8dp"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginBottom="8dp"
-    android:elevation="2dp">
+    android:background="?attr/selectableItemBackground">
 
     <ImageView
         android:id="@+id/itemThumbnail"
-        android:layout_width="64dp"
-        android:layout_height="64dp"
-        android:layout_gravity="center_vertical"
-        android:scaleType="centerCrop"
-        android:background="@drawable/rounded_bg"
-        android:contentDescription="gif"/>
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:contentDescription="Exercise Thumbnail"
+        android:scaleType="centerCrop" />
 
     <LinearLayout
         android:orientation="vertical"
-        android:layout_width="0dp"
+        android:layout_marginStart="8dp"
         android:layout_weight="1"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="12dp">
+        android:layout_width="0dp"
+        android:layout_height="wrap_content">
 
         <TextView
             android:id="@+id/itemName"
             android:textStyle="bold"
             android:textSize="18sp"
-            android:textColor="@color/alwaysBlack"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
 
         <TextView
             android:id="@+id/itemReps"
-            android:textColor="@color/alwaysBlack"
+            android:textSize="14sp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
 
         <TextView
             android:id="@+id/itemTimer"
-            android:textColor="@color/alwaysBlack"
+            android:textSize="14sp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
 
         <TextView
             android:id="@+id/itemDifficulty"
-            android:textColor="@color/alwaysBlack"
+            android:textSize="14sp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
     </LinearLayout>
 
     <Button
         android:id="@+id/btnAdd"
+        android:text="Start"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Start"
-        android:textColor="@color/alwaysBlack"
-        android:backgroundTint="@color/primary"/>
+        android:layout_gravity="center_vertical" />
+
 </LinearLayout>

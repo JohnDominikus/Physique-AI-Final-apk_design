@@ -1,11 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:orientation="vertical"
-    android:background="?android:attr/colorBackground"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".WorkoutListActivity">
 
-    <!-- Top bar with Back, Title, Heart, and Search icons -->
+    <!-- Top bar with Back, Title, and Liked Workouts icons -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
@@ -22,31 +23,26 @@
             android:layout_height="wrap_content"
             android:src="@android:drawable/ic_menu_revert"
             android:background="?attr/selectableItemBackgroundBorderless"
-            android:contentDescription="Back"
-            android:visibility="gone"/> <!-- Initially hidden, can be shown if this isn't the main entry -->
+            android:contentDescription="Back"/>
 
         <TextView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="ADD RECIPES"
+            android:text="WORKOUTS"
             android:textSize="20sp"
             android:textStyle="bold"
             android:textColor="@android:color/white"
             android:gravity="center"/>
 
         <ImageButton
-            android:id="@+id/likedRecipesButton"
+            android:id="@+id/likedWorkoutsButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="?attr/selectableItemBackgroundBorderless"
-            android:contentDescription="Liked Recipes"
-            android:src="@drawable/fav"
-            android:layout_marginEnd="8dp"/> <!-- Using outlined for consistency -->
-
-        <!-- Moved search input to its own section below the top bar -->
+            android:contentDescription="Liked Workouts"
+            android:src="@android:drawable/btn_star_big_on" />
     </LinearLayout>
-
 
     <!-- Search Bar -->
     <LinearLayout
@@ -57,19 +53,19 @@
         android:gravity="center_vertical">
 
         <EditText
-            android:id="@+id/searchRecipeEditText"
+            android:id="@+id/searchWorkoutEditText"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:background="@android:color/transparent"
-            android:hint="Search recipes"
+            android:hint="Search workouts"
             android:textColor="?android:attr/textColorPrimary"
             android:textColorHint="?android:attr/textColorHint"
             tools:ignore="TouchTargetSizeCheck"
             android:layout_marginEnd="8dp"/>
 
         <ImageButton
-            android:id="@+id/searchRecipeButton"
+            android:id="@+id/searchWorkoutButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@android:color/transparent"
@@ -78,7 +74,7 @@
             tools:ignore="TouchTargetSizeCheck" />
     </LinearLayout>
 
-    <!-- Filter Buttons (Example: Meal Type) -->
+    <!-- Filter Buttons -->
     <LinearLayout
         android:orientation="horizontal"
         android:layout_width="match_parent"
@@ -87,53 +83,47 @@
         android:padding="8dp">
 
         <Button
-            android:id="@+id/btnAllMeals"
+            android:id="@+id/btnAllWorkouts"
             android:text="All"
             android:layout_width="0dp"
             android:layout_weight="1"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="4dp"/>
+            android:layout_height="wrap_content"/>
 
         <Button
-            android:id="@+id/btnBreakfast"
-            android:text="Breakfast"
+            android:id="@+id/btnChest"
+            android:text="Chest"
             android:layout_width="0dp"
             android:layout_weight="1"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="4dp"/>
+            android:layout_height="wrap_content"/>
 
         <Button
-            android:id="@+id/btnLunch"
-            android:text="Lunch"
+            android:id="@+id/btnBack"
+            android:text="Back"
             android:layout_width="0dp"
             android:layout_weight="1"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="4dp"/>
+            android:layout_height="wrap_content"/>
 
         <Button
-            android:id="@+id/btnDinner"
-            android:text="Dinner"
+            android:id="@+id/btnLegs"
+            android:text="Legs"
             android:layout_width="0dp"
             android:layout_weight="1"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="4dp"/>
+            android:layout_height="wrap_content"/>
 
         <Button
-            android:id="@+id/btnSnacks"
-            android:text="Snacks"
+            android:id="@+id/btnArms"
+            android:text="Arms"
             android:layout_width="0dp"
             android:layout_weight="1"
-            android:layout_height="wrap_content" />
-
+            android:layout_height="wrap_content"/>
     </LinearLayout>
 
-    <!-- RecyclerView for Recipes -->
+    <!-- RecyclerView for Workouts -->
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recipeRecycler"
+        android:id="@+id/workoutsRecycler"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
         android:paddingStart="8dp"
         android:paddingEnd="8dp"/>
-
 </LinearLayout>

@@ -59,7 +59,15 @@
     <string name="search_workouts">Search workouts</string>
     <string name="select_type">Select Type</string>
     <string name="start">START</string>
+    <string name="remove_from_liked">unliked   workout</string>
+    <string name="workout_image">image\n</string>
 
+
+
+    <string name="difficulty_format">Difficulty: %s</string>
+    <string name="equipment_format">Equipment: %s</string>
+    <string name="muscle_groups_format">Muscle Groups: %s</string>
+    <string name="target_format">Target: %s</string>
     <!-- Plurals -->
     <plurals name="task_count">
         <item quantity="one">%d Task</item>

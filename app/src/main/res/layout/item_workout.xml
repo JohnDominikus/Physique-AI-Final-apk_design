@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -6,14 +7,15 @@
     android:orientation="horizontal"
     android:padding="16dp"
     android:background="?android:attr/selectableItemBackground"
-    android:gravity="center_vertical">
+    android:gravity="center_vertical"
+    tools:ignore="ExtraText">
 
     <ImageView
-        android:id="@+id/recipeImage"
+        android:id="@+id/workoutImage"
         android:layout_width="60dp"
         android:layout_height="60dp"
         android:scaleType="centerCrop"
-        android:contentDescription="Recipe Image"
+        android:contentDescription="Workout Image"
         android:layout_marginEnd="16dp"
         app:srcCompat="@android:drawable/sym_def_app_icon"/>
 
@@ -24,27 +26,35 @@
         android:orientation="vertical">
 
         <TextView
-            android:id="@+id/recipeName"
+            android:id="@+id/workoutName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Recipe Name"
+            android:text="Workout Name"
             android:textColor="@android:color/black"
             android:textSize="18sp"
             android:textStyle="bold" />
 
         <TextView
-            android:id="@+id/recipeDietaryTags"
+            android:id="@+id/workoutMuscleGroups"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Dietary Tag"
+            android:text="Target Muscle Groups"
             android:textColor="@android:color/darker_gray"
             android:textSize="14sp" />
 
         <TextView
-            android:id="@+id/mealType"
+            android:id="@+id/workoutDifficulty"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Meal Type"
+            android:text="Difficulty"
+            android:textColor="@android:color/darker_gray"
+            android:textSize="14sp" />
+
+        <TextView
+            android:id="@+id/workoutEquipment"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Equipment"
             android:textColor="@android:color/darker_gray"
             android:textSize="14sp" />
 
@@ -55,13 +65,22 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:src="@android:drawable/ic_menu_info_details"
-        android:contentDescription="Info" />
+        android:contentDescription="Info"
+        android:layout_marginEnd="12dp"
+        android:clickable="true"
+        android:focusable="true"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:visibility="gone"/>
 
     <ImageView
         android:id="@+id/heartIcon"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:clickable="true"
+        android:contentDescription="Like"
+        android:focusable="true"
         android:src="@drawable/fav"
-        android:contentDescription="Like" />
+        tools:ignore="TouchTargetSizeCheck" />
 
 </LinearLayout>

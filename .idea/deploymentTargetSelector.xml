@@ -4,10 +4,10 @@
     <selectionStates>
       <SelectionState runConfigName="app">
         <option name="selectionMode" value="DROPDOWN" />
-        <DropdownSelection timestamp="2025-05-06T16:39:48.226185500Z">
+        <DropdownSelection timestamp="2025-06-02T21:14:04.162091400Z">
           <Target type="DEFAULT_BOOT">
             <handle>
-              <DeviceId pluginId="PhysicalDevice" identifier="serial=09424252CN000118" />
+              <DeviceId pluginId="LocalEmulator" identifier="path=C:\Users\Shiela-PC\.android\avd\Physiqeu_Tester.avd" />
             </handle>
           </Target>
         </DropdownSelection>

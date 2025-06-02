@@ -1,80 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:orientation="vertical"
-    android:background="?android:attr/colorBackground"
+    android:id="@+id/workoutListLayout"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp">
 
-    <!-- Search Bar -->
+    <!-- Search Section -->
     <LinearLayout
-        android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="8dp">
+        android:orientation="horizontal">
 
         <EditText
-            android:id="@+id/searchEditText"
+            android:id="@+id/searchWorkoutEditText"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:background="@android:color/transparent"
-            android:hint="Search exercise"
-            android:textColor="?android:attr/textColorPrimary"
-            android:textColorHint="?android:attr/textColorHint"
-            tools:ignore="TouchTargetSizeCheck" />
+            android:layout_height="wrap_content"
+            android:hint="Search workouts" />
 
         <ImageButton
-            android:id="@+id/searchButton"
+            android:id="@+id/searchWorkoutButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@android:color/transparent"
-            android:contentDescription="Search"
             android:src="@android:drawable/ic_menu_search"
-            tools:ignore="TouchTargetSizeCheck" />
+            android:contentDescription="Search"
+            android:background="?attr/selectableItemBackgroundBorderless"/>
     </LinearLayout>
 
     <!-- Filter Buttons -->
     <LinearLayout
-        android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="12dp"
+        android:weightSum="5"
         android:gravity="center">
 
         <Button
-            android:id="@+id/btnAll"
-            android:text="All"
-            android:layout_width="0dp"
+            android:id="@+id/btnAllWorkouts"
             android:layout_weight="1"
-            android:layout_height="wrap_content" />
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="All" />
 
         <Button
-            android:id="@+id/btnStrength"
-            android:text="Strength"
-            android:layout_width="0dp"
+            android:id="@+id/btnChest"
             android:layout_weight="1"
-            android:layout_height="wrap_content" />
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="Chest" />
 
         <Button
-            android:id="@+id/btnCardio"
-            android:text="Cardio"
-            android:layout_width="0dp"
+            android:id="@+id/btnBack"
             android:layout_weight="1"
-            android:layout_height="wrap_content" />
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="Back" />
 
         <Button
-            android:id="@+id/btnOthers"
-            android:Color="#FFFFFF"
-            android:text="Others"
-            android:layout_width="0dp"
+            android:id="@+id/btnLegs"
             android:layout_weight="1"
-            android:layout_height="wrap_content" />
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="Legs" />
+
+        <Button
+            android:id="@+id/btnArms"
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="Arms" />
     </LinearLayout>
 
-    <!-- RecyclerView for Exercises -->
+    <!-- RecyclerView for workouts -->
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/exerciseRecycler"
+        android:id="@+id/workoutRecycler"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1" />
+        android:layout_weight="1"
+        android:layout_marginTop="16dp" />
+
+    <!-- Liked Workouts Button -->
+    <ImageButton
+        android:id="@+id/likedWorkoutsButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@android:drawable/btn_star_big_on"
+        android:contentDescription="Liked Workouts"
+        android:layout_gravity="end"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:layout_marginTop="8dp" />
 
 </LinearLayout>
