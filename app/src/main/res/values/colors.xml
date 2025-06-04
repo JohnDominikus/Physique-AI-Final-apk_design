@@ -115,4 +115,12 @@
 <color name="primaryDark">#1565C0</color>
 <color name="accent">#FF4081</color>
 
-    </resources>
+    <color name="blue_700">#1976D2</color>        <!-- Save icon tint, accent -->
+    <color name="gray_600">#757575</color>
+    <color name="divider">#E0E0E0</color>
+    <color name="edittext_bg">#F5F5F5</color>
+    <color name="text_primary">#222222</color>    <!-- Main text (dark gray) -->
+    <color name="text_secondary">#444444</color>  <!-- Secondary text -->
+    <color name="text_hint">#888888</color>
+    <color name="background">#FFFFFF</color>
+</resources>

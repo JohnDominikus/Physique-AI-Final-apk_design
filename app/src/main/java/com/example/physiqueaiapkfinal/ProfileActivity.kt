@@ -83,6 +83,9 @@ class ProfileActivity : AppCompatActivity() {
     private fun setupEditListeners() {
         editNameIcon.setOnClickListener {
             editNameLayout.visibility = View.VISIBLE
+            // Pre-fill current name if available
+            val currentName = tvName.text.toString().removePrefix("Name: ").trim()
+            editName.setText(currentName)
         }
 
         saveNameIcon.setOnClickListener {
@@ -93,7 +96,7 @@ class ProfileActivity : AppCompatActivity() {
             val lastName = parts.getOrNull(1)?.trim().orEmpty()
 
             if (firstName.isEmpty() || lastName.isEmpty()) {
-                Toast.makeText(this, "Enter first and last name", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Enter both first and last name", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
@@ -104,8 +107,10 @@ class ProfileActivity : AppCompatActivity() {
                 .setMessage("Save this name?\n\n$displayFormatted")
                 .setPositiveButton("Yes") { _, _ ->
                     firestore.collection("userinfo").document(uid!!).update(
-                        "personalInfo.firstName", firstName,
-                        "personalInfo.lastName", lastName
+                        mapOf(
+                            "personalInfo.firstName" to firstName,
+                            "personalInfo.lastName" to lastName
+                        )
                     )
                         .addOnSuccessListener {
                             Toast.makeText(this, "Name updated", Toast.LENGTH_SHORT).show()
@@ -121,6 +126,10 @@ class ProfileActivity : AppCompatActivity() {
 
         editBirthdateIcon.setOnClickListener {
             editBirthdateLayout.visibility = View.VISIBLE
+            // Pre-fill current birthdate if available
+            val currentBirthdate = tvBirthdate.text.toString().removePrefix("Birthdate: ").trim()
+            editBirthdate.setText(currentBirthdate)
+
             val cal = Calendar.getInstance()
             DatePickerDialog(this, { _, y, m, d ->
                 val dateStr = "${(m + 1).toString().padStart(2, '0')}/${d.toString().padStart(2, '0')}/$y"
@@ -131,15 +140,26 @@ class ProfileActivity : AppCompatActivity() {
         saveBirthdateIcon.setOnClickListener {
             val birthdate = editBirthdate.text.toString().trim()
 
+            if (birthdate.isEmpty()) {
+                Toast.makeText(this, "Birthdate cannot be empty", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
             firestore.collection("userinfo").document(uid!!).update("personalInfo.birthdate", birthdate)
                 .addOnSuccessListener {
                     Toast.makeText(this, "Birthdate updated", Toast.LENGTH_SHORT).show()
                     editBirthdateLayout.visibility = View.GONE
                 }
+                .addOnFailureListener {
+                    Toast.makeText(this, "Update failed: ${it.message}", Toast.LENGTH_LONG).show()
+                }
         }
 
         editPhoneIcon.setOnClickListener {
             editPhoneLayout.visibility = View.VISIBLE
+            // Pre-fill current phone if available
+            val currentPhone = tvPhone.text.toString().removePrefix("Phone: ").trim()
+            editPhone.setText(currentPhone)
         }
 
         savePhoneIcon.setOnClickListener {
@@ -181,28 +201,30 @@ class ProfileActivity : AppCompatActivity() {
             }
 
             if (doc != null && doc.exists()) {
-                val personal = doc.get("personalInfo") as? Map<*, *> ?: return@addSnapshotListener
-                val firstName = personal["firstName"]?.toString() ?: ""
-                val lastName = personal["lastName"]?.toString() ?: ""
-                val email = personal["email"]?.toString() ?: "N/A"
-                val birthdate = personal["birthdate"]?.toString() ?: "N/A"
-                val phone = personal["phone"]?.toString() ?: "N/A"
+                val personal = doc.get("personalInfo") as? Map<*, *>
+                val firstName = personal?.get("firstName")?.toString() ?: ""
+                val lastName = personal?.get("lastName")?.toString() ?: ""
+                val email = personal?.get("email")?.toString() ?: "N/A"
+                val birthdate = personal?.get("birthdate")?.toString() ?: "N/A"
+                val phone = personal?.get("phone")?.toString() ?: "N/A"
 
                 tvName.text = "Name: $firstName $lastName"
                 tvEmail.text = "Email: $email"
                 tvBirthdate.text = "Birthdate: $birthdate"
                 tvPhone.text = "Phone: $phone"
 
-                // Fetch BMI information and display
-                val bmiInfo = doc.get("bmiInfo") as? Map<*, *> ?: emptyMap<String, String>()
-                val bmiStatus = bmiInfo["status"]?.toString()?.replaceFirstChar { it.uppercase() } ?: "N/A"
-                val bmiValue = bmiInfo["bmi"]?.toString()?.toDoubleOrNull()?.let { String.format("%.1f", it) } ?: "N/A"
+                // Fetch BMI info safely
+                val bmiInfo = doc.get("bmiInfo") as? Map<*, *>
+                val bmiStatusRaw = bmiInfo?.get("status")?.toString() ?: "N/A"
+                val bmiStatus = bmiStatusRaw.replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString() }
+                val bmiValueRaw = bmiInfo?.get("bmi")?.toString()
+                val bmiValue = bmiValueRaw?.toDoubleOrNull()?.let { String.format("%.1f", it) } ?: "N/A"
 
                 tvBMIStatus.text = "BMI Status: $bmiStatus"
                 tvBMI.text = "BMI: $bmiValue"
 
                 tvBMIStatus.setTextColor(
-                    when (bmiStatus.lowercase()) {
+                    when (bmiStatusRaw.lowercase()) {
                         "normal" -> getColor(R.color.teal_700)
                         "overweight" -> getColor(android.R.color.holo_orange_light)
                         "underweight" -> getColor(android.R.color.holo_blue_light)
