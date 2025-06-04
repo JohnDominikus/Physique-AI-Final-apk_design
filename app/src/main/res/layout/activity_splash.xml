@@ -2,35 +2,44 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@android:color/white">
+    android:background="@android:color/white"
+    android:padding="32dp">
 
+    <!-- Centered Logo -->
     <ImageView
         android:id="@+id/logoImage"
-        android:layout_width="100dp"
-        android:layout_height="100dp"
-        android:layout_centerInParent="true"
+        android:layout_width="140dp"
+        android:layout_height="140dp"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:layout_marginBottom="80dp"
         android:src="@drawable/physiqueailogo"
         android:scaleType="centerInside" />
 
+    <!-- Horizontal Progress Bar just below the logo -->
     <ProgressBar
         android:id="@+id/progressBar"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="match_parent"
+        android:layout_height="12dp"
         android:layout_below="@id/logoImage"
-        android:layout_marginTop="20dp"
-        android:visibility="gone" />
+        android:layout_marginTop="24dp"
+        android:layout_centerHorizontal="true"
+        android:max="100"
+        android:progress="0"
+        android:indeterminate="false"
+        android:progressDrawable="@drawable/custom_progress_bar" />
 
+    <!-- Center-aligned Loading Text -->
     <TextView
         android:id="@+id/loadingText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/progressBar"
+        android:layout_marginTop="12dp"
         android:layout_centerHorizontal="true"
-        android:text="Loading, please wait..."
-        android:textSize="16sp"
-        android:textColor="@android:color/black"
-        android:visibility="gone"
-        android:layout_marginTop="10dp" />
-
+        android:text="Loading... 0%"
+        android:textSize="18sp"
+        android:textColor="#444444"
+        android:textStyle="bold" />
 </RelativeLayout>

@@ -59,7 +59,7 @@ class WorkoutDetailActivity : AppCompatActivity() {
     }
 
     private fun fetchWorkoutDetails(workoutId: String) {
-        db.collection("workouts")
+        db.collection("workoutcollection")
             .document(workoutId)
             .get()
             .addOnSuccessListener { doc ->

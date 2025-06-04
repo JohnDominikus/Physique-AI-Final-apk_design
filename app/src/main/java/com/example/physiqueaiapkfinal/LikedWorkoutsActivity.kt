@@ -29,7 +29,7 @@ class LikedWorkoutsActivity : AppCompatActivity() {
     private lateinit var loadingIndicator: ProgressBar
 
     private val TAG = "LikedWorkoutsActivity"
-    private val BATCH_SIZE = 10 // Firestore "whereIn" max limit
+    private val BATCH_SIZE = 10 // Firestore 'whereIn' max
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -53,14 +53,12 @@ class LikedWorkoutsActivity : AppCompatActivity() {
         adapter = LikedWorkoutAdapter(
             likedWorkoutList,
             onViewClick = { workout ->
-                // Open workout details screen
                 val intent = Intent(this, WorkoutDetailActivity::class.java).apply {
                     putExtra("workoutId", workout.id)
                 }
                 startActivity(intent)
             },
             onRemoveClick = { workout ->
-                // Remove workout from liked list
                 removeWorkoutFromLiked(workout)
             }
         )
@@ -73,6 +71,7 @@ class LikedWorkoutsActivity : AppCompatActivity() {
         }
     }
 
+    // 🔁 Real-time listener for liked workout IDs
     private fun fetchLikedWorkouts() {
         val userId = auth.currentUser?.uid
 
@@ -84,84 +83,78 @@ class LikedWorkoutsActivity : AppCompatActivity() {
             return
         }
 
-        Log.d(TAG, "Fetching liked workouts for user: $userId")
-
+        firestoreListener?.remove() // Clear any old listener
         firestoreListener = db.collection("users")
             .document(userId)
             .collection("likedWorkouts")
             .addSnapshotListener { snapshot, error ->
                 if (error != null) {
-                    Log.e(TAG, "Error fetching liked workouts", error)
+                    Log.e(TAG, "Error listening to liked workouts", error)
                     handleError("Error fetching liked workouts")
                     return@addSnapshotListener
                 }
 
-                if (snapshot == null) {
-                    Log.d(TAG, "Liked workouts snapshot is null")
-                    handleError("Error fetching data")
+                if (snapshot == null || snapshot.isEmpty) {
+                    Log.d(TAG, "No liked workouts found")
+                    likedWorkoutList.clear()
+                    adapter.notifyDataSetChanged()
+                    showEmptyState("You haven't liked any workouts yet")
                     return@addSnapshotListener
                 }
 
-                Log.d(TAG, "Liked workouts snapshot received. Documents: ${snapshot.size()}")
-
-                val likedWorkoutIds = snapshot.documents.map { doc ->
-                    // Use workoutId field if present, otherwise doc ID
-                    doc.getString("workoutId") ?: doc.id
+                val likedWorkoutIds = snapshot.documents.mapNotNull {
+                    it.getString("workoutId") ?: it.id
                 }
 
-                likedWorkoutList.clear()
-
-                if (likedWorkoutIds.isEmpty()) {
-                    Log.d(TAG, "No liked workouts found")
-                    showEmptyState("You haven't liked any workouts yet")
-                } else {
-                    Log.d(TAG, "Fetching details for ${likedWorkoutIds.size} liked workouts")
-                    fetchWorkoutDetails(likedWorkoutIds)
-                }
+                Log.d(TAG, "Liked workout IDs: ${likedWorkoutIds.size}")
+                fetchWorkoutDetailsInBatches(likedWorkoutIds)
             }
     }
 
-    private fun fetchWorkoutDetails(workoutIds: List<String>) {
+    // 🔄 Fetch workouts in chunks of 10
+    private fun fetchWorkoutDetailsInBatches(workoutIds: List<String>) {
         val batches = workoutIds.chunked(BATCH_SIZE)
+        val tempWorkoutList = mutableListOf<Workout>()
         var completedBatches = 0
-        val totalBatches = batches.size
+
+        if (batches.isEmpty()) {
+            likedWorkoutList.clear()
+            adapter.notifyDataSetChanged()
+            showEmptyState("You haven't liked any workouts yet")
+            return
+        }
 
         for (batch in batches) {
             db.collection("workoutcollection")
                 .whereIn(FieldPath.documentId(), batch)
                 .get()
-                .addOnSuccessListener { workoutsSnapshot ->
-                    Log.d(TAG, "Batch workout details received. Count: ${workoutsSnapshot.size()}")
-
-                    for (doc in workoutsSnapshot.documents) {
-                        try {
-                            val workout = doc.toObject(Workout::class.java)?.copy(id = doc.id)
-                            workout?.let {
-                                likedWorkoutList.add(it)
-                                Log.d(TAG, "Added workout: ${it.name}")
-                            }
-                        } catch (e: Exception) {
-                            Log.e(TAG, "Error parsing workout document: ${doc.id}", e)
-                        }
+                .addOnSuccessListener { snapshot ->
+                    for (doc in snapshot.documents) {
+                        val workout = doc.toObject(Workout::class.java)?.copy(id = doc.id)
+                        workout?.let { tempWorkoutList.add(it) }
                     }
-
                     completedBatches++
-                    if (completedBatches == totalBatches) {
-                        runOnUiThread {
-                            adapter.notifyDataSetChanged()
-                            updateUI()
-                        }
-                    }
+                    checkIfAllBatchesCompleted(completedBatches, batches.size, tempWorkoutList)
                 }
                 .addOnFailureListener { e ->
-                    Log.e(TAG, "Error fetching workout details for batch", e)
+                    Log.e(TAG, "Error fetching batch", e)
                     completedBatches++
-                    if (completedBatches == totalBatches) {
-                        runOnUiThread {
-                            handleError("Error loading some workout details")
-                        }
-                    }
+                    checkIfAllBatchesCompleted(completedBatches, batches.size, tempWorkoutList)
                 }
+        }
+    }
+
+    private fun checkIfAllBatchesCompleted(
+        completed: Int,
+        total: Int,
+        workouts: List<Workout>
+    ) {
+        if (completed == total) {
+            val uniqueWorkouts = workouts.distinctBy { it.id }
+            likedWorkoutList.clear()
+            likedWorkoutList.addAll(uniqueWorkouts)
+            adapter.notifyDataSetChanged()
+            updateUI()
         }
     }
 
@@ -186,7 +179,6 @@ class LikedWorkoutsActivity : AppCompatActivity() {
 
     private fun updateUI() {
         loadingIndicator.visibility = View.GONE
-
         if (likedWorkoutList.isEmpty()) {
             showEmptyState("You haven't liked any workouts yet")
         } else {
@@ -198,12 +190,9 @@ class LikedWorkoutsActivity : AppCompatActivity() {
     private fun removeWorkoutFromLiked(workout: Workout) {
         val userId = auth.currentUser?.uid
         if (userId == null) {
-            Log.d(TAG, "User not logged in - can't remove liked workout")
             Toast.makeText(this, "Please log in to modify liked workouts", Toast.LENGTH_SHORT).show()
             return
         }
-
-        Log.d(TAG, "Removing liked workout: ${workout.id}")
 
         db.collection("users")
             .document(userId)
@@ -211,21 +200,17 @@ class LikedWorkoutsActivity : AppCompatActivity() {
             .document(workout.id)
             .delete()
             .addOnSuccessListener {
-                Log.d(TAG, "Successfully removed liked workout")
                 Toast.makeText(this, "${workout.name} removed from liked workouts", Toast.LENGTH_SHORT).show()
-
-                // Remove locally and refresh UI
                 likedWorkoutList.removeAll { it.id == workout.id }
                 adapter.notifyDataSetChanged()
                 updateUI()
             }
             .addOnFailureListener { e ->
-                Log.e(TAG, "Error removing liked workout", e)
                 Toast.makeText(this, "Error removing workout: ${e.message}", Toast.LENGTH_SHORT).show()
             }
     }
 
-    // Optional helper to add liked workout externally
+    // Optional: Add liked workout externally
     fun addWorkoutToLiked(workoutId: String) {
         val userId = auth.currentUser?.uid ?: return
 

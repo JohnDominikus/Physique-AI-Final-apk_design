@@ -1,8 +1,8 @@
 package com.example.physiqueaiapkfinal
 
 data class Workout(
-    val id: String = "",
-    val name: String? = null,
+    var id: String = "",
+    val name: String? = "",
     val description: String? = null,
     val difficulty: String? = null,
     val equipment: String? = null,

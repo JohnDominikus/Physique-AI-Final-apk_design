@@ -5,123 +5,169 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.ktx.toObject
 
 class WorkoutInfoFragment : Fragment() {
 
     private var workoutId: String? = null
-    private val db = FirebaseFirestore.getInstance()
+    private val db by lazy { FirebaseFirestore.getInstance() }
 
-    // Use lateinit for views that will be initialized in onCreateView
+    // Views
+    private lateinit var loadingProgressBar: ProgressBar
+    private lateinit var nameTextView: TextView
     private lateinit var difficultyTextView: TextView
     private lateinit var targetTextView: TextView
     private lateinit var muscleGroupsTextView: TextView
     private lateinit var equipmentTextView: TextView
     private lateinit var descriptionTextView: TextView
-
-    companion object {
-        private const val ARG_WORKOUT_ID = "workout_id"
-
-        @JvmStatic
-        fun newInstance(workoutId: String) =
-            WorkoutInfoFragment().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_WORKOUT_ID, workoutId)
-                }
-            }
-    }
+    private lateinit var repsTextView: TextView
+    private lateinit var timerTextView: TextView
+    private lateinit var instructionsTextView: TextView
+    private lateinit var safetyWarningTextView: TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        workoutId = arguments?.getString(ARG_WORKOUT_ID)
-        Log.d("WorkoutInfoFragment", "Received workout ID: $workoutId")
+        // Restore workoutId from savedInstanceState if available, else from arguments
+        workoutId = savedInstanceState?.getString(ARG_WORKOUT_ID) ?: arguments?.getString(ARG_WORKOUT_ID)?.takeIf { it.isNotBlank() }
+        Log.d(TAG, "onCreate: Initialized with workout ID: $workoutId")
     }
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
+        Log.d(TAG, "onCreateView called")
         return inflater.inflate(R.layout.fragment_workout_info, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        initializeViews(view)
-        loadWorkoutData()
-    }
-
-    private fun initializeViews(view: View) {
-        descriptionTextView = view.findViewById(R.id.workoutInfoDescription)
-        difficultyTextView = view.findViewById(R.id.workoutInfoDifficulty)
-        equipmentTextView = view.findViewById(R.id.workoutInfoEquipment)
-        muscleGroupsTextView = view.findViewById(R.id.workoutInfoMuscleGroups)
-        targetTextView = view.findViewById(R.id.workoutInfoTarget)
-    }
-
-    private fun loadWorkoutData() {
-        val id = workoutId ?: run {
-            showToast("No workout ID provided.")
-            return
+        Log.d(TAG, "onViewCreated called")
+        initViews(view)
+        if (workoutId != null) {
+            loadWorkoutData(workoutId!!)
+        } else {
+            showError("Invalid workout ID")
+            // Do not force back navigation here; just show error to user
         }
+    }
 
-        Log.d("WorkoutInfoFragment", "Loading workout data for ID: $id")
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        workoutId?.let {
+            outState.putString(ARG_WORKOUT_ID, it)
+            Log.d(TAG, "onSaveInstanceState: saved workoutId: $it")
+        }
+    }
 
-        db.collection("workoutcollection").document(id)
+    private fun initViews(view: View) {
+        with(view) {
+            loadingProgressBar = findViewById(R.id.loadingProgressBar)
+            nameTextView = findViewById(R.id.workoutInfoName)
+            difficultyTextView = findViewById(R.id.workoutInfoDifficulty)
+            targetTextView = findViewById(R.id.workoutInfoTarget)
+            muscleGroupsTextView = findViewById(R.id.workoutInfoMuscleGroups)
+            equipmentTextView = findViewById(R.id.workoutInfoEquipment)
+            descriptionTextView = findViewById(R.id.workoutInfoDescription)
+            repsTextView = findViewById(R.id.workoutInfoReps)
+            timerTextView = findViewById(R.id.workoutInfoTimer)
+            instructionsTextView = findViewById(R.id.workoutInfoInstructions)
+            safetyWarningTextView = findViewById(R.id.workoutInfoSafetyWarning)
+        }
+    }
+
+    private fun loadWorkoutData(workoutId: String) {
+        showLoading(true)
+        Log.d(TAG, "Fetching workout data for ID: $workoutId")
+
+        db.collection("workoutcollection").document(workoutId)
             .get()
             .addOnSuccessListener { document ->
-                if (document.exists()) {
-                    try {
-                        val workout = document.toObject(Workout::class.java)
-                        if (workout != null) {
-                            populateWorkoutInfo(workout)
-                        } else {
-                            Log.e("WorkoutInfoFragment", "Workout object is null")
-                            showToast("Error parsing workout data.")
-                        }
-                    } catch (e: Exception) {
-                        Log.e("WorkoutInfoFragment", "Error converting document: ${e.message}")
-                        showToast("Error processing workout data.")
+                if (!isAdded) {
+                    Log.w(TAG, "Fragment not added to activity, skipping UI update")
+                    return@addOnSuccessListener
+                }
+
+                showLoading(false)
+
+                if (!document.exists()) {
+                    showError("Workout not found for ID: $workoutId")
+                    return@addOnSuccessListener
+                }
+
+                try {
+                    Log.d(TAG, "Document data: ${document.data}")
+                    val workout = document.toObject<Workout>()?.apply {
+                        id = document.id
                     }
-                } else {
-                    Log.e("WorkoutInfoFragment", "Document does not exist")
-                    showToast("Workout not found.")
+
+                    if (workout != null) {
+                        displayWorkoutData(workout)
+                    } else {
+                        showError("Invalid workout format")
+                    }
+                } catch (e: Exception) {
+                    Log.e(TAG, "Error parsing workout", e)
+                    showError("Error loading workout data")
                 }
             }
-            .addOnFailureListener { exception ->
-                Log.e("WorkoutInfoFragment", "Error fetching document: ${exception.message}")
-                showToast("Error fetching data: ${exception.message}")
+            .addOnFailureListener { e ->
+                if (!isAdded) {
+                    Log.w(TAG, "Fragment not added to activity, skipping UI update")
+                    return@addOnFailureListener
+                }
+                showLoading(false)
+                Log.e(TAG, "Firestore error", e)
+                showError("Failed to load: ${e.localizedMessage}")
             }
     }
 
-    private fun populateWorkoutInfo(workout: Workout) {
-        try {
-            descriptionTextView.text = workout.description ?: "No description available"
-            difficultyTextView.text = getString(R.string.difficulty_format, workout.difficulty ?: "N/A")
-            equipmentTextView.text = getString(R.string.equipment_format, workout.equipment ?: "N/A")
+    private fun displayWorkoutData(workout: Workout) {
+        fun String?.orDefault(default: String) = this?.takeIf { it.isNotBlank() } ?: default
+        fun Int?.orDefault(default: String) = this?.toString() ?: default
 
-            val muscleGroupsText = when {
-                workout.muscle_groups is List<*> -> (workout.muscle_groups as List<*>)
-                    .filterIsInstance<String>()
-                    .joinToString(", ")
-                workout.muscle_groups is String -> workout.muscle_groups as String
-                else -> "N/A"
-            }
-            muscleGroupsTextView.text = getString(R.string.muscle_groups_format, muscleGroupsText)
+        nameTextView.text = workout.name.orDefault("Unnamed Workout")
+        difficultyTextView.text = "Difficulty: ${workout.difficulty.orDefault("Not specified")}"
+        targetTextView.text = "Target: ${workout.target.orDefault("Not specified")}"
+        muscleGroupsTextView.text = "Muscles: ${workout.muscle_groups.orDefault("Not specified")}"
+        equipmentTextView.text = "Equipment: ${workout.equipment.orDefault("None required")}"
+        descriptionTextView.text = workout.description.orDefault("No description available")
+        repsTextView.text = "Reps: ${workout.reps.orDefault("Not specified")}"
+        timerTextView.text = "Duration: ${workout.timer.orDefault("0")} seconds"
+        instructionsTextView.text = workout.instructions.orDefault("No instructions provided")
 
-            targetTextView.text = getString(R.string.target_format, workout.target ?: "N/A")
-
-            Log.d("WorkoutInfoFragment", "Successfully populated workout info")
-        } catch (e: Exception) {
-            Log.e("WorkoutInfoFragment", "Error populating workout info: ${e.message}")
-            showToast("Error displaying workout data")
+        workout.safety_warning?.takeIf { it.isNotBlank() }?.let {
+            safetyWarningTextView.text = "⚠️ $it"
+            safetyWarningTextView.visibility = View.VISIBLE
+        } ?: run {
+            safetyWarningTextView.visibility = View.GONE
         }
     }
 
-    private fun showToast(message: String) {
-        Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
+    private fun showLoading(show: Boolean) {
+        loadingProgressBar.visibility = if (show) View.VISIBLE else View.GONE
+    }
+
+    private fun showError(message: String) {
+        Toast.makeText(requireContext(), message, Toast.LENGTH_LONG).show()
+        Log.e(TAG, message)
+        // Do not perform forced back navigation here; just notify user
+    }
+
+    companion object {
+        private const val TAG = "WorkoutInfoFragment"
+        private const val ARG_WORKOUT_ID = "workout_id"
+
+        fun newInstance(workoutId: String) = WorkoutInfoFragment().apply {
+            arguments = Bundle().apply {
+                putString(ARG_WORKOUT_ID, workoutId)
+            }
+        }
     }
 }

@@ -64,7 +64,7 @@ class DashboardActivity : AppCompatActivity() {
             navigateToActivity( RecipeListActivity::class.java)
         }
         findViewById<View>(R.id.btnTask).setOnClickListener {
-            //navigateToActivity(TaskActivity::class.java)
+         //   navigateToActivity(UserTodoActivity::class.java)
         }
         findViewById<View>(R.id.btnBMI).setOnClickListener {
             navigateToActivity(BmiCalculatorActivity::class.java)
@@ -99,7 +99,7 @@ class DashboardActivity : AppCompatActivity() {
                R.id.nav_workout -> navigateToActivity(LikedWorkoutsActivity::class.java)
                 R.id.nav_posture -> navigateToActivity(PostureActivity::class.java)
                 R.id.nav_dietary -> navigateToActivity( RecipeListActivity::class.java)
-              //  R.id.nav_task -> navigateToActivity(TaskActivity::class.java)
+              // R.id.nav_task -> navigateToActivity(UserTodoActivity::class.java)
                 else -> Log.e("Dashboard", "Unknown menu item selected")
             }
             true
