@@ -124,6 +124,12 @@
             <item name="android:background">@drawable/border</item>
         </style>
 
+    <style name="CustomSeekBar" parent="Widget.AppCompat.SeekBar">
+        <item name="android:progressTint">#4A90E2</item>
+        <item name="android:progressBackgroundTint">#E0E0E0</item>
+        <item name="android:thumbTint">#4A90E2</item>
+    </style>
+
 
     <string name="difficulty_label">Difficulty: %1$s</string>
     <string name="target_label">Target: %1$s</string>

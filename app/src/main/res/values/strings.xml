@@ -73,4 +73,26 @@
         <item quantity="one">%d Task</item>
         <item quantity="other">%d Tasks</item>
     </plurals>
+
+
+
+    <string name="pushup_counter_text">Push-ups: %1$d</string>
+
+
+
+    <string name="your_bmi">Your BMI</string>
+    <string name="normal_bmi_range">Normal BMI weight range for the height:</string>
+    <string name="bmi_status">BMI status icon</string>
+    <string name="bmi_status_normal">Your BMI is in the normal range</string>
+    <string name="bmi_categories">BMI Categories</string>
+    <string name="underweight">Underweight</string>
+    <string name="underweight_value">&lt; 18.5</string>
+    <string name="normal">Normal</string>
+    <string name="normal_value">18.5 - 24.9</string>
+    <string name="overweight">Overweight</string>
+    <string name="overweight_value">25 - 29.9</string>
+    <string name="obese">Obese</string>
+    <string name="obese_value">≥ 30</string>
+    <string name="save_bmi">Save BMI</string>
+    <string name="back_to_calculator">Back to BMI Calculator</string>
 </resources>

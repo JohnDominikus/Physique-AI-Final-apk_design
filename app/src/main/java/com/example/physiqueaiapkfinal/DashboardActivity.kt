@@ -55,7 +55,7 @@ class DashboardActivity : AppCompatActivity() {
      */
     private fun setupFrameLayoutClickListeners() {
         findViewById<View>(R.id.btnPosture).setOnClickListener {
-            navigateToActivity(PostureActivity::class.java)
+            navigateToActivity(PoseActivity::class.java)
         }
         findViewById<View>(R.id.btnExercise).setOnClickListener {
             navigateToActivity(WorkoutListActivity::class.java)
@@ -97,7 +97,7 @@ class DashboardActivity : AppCompatActivity() {
             when (item.itemId) {
                 R.id.nav_home -> { /* Already on home */ }
                R.id.nav_workout -> navigateToActivity(LikedWorkoutsActivity::class.java)
-                R.id.nav_posture -> navigateToActivity(PostureActivity::class.java)
+                R.id.nav_posture -> navigateToActivity(PoseActivity::class.java)
                 R.id.nav_dietary -> navigateToActivity( RecipeListActivity::class.java)
               // R.id.nav_task -> navigateToActivity(UserTodoActivity::class.java)
                 else -> Log.e("Dashboard", "Unknown menu item selected")

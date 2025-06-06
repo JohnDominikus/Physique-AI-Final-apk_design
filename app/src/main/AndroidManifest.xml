@@ -6,10 +6,21 @@
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
+    <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" />
+    <uses-permission android:name="android.permission.READ_MEDIA_AUDIO" />
 
     <!-- 🔹 Camera Features -->
     <uses-feature android:name="android.hardware.camera" android:required="true" />
     <uses-feature android:name="android.hardware.camera.any" android:required="true" />
+
+    <!-- For Android 12L and below (API 32-) -->
+    <uses-permission
+        android:name="android.permission.READ_EXTERNAL_STORAGE"
+        android:maxSdkVersion="32" />
+    <uses-permission
+        android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+        android:maxSdkVersion="29" />
 
     <application
         android:allowBackup="true"
@@ -43,33 +54,23 @@
         <activity android:name=".PhysicalActivity" android:exported="true" />
         <activity android:name=".MedicalActivity" android:exported="true" />
         <activity android:name=".WorkoutListActivity" android:exported="true" />
-        <activity android:name=".PostureActivity" android:exported="true" />
-
-
+        <activity android:name=".PoseActivity" android:exported="true" />
         <activity android:name=".BmiCalculatorActivity" android:exported="true" />
         <activity android:name=".ResultActivity" android:exported="true" />
         <activity android:name=".SplashActivity" android:exported="true" />
         <activity android:name=".ExerciseDetailActivity" android:exported="true" />
 
+        <!-- 🔹 Recipe Activities -->
+        <activity android:name=".RecipeListActivity" android:exported="false" />
+        <activity android:name=".RecipeDetailActivity" android:exported="false" />
+        <activity android:name=".LikedRecipesActivity" android:exported="false" />
 
-        <activity android:name=".RecipeListActivity"
-            android:exported="false">
-            <!-- Optional: Add an intent-filter here if this is a main entry point -->
-        </activity>
-        <activity android:name=".RecipeDetailActivity"
-            android:exported="false">
-        </activity>
-        <activity android:name=".LikedRecipesActivity"
-            android:exported="false">
-        </activity>
+        <!-- 🔹 Workout Detail Activities -->
+        <activity android:name=".WorkoutDetailActivity" android:exported="false" />
+        <activity android:name=".LikedWorkoutsActivity" android:exported="false" />
 
-        <activity android:name=".WorkoutDetailActivity"
-            android:exported="false">
-        </activity>
-        <activity android:name=".LikedWorkoutsActivity"
-            android:exported="false">
-        </activity>
-
+        <!-- 🔹 Stream -->
+        <activity android:name=".StreamActivity" android:exported="false" />
 
     </application>
 </manifest>

@@ -49,7 +49,7 @@ class ExerciseDetailActivity : AppCompatActivity() {
             }
 
         poseBtn.setOnClickListener {
-            val intent = Intent(this, PostureActivity::class.java)
+            val intent = Intent(this, WorkoutPoseAIFragment::class.java)
             intent.putExtra("exerciseId", exerciseId)
             startActivity(intent)
         }

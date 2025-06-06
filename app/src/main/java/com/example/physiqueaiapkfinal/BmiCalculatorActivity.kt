@@ -3,17 +3,17 @@ package com.example.physiqueaiapkfinal
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
-import android.widget.Button
-import android.widget.ImageButton
-import android.widget.SeekBar
-import android.widget.TextView
-import android.widget.Toast
+import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
+import androidx.cardview.widget.CardView
+import kotlin.math.pow
+import kotlin.math.roundToInt
 
 class BmiCalculatorActivity : AppCompatActivity() {
 
-    private lateinit var genderMaleButton: Button
-    private lateinit var genderFemaleButton: Button
+    // UI Components
+    private lateinit var maleCard: CardView
+    private lateinit var femaleCard: CardView
     private lateinit var heightSeekBar: SeekBar
     private lateinit var heightTextView: TextView
     private lateinit var weightDecreaseButton: ImageButton
@@ -23,103 +23,266 @@ class BmiCalculatorActivity : AppCompatActivity() {
     private lateinit var ageIncreaseButton: ImageButton
     private lateinit var ageTextView: TextView
     private lateinit var calculateBMIButton: Button
+    private lateinit var backButton: ImageButton
 
-    private var gender: String = "Male"
+    // Data variables
+    private var selectedGender: Gender = Gender.MALE
     private var weight: Int = 70
     private var height: Int = 170
     private var age: Int = 25
 
+    // Constants
+    companion object {
+        private const val MIN_WEIGHT = 30
+        private const val MAX_WEIGHT = 300
+        private const val MIN_AGE = 10
+        private const val MAX_AGE = 120
+        private const val MIN_HEIGHT = 100
+        private const val MAX_HEIGHT = 250
+
+        private const val UNDERWEIGHT_THRESHOLD = 18.5
+        private const val NORMAL_LOWER = 18.5
+        private const val NORMAL_UPPER = 24.9
+        private const val OVERWEIGHT_LOWER = 25.0
+        private const val OVERWEIGHT_UPPER = 29.9
+        private const val OBESE_CLASS1_LOWER = 30.0
+        private const val OBESE_CLASS1_UPPER = 34.9
+        private const val OBESE_CLASS2_LOWER = 35.0
+        private const val OBESE_CLASS2_UPPER = 39.9
+        private const val OBESE_CLASS3_THRESHOLD = 40.0
+    }
+
+    enum class Gender {
+        MALE, FEMALE
+    }
+
+    data class BMIResult(
+        val bmi: Double,
+        val category: String,
+        val description: String,
+        val healthyWeightRange: Pair<Int, Int>
+    )
+
     override fun onCreate(savedInstanceState: Bundle?) {
-         super.onCreate(savedInstanceState)
+        super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_bmi_calculator)
 
-        // Initialize views from the layout XML
-        genderMaleButton = findViewById(R.id.maleButton)
-        genderFemaleButton = findViewById(R.id.femaleButton)
+        initializeViews()
+        setupInitialValues()
+        setupEventListeners()
+    }
+
+    private fun initializeViews() {
+        maleCard = findViewById(R.id.maleCard)
+        femaleCard = findViewById(R.id.femaleCard)
         heightSeekBar = findViewById(R.id.heightSeekBar)
         heightTextView = findViewById(R.id.heightValue)
         weightDecreaseButton = findViewById(R.id.weightMinus)
         weightIncreaseButton = findViewById(R.id.weightPlus)
-        weightTextView = findViewById(R.id.weightInput)
+        weightTextView = findViewById(R.id.weightValue)
         ageDecreaseButton = findViewById(R.id.ageMinus)
         ageIncreaseButton = findViewById(R.id.agePlus)
-        ageTextView = findViewById(R.id.ageInput)
+        ageTextView = findViewById(R.id.ageValue)
         calculateBMIButton = findViewById(R.id.calculateButton)
+        backButton = findViewById(R.id.backButton)
+    }
 
-        // Gender buttons click listeners
-        genderMaleButton.setOnClickListener {
-            gender = "Male"
-            Toast.makeText(this, "Gender: Male", Toast.LENGTH_SHORT).show()
+    private fun setupInitialValues() {
+        heightSeekBar.max = MAX_HEIGHT - MIN_HEIGHT
+        heightSeekBar.progress = height - MIN_HEIGHT
+        updateUI()
+        updateGenderSelection()
+    }
+
+    private fun setupEventListeners() {
+        // Back button click listener
+        backButton.setOnClickListener {
+            finish() // Close the current activity and return to previous one
         }
 
-        genderFemaleButton.setOnClickListener {
-            gender = "Female"
-            Toast.makeText(this, "Gender: Female", Toast.LENGTH_SHORT).show()
+        maleCard.setOnClickListener {
+            selectedGender = Gender.MALE
+            updateGenderSelection()
+            showToast("Gender: Male selected")
         }
 
-        // Height SeekBar listener
+        femaleCard.setOnClickListener {
+            selectedGender = Gender.FEMALE
+            updateGenderSelection()
+            showToast("Gender: Female selected")
+        }
+
         heightSeekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
-            @SuppressLint("SetTextI18n")
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                height = progress
-                heightTextView.text = "Height: $height cm"
+                height = MIN_HEIGHT + progress
+                updateHeightDisplay()
             }
 
             override fun onStartTrackingTouch(seekBar: SeekBar?) {}
             override fun onStopTrackingTouch(seekBar: SeekBar?) {}
         })
 
-        // Weight buttons click listeners
         weightDecreaseButton.setOnClickListener {
-            if (weight > 30) {
-                weight -= 1
-                weightTextView.text = "$weight"
+            if (weight > MIN_WEIGHT) {
+                weight--
+                updateWeightDisplay()
+            } else {
+                showToast("Minimum weight is $MIN_WEIGHT kg")
             }
         }
 
         weightIncreaseButton.setOnClickListener {
-            if (weight < 200) {
-                weight += 1
-                weightTextView.text = "$weight"
+            if (weight < MAX_WEIGHT) {
+                weight++
+                updateWeightDisplay()
+            } else {
+                showToast("Maximum weight is $MAX_WEIGHT kg")
             }
         }
 
-        // Age buttons click listeners
         ageDecreaseButton.setOnClickListener {
-            if (age > 10) {
-                age -= 1
-                ageTextView.text = "$age"
+            if (age > MIN_AGE) {
+                age--
+                updateAgeDisplay()
+            } else {
+                showToast("Minimum age is $MIN_AGE years")
             }
         }
 
         ageIncreaseButton.setOnClickListener {
-            if (age < 100) {
-                age += 1
-                ageTextView.text = "$age"
+            if (age < MAX_AGE) {
+                age++
+                updateAgeDisplay()
+            } else {
+                showToast("Maximum age is $MAX_AGE years")
             }
         }
 
-        // Calculate BMI button click listener
         calculateBMIButton.setOnClickListener {
-            calculateBMI()
+            if (validateInputs()) {
+                calculateAndShowBMI()
+            }
         }
     }
 
-    private fun calculateBMI() {
-        val heightInMeters = height / 100.0
-        val bmi = weight / (heightInMeters * heightInMeters)
+    private fun updateGenderSelection() {
+        when (selectedGender) {
+            Gender.MALE -> {
+                maleCard.cardElevation = 12f
+                femaleCard.cardElevation = 4f
+                maleCard.alpha = 1.0f
+                femaleCard.alpha = 0.7f
+            }
+            Gender.FEMALE -> {
+                femaleCard.cardElevation = 12f
+                maleCard.cardElevation = 4f
+                femaleCard.alpha = 1.0f
+                maleCard.alpha = 0.7f
+            }
+        }
+    }
 
-        val result = when {
-            bmi < 18.5 -> "Underweight"
-            bmi in 18.5..24.9 -> "Normal"
-            bmi in 25.0..29.9 -> "Overweight"
-            else -> "Obese"
+    private fun updateUI() {
+        updateHeightDisplay()
+        updateWeightDisplay()
+        updateAgeDisplay()
+    }
+
+    @SuppressLint("SetTextI18n")
+    private fun updateHeightDisplay() {
+        heightTextView.text = "$height cm"
+    }
+
+    @SuppressLint("SetTextI18n")
+    private fun updateWeightDisplay() {
+        weightTextView.text = "$weight kg"
+    }
+
+    @SuppressLint("SetTextI18n")
+    private fun updateAgeDisplay() {
+        ageTextView.text = "$age yrs"
+    }
+
+    private fun validateInputs(): Boolean {
+        return when {
+            height !in MIN_HEIGHT..MAX_HEIGHT -> {
+                showToast("Please set a valid height between $MIN_HEIGHT-$MAX_HEIGHT cm")
+                false
+            }
+            weight !in MIN_WEIGHT..MAX_WEIGHT -> {
+                showToast("Please set a valid weight between $MIN_WEIGHT-$MAX_WEIGHT kg")
+                false
+            }
+            age !in MIN_AGE..MAX_AGE -> {
+                showToast("Please set a valid age between $MIN_AGE-$MAX_AGE years")
+                false
+            }
+            else -> true
+        }
+    }
+
+    private fun calculateAndShowBMI() {
+        val bmiResult = calculateBMIResult()
+
+        val intent = Intent(this, ResultActivity::class.java).apply {
+            putExtra("BMI", bmiResult.bmi)
+            putExtra("STATUS", bmiResult.category)
+            putExtra("DESCRIPTION", bmiResult.description)
+            putExtra("HEALTHY_WEIGHT_MIN", bmiResult.healthyWeightRange.first)
+            putExtra("HEALTHY_WEIGHT_MAX", bmiResult.healthyWeightRange.second)
+            putExtra("CURRENT_WEIGHT", weight)
+            putExtra("HEIGHT", height)
+            putExtra("AGE", age)
+            putExtra("GENDER", selectedGender.name)
         }
 
-        // Pass the BMI result to the ResultActivity
-        val intent = Intent(this, ResultActivity::class.java)
-        intent.putExtra("BMI", bmi)
-        intent.putExtra("STATUS", result)
         startActivity(intent)
+    }
+
+    private fun calculateBMIResult(): BMIResult {
+        val heightInMeters = height / 100.0
+        val rawBmi = weight / (heightInMeters.pow(2))
+        val bmi = (rawBmi * 10).roundToInt() / 10.0
+
+        val (category, description) = when {
+            bmi < UNDERWEIGHT_THRESHOLD ->
+                "Underweight" to "You may need to gain weight. Consider consulting a healthcare provider."
+
+            bmi in NORMAL_LOWER..NORMAL_UPPER ->
+                "Normal" to "You have a healthy weight. Keep it up!"
+
+            bmi in OVERWEIGHT_LOWER..OVERWEIGHT_UPPER ->
+                "Overweight" to "Consider some lifestyle changes like exercise or healthy eating."
+
+            bmi in OBESE_CLASS1_LOWER..OBESE_CLASS1_UPPER ->
+                "Obese (Class I)" to "You should consult a doctor about a weight-loss plan."
+
+            bmi in OBESE_CLASS2_LOWER..OBESE_CLASS2_UPPER ->
+                "Obese (Class II)" to "Weight loss is highly recommended. Consult a healthcare provider."
+
+            bmi >= OBESE_CLASS3_THRESHOLD ->
+                "Obese (Class III)" to "You should seek medical attention for your weight urgently."
+
+            else -> "Unknown" to "Unable to classify BMI"
+        }
+
+        val healthyWeightRange = calculateHealthyWeightRange(heightInMeters)
+
+        return BMIResult(
+            bmi = bmi,
+            category = category,
+            description = description,
+            healthyWeightRange = healthyWeightRange
+        )
+    }
+
+    private fun calculateHealthyWeightRange(heightInMeters: Double): Pair<Int, Int> {
+        val minWeight = (NORMAL_LOWER * heightInMeters.pow(2)).roundToInt()
+        val maxWeight = (NORMAL_UPPER * heightInMeters.pow(2)).roundToInt()
+        return Pair(minWeight, maxWeight)
+    }
+
+    private fun showToast(message: String) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
     }
 }

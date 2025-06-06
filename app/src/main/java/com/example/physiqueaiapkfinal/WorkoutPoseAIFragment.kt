@@ -18,7 +18,8 @@ class WorkoutPoseAIFragment : Fragment() {
     }
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
+        inflater: LayoutInflater,
+        container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         return inflater.inflate(R.layout.fragment_workout_pose_ai, container, false)
@@ -27,19 +28,28 @@ class WorkoutPoseAIFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val startButton = view.findViewById<Button>(R.id.startPostureButton)
-        startButton.setOnClickListener {
-            val intent = Intent(requireContext(), PostureActivity::class.java)
-            // Pass workoutId to PostureActivity if available
-            intent.putExtra(ARG_WORKOUT_ID, workoutId)
+        view.findViewById<Button>(R.id.startPostureButton)?.setOnClickListener {
+            // Navigate to PoseActivity (which uses activity_poseai layout)
+            val intent = Intent(requireActivity(), PoseActivity::class.java).apply {
+                // Pass the workout ID if available
+                workoutId?.let { id -> putExtra(ARG_WORKOUT_ID, id) }
+
+                // Add any additional flags or data if needed
+                flags = Intent.FLAG_ACTIVITY_SINGLE_TOP
+            }
             startActivity(intent)
+
+            // Optional: Add fragment transition animation
+            requireActivity().overridePendingTransition(
+                R.anim.slide_in_right,
+                R.anim.slide_out_left
+            )
         }
     }
 
     companion object {
         private const val ARG_WORKOUT_ID = "workoutId"
 
-        @JvmStatic
         fun newInstance(workoutId: String) = WorkoutPoseAIFragment().apply {
             arguments = Bundle().apply {
                 putString(ARG_WORKOUT_ID, workoutId)
