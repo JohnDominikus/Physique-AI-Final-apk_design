@@ -86,13 +86,20 @@
     <string name="bmi_status_normal">Your BMI is in the normal range</string>
     <string name="bmi_categories">BMI Categories</string>
     <string name="underweight">Underweight</string>
-    <string name="underweight_value">&lt; 18.5</string>
+    <string name="underweight_value"> 18.5</string>
     <string name="normal">Normal</string>
     <string name="normal_value">18.5 - 24.9</string>
     <string name="overweight">Overweight</string>
     <string name="overweight_value">25 - 29.9</string>
     <string name="obese">Obese</string>
-    <string name="obese_value">≥ 30</string>
+    <string name="obese_value"> 30</string>
     <string name="save_bmi">Save BMI</string>
     <string name="back_to_calculator">Back to BMI Calculator</string>
+
+
+    <string name="water_reminder_title">💧 Time to Drink Water!</string>
+    <string name="water_reminder_message">Remember to drink %dml of water</string>
+    <string name="mark_as_done">I drank it</string>
+    <string name="water_intake_recorded">✓ Recorded %dml water intake</string>
+    <string name="water_intake_failed">Failed to record water intake</string>
 </resources>

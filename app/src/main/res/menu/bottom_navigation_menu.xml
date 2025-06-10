@@ -3,8 +3,8 @@
 
     <item
         android:id="@+id/nav_workout"
-        android:icon="@drawable/task"
-        android:title="TODO"
+        android:icon="@drawable/excercise"
+        android:title="Workout"
         app:showAsAction="ifRoom"
 
     android:titleTextColor="@color/nav_item_text_color"

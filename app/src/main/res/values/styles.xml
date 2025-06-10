@@ -137,5 +137,15 @@
     <string name="safety_warning_label">Safety Warning: %1$s</string>
     <string name="reps_label">Reps: %1$s</string>
     <string name="no_description">No description available.</string>
+    <style name="StatusTextStyle">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:background">#80000000</item> <!-- Semi-transparent black -->
+        <item name="android:padding">8dp</item>
+        <item name="android:textColor">#FFFFFF</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:elevation">4dp</item>
+        <item name="android:backgroundTint">@null</item>
+    </style>
 
 </resources>
