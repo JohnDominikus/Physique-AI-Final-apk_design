@@ -28,49 +28,27 @@
             android:background="?attr/selectableItemBackgroundBorderless"/>
     </LinearLayout>
 
-    <!-- Filter Buttons -->
+    <!-- Category Filter Dropdown -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:layout_marginTop="12dp"
-        android:weightSum="5"
-        android:gravity="center">
+        android:gravity="center_vertical">
 
-        <Button
-            android:id="@+id/btnAllWorkouts"
-            android:layout_weight="1"
-            android:layout_width="0dp"
+        <TextView
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="All" />
+            android:text="Category: "
+            android:textSize="16sp"
+            android:layout_marginEnd="8dp" />
 
-        <Button
-            android:id="@+id/btnChest"
-            android:layout_weight="1"
+        <Spinner
+            android:id="@+id/categorySpinner"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:text="Chest" />
-
-        <Button
-            android:id="@+id/btnBack"
             android:layout_weight="1"
-            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="Back" />
-
-        <Button
-            android:id="@+id/btnLegs"
-            android:layout_weight="1"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:text="Legs" />
-
-        <Button
-            android:id="@+id/btnArms"
-            android:layout_weight="1"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:text="Arms" />
+            android:layout_marginEnd="16dp" />
     </LinearLayout>
 
     <!-- RecyclerView for workouts -->

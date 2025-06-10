@@ -2,9 +2,12 @@ package com.example.physiqueaiapkfinal
 
 import android.content.Intent
 import android.os.Bundle
-import android.widget.Button
+import android.view.View
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
 import android.widget.EditText
 import android.widget.ImageButton
+import android.widget.Spinner
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -17,11 +20,7 @@ class WorkoutListActivity : AppCompatActivity() {
 
     private lateinit var recyclerView: RecyclerView
     private lateinit var searchEditText: EditText
-    private lateinit var btnAll: Button
-    private lateinit var btnChest: Button
-    private lateinit var btnBack: Button
-    private lateinit var btnLegs: Button
-    private lateinit var btnArms: Button
+    private lateinit var categorySpinner: Spinner
     private lateinit var likedWorkoutsButton: ImageButton // ImageButton for liked workouts
 
     private val workoutList = mutableListOf<Workout>()
@@ -33,17 +32,16 @@ class WorkoutListActivity : AppCompatActivity() {
     private val likedWorkoutIds = mutableSetOf<String>() // To store liked workout IDs
     private var likedWorkoutsListener: ListenerRegistration? = null // Listener for liked workouts
 
+    // Categories for the dropdown
+    private val categories = arrayOf("All", "Chest", "Back", "Legs", "Arms")
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_workoutlist)
 
         recyclerView = findViewById(R.id.workoutRecycler)
         searchEditText = findViewById(R.id.searchWorkoutEditText)
-        btnAll = findViewById(R.id.btnAllWorkouts)
-        btnChest = findViewById(R.id.btnChest)
-        btnBack = findViewById(R.id.btnBack)
-        btnLegs = findViewById(R.id.btnLegs)
-        btnArms = findViewById(R.id.btnArms)
+        categorySpinner = findViewById(R.id.categorySpinner)
         likedWorkoutsButton = findViewById(R.id.likedWorkoutsButton) // Find the liked workouts button
 
         recyclerView.layoutManager = LinearLayoutManager(this)
@@ -55,25 +53,42 @@ class WorkoutListActivity : AppCompatActivity() {
         }
         recyclerView.adapter = adapter
 
+        setupCategorySpinner()
         setupSearchAndFilter()
         listenForWorkoutsRealtime()
         setupLikedWorkoutsButton()
         listenForLikedWorkouts() // Start listening for liked workouts
     }
 
+    private fun setupCategorySpinner() {
+        // Create adapter for spinner
+        val spinnerAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, categories)
+        spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        categorySpinner.adapter = spinnerAdapter
+
+        // Set listener for spinner selection
+        categorySpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long) {
+                val selectedCategory = categories[position]
+                filterWorkouts(category = selectedCategory)
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>) {
+                // Do nothing
+            }
+        }
+    }
+
     private fun setupSearchAndFilter() {
         findViewById<ImageButton>(R.id.searchWorkoutButton).setOnClickListener {
-            filterWorkouts()
+            val selectedCategory = categories[categorySpinner.selectedItemPosition]
+            filterWorkouts(category = selectedCategory)
         }
         searchEditText.setOnEditorActionListener { _, _, _ ->
-            filterWorkouts()
+            val selectedCategory = categories[categorySpinner.selectedItemPosition]
+            filterWorkouts(category = selectedCategory)
             true
         }
-        btnAll.setOnClickListener { filterWorkouts(category = "All") }
-        btnChest.setOnClickListener { filterWorkouts(category = "Chest") }
-        btnBack.setOnClickListener { filterWorkouts(category = "Back") }
-        btnLegs.setOnClickListener { filterWorkouts(category = "Legs") }
-        btnArms.setOnClickListener { filterWorkouts(category = "Arms") }
     }
 
     private fun listenForWorkoutsRealtime() {

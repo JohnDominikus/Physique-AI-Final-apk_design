@@ -2,9 +2,12 @@ package com.example.physiqueaiapkfinal
 
 import android.content.Intent
 import android.os.Bundle
-import android.widget.Button
+import android.view.View
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
 import android.widget.EditText
 import android.widget.ImageButton
+import android.widget.Spinner
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -17,11 +20,7 @@ class RecipeListActivity : AppCompatActivity() {
 
     private lateinit var recyclerView: RecyclerView
     private lateinit var searchEditText: EditText
-    private lateinit var btnAll: Button
-    private lateinit var btnBreakfast: Button
-    private lateinit var btnLunch: Button
-    private lateinit var btnDinner: Button
-    private lateinit var btnSnacks: Button
+    private lateinit var mealTypeSpinner: Spinner
     private lateinit var likedRecipesButton: ImageButton // ImageButton for liked recipes
 
     private val recipeList = mutableListOf<Recipe>()
@@ -33,6 +32,8 @@ class RecipeListActivity : AppCompatActivity() {
     private val likedRecipeIds = mutableSetOf<String>() // To store liked recipe IDs
     private var likedRecipesListener: ListenerRegistration? = null // Listener for liked recipes
 
+    // Meal types for the dropdown
+    private val mealTypes = arrayOf("All", "Breakfast", "Lunch", "Dinner", "Snacks")
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -40,13 +41,8 @@ class RecipeListActivity : AppCompatActivity() {
 
         recyclerView = findViewById(R.id.recipeRecycler)
         searchEditText = findViewById(R.id.searchRecipeEditText)
-        btnAll = findViewById(R.id.btnAllMeals)
-        btnBreakfast = findViewById(R.id.btnBreakfast)
-        btnLunch = findViewById(R.id.btnLunch)
-        btnDinner = findViewById(R.id.btnDinner)
-        btnSnacks = findViewById(R.id.btnSnacks)
+        mealTypeSpinner = findViewById(R.id.mealTypeSpinner)
         likedRecipesButton = findViewById(R.id.likedRecipesButton) // Find the liked recipes button
-
 
         recyclerView.layoutManager = LinearLayoutManager(this)
         adapter = RecipeAdapter(filteredList) { recipe ->
@@ -57,25 +53,42 @@ class RecipeListActivity : AppCompatActivity() {
         }
         recyclerView.adapter = adapter
 
+        setupMealTypeSpinner()
         setupSearchAndFilter()
         listenForRecipesRealtime()
         setupLikedRecipesButton()
         listenForLikedRecipes() // Start listening for liked recipes
     }
 
+    private fun setupMealTypeSpinner() {
+        // Create adapter for spinner
+        val spinnerAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, mealTypes)
+        spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        mealTypeSpinner.adapter = spinnerAdapter
+
+        // Set listener for spinner selection
+        mealTypeSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long) {
+                val selectedMealType = mealTypes[position]
+                filterRecipes(category = selectedMealType)
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>) {
+                // Do nothing
+            }
+        }
+    }
+
     private fun setupSearchAndFilter() {
         findViewById<ImageButton>(R.id.searchRecipeButton).setOnClickListener {
-            filterRecipes()
+            val selectedMealType = mealTypes[mealTypeSpinner.selectedItemPosition]
+            filterRecipes(category = selectedMealType)
         }
         searchEditText.setOnEditorActionListener { _, _, _ ->
-            filterRecipes()
+            val selectedMealType = mealTypes[mealTypeSpinner.selectedItemPosition]
+            filterRecipes(category = selectedMealType)
             true
         }
-        btnAll.setOnClickListener { filterRecipes(category = "All") }
-        btnBreakfast.setOnClickListener { filterRecipes(category = "Breakfast") }
-        btnLunch.setOnClickListener { filterRecipes(category = "Lunch") }
-        btnDinner.setOnClickListener { filterRecipes(category = "Dinner") }
-        btnSnacks.setOnClickListener { filterRecipes(category = "Snacks") }
     }
 
     private fun listenForRecipesRealtime() {
@@ -153,7 +166,6 @@ class RecipeListActivity : AppCompatActivity() {
             adapter.setLikedRecipeIds(likedRecipeIds)
         }
     }
-
 
     override fun onDestroy() {
         super.onDestroy()

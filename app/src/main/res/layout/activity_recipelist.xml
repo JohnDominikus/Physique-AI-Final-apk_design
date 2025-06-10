@@ -78,53 +78,27 @@
             tools:ignore="TouchTargetSizeCheck" />
     </LinearLayout>
 
-    <!-- Filter Buttons (Example: Meal Type) -->
+    <!-- Category Filter Dropdown -->
     <LinearLayout
-        android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="center"
-        android:padding="8dp">
+        android:orientation="horizontal"
+        android:padding="8dp"
+        android:gravity="center_vertical">
 
-        <Button
-            android:id="@+id/btnAllMeals"
-            android:text="All"
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Meal Type: "
+            android:textSize="16sp"
+            android:layout_marginEnd="8dp" />
+
+        <Spinner
+            android:id="@+id/mealTypeSpinner"
             android:layout_width="0dp"
             android:layout_weight="1"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="4dp"/>
-
-        <Button
-            android:id="@+id/btnBreakfast"
-            android:text="Breakfast"
-            android:layout_width="0dp"
-            android:layout_weight="1"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="4dp"/>
-
-        <Button
-            android:id="@+id/btnLunch"
-            android:text="Lunch"
-            android:layout_width="0dp"
-            android:layout_weight="1"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="4dp"/>
-
-        <Button
-            android:id="@+id/btnDinner"
-            android:text="Dinner"
-            android:layout_width="0dp"
-            android:layout_weight="1"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="4dp"/>
-
-        <Button
-            android:id="@+id/btnSnacks"
-            android:text="Snacks"
-            android:layout_width="0dp"
-            android:layout_weight="1"
-            android:layout_height="wrap_content" />
-
+            android:layout_marginEnd="16dp" />
     </LinearLayout>
 
     <!-- RecyclerView for Recipes -->
