@@ -95,6 +95,7 @@ dependencies {
     implementation(libs.androidx.material3.android)
     implementation(libs.androidx.animation.core.android)
     implementation(libs.androidx.databinding.runtime)
+    implementation(libs.androidx.activity)
     annotationProcessor("com.github.bumptech.glide:compiler:4.16.0")
 
 
@@ -103,6 +104,7 @@ dependencies {
     implementation("com.google.mlkit:pose-detection-accurate:18.0.0-beta5")
     implementation("com.google.android.odml:image:1.0.0-beta1")
     implementation("com.google.mlkit:camera:16.0.0-beta3")
+
     // Navigation & Layout
     implementation(libs.androidx.navigation.fragment.ktx)
     implementation(libs.androidx.navigation.ui.ktx)

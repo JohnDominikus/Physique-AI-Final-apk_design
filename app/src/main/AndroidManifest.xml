@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.physiqueaiapkfinal">
-
     <!-- 🔹 Required Permissions -->
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.INTERNET" />
@@ -9,12 +8,13 @@
     <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
     <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" />
     <uses-permission android:name="android.permission.READ_MEDIA_AUDIO" />
-    <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
-    <!-- 🔹 Camera Features -->
-    <uses-feature android:name="android.hardware.camera" android:required="true" />
-    <uses-feature android:name="android.hardware.camera.any" android:required="true" />
-
-    <!-- For Android 12L and below (API 32-) -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" /> <!-- 🔹 Camera Features -->
+    <uses-feature
+        android:name="android.hardware.camera"
+        android:required="true" />
+    <uses-feature
+        android:name="android.hardware.camera.any"
+        android:required="true" /> <!-- For Android 12L and below (API 32-) -->
     <uses-permission
         android:name="android.permission.READ_EXTERNAL_STORAGE"
         android:maxSdkVersion="32" />
@@ -31,48 +31,87 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Physiqueaiapkfinal">
-
-        <!-- 🔹 Launcher Activity -->
+        <activity
+            android:name=".DumbbellFrontRaiseActivity"
+            android:exported="false" />
+        <activity
+            android:name=".HipThrustsActivity"
+            android:exported="false" />
+        <activity
+            android:name=".SquatActivity"
+            android:exported="false" /> <!-- 🔹 Launcher Activity -->
         <activity
             android:name=".LandingActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-        </activity>
-
-        <!-- 🔹 Auth Activities -->
-        <activity android:name=".RegisterActivity" android:exported="true" />
-        <activity android:name=".LoginActivity" android:exported="true" />
-        <activity android:name=".ForgotPasswordActivity" android:exported="true" />
-        <activity android:name=".ForgotPasswordNewPasswordActivity" android:exported="true" />
-
-        <!-- 🔹 Main Functional Activities -->
-        <activity android:name=".DashboardActivity" android:exported="true" />
-        <activity android:name=".ProfileActivity" android:exported="false" />
-        <activity android:name=".PhysicalActivity" android:exported="true" />
-        <activity android:name=".MedicalActivity" android:exported="true" />
-        <activity android:name=".WorkoutListActivity" android:exported="true" />
-        <activity android:name=".PoseActivity" android:exported="true" />
-        <activity android:name=".BmiCalculatorActivity" android:exported="true" />
-        <activity android:name=".ResultActivity" android:exported="true" />
-        <activity android:name=".SplashActivity" android:exported="true" />
-        <activity android:name=".ExerciseDetailActivity" android:exported="true" />
-
-        <!-- 🔹 Recipe Activities -->
-        <activity android:name=".RecipeListActivity" android:exported="false" />
-        <activity android:name=".RecipeDetailActivity" android:exported="false" />
-        <activity android:name=".LikedRecipesActivity" android:exported="false" />
-
-        <!-- 🔹 Workout Detail Activities -->
-        <activity android:name=".WorkoutDetailActivity" android:exported="false" />
-        <activity android:name=".LikedWorkoutsActivity" android:exported="false" />
-
-        <!-- 🔹 Stream -->
-        <activity android:name=".StreamActivity" android:exported="false" />
-
-
-        <activity android:name=".WorkoutTaskActivity" android:exported="false" />
+        </activity> <!-- 🔹 Auth Activities -->
+        <activity
+            android:name=".RegisterActivity"
+            android:exported="true" />
+        <activity
+            android:name=".LoginActivity"
+            android:exported="true" />
+        <activity
+            android:name=".ForgotPasswordActivity"
+            android:exported="true" />
+        <activity
+            android:name=".ForgotPasswordNewPasswordActivity"
+            android:exported="true" /> <!-- 🔹 Main Functional Activities -->
+        <activity
+            android:name=".DashboardActivity"
+            android:exported="true" />
+        <activity
+            android:name=".ProfileActivity"
+            android:exported="false" />
+        <activity
+            android:name=".PhysicalActivity"
+            android:exported="true" />
+        <activity
+            android:name=".MedicalActivity"
+            android:exported="true" />
+        <activity
+            android:name=".WorkoutListActivity"
+            android:exported="true" />
+        <activity
+            android:name=".PoseActivity"
+            android:exported="true" />
+        <activity
+            android:name=".BmiCalculatorActivity"
+            android:exported="true" />
+        <activity
+            android:name=".ResultActivity"
+            android:exported="true" />
+        <activity
+            android:name=".SplashActivity"
+            android:exported="true" />
+        <activity
+            android:name=".ExerciseDetailActivity"
+            android:exported="true" /> <!-- 🔹 Recipe Activities -->
+        <activity
+            android:name=".RecipeListActivity"
+            android:exported="false" />
+        <activity
+            android:name=".RecipeDetailActivity"
+            android:exported="false" />
+        <activity
+            android:name=".LikedRecipesActivity"
+            android:exported="false" /> <!-- 🔹 Workout Detail Activities -->
+        <activity
+            android:name=".WorkoutDetailActivity"
+            android:exported="false" />
+        <activity
+            android:name=".LikedWorkoutsActivity"
+            android:exported="false" /> <!-- 🔹 Stream -->
+        <activity
+            android:name=".StreamActivity"
+            android:exported="false" />
+        <activity
+            android:name=".WorkoutTaskActivity"
+            android:exported="false" />
     </application>
+
 </manifest>

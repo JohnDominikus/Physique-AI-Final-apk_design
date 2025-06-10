@@ -99,7 +99,7 @@ public class GraphicOverlay extends View {
     public abstract void draw(Canvas canvas);
 
     protected void drawRect(
-        Canvas canvas, float left, float top, float right, float bottom, Paint paint) {
+            Canvas canvas, float left, float top, float right, float bottom, Paint paint) {
       canvas.drawRect(left, top, right, bottom, paint);
     }
 
@@ -165,13 +165,13 @@ public class GraphicOverlay extends View {
      * @param zMax max value of all z values going to be passed in
      */
     public void updatePaintColorByZValue(
-        Paint paint,
-        Canvas canvas,
-        boolean visualizeZ,
-        boolean rescaleZForVisualization,
-        float zInImagePixel,
-        float zMin,
-        float zMax) {
+            Paint paint,
+            Canvas canvas,
+            boolean visualizeZ,
+            boolean rescaleZForVisualization,
+            float zInImagePixel,
+            float zMin,
+            float zMax) {
       if (!visualizeZ) {
         return;
       }
@@ -214,8 +214,8 @@ public class GraphicOverlay extends View {
   public GraphicOverlay(Context context, AttributeSet attrs) {
     super(context, attrs);
     addOnLayoutChangeListener(
-        (view, left, top, right, bottom, oldLeft, oldTop, oldRight, oldBottom) ->
-            needUpdateTransformation = true);
+            (view, left, top, right, bottom, oldLeft, oldTop, oldRight, oldBottom) ->
+                    needUpdateTransformation = true);
   }
 
   /** Removes all graphics from the overlay. */

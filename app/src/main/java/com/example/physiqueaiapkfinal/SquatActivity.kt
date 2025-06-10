@@ -20,11 +20,10 @@ import androidx.camera.core.*
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import com.example.physiqueaiapkfinal.databinding.ActivityStreamBinding
+import com.example.physiqueaiapkfinal.databinding.ActivitySquatBinding
 import com.example.physiqueaiapkfinal.visionutils.GraphicOverlay
 import com.example.physiqueaiapkfinal.visionutils.PoseGraphic
 import com.example.physiqueaiapkfinal.visionutils.classification.PoseClassifierProcessor
-
 import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.pose.Pose
 import com.google.mlkit.vision.pose.PoseDetection
@@ -39,70 +38,68 @@ import kotlin.math.sqrt
 import kotlin.math.cos
 import kotlin.math.acos
 
-class StreamActivity : AppCompatActivity() {
-    private lateinit var binding: ActivityStreamBinding
+class SquatActivity : AppCompatActivity() {
+    private lateinit var binding: ActivitySquatBinding
     private lateinit var cameraExecutor: ExecutorService
     private lateinit var backgroundExecutor: ExecutorService
     private lateinit var poseDetector: com.google.mlkit.vision.pose.PoseDetector
     private var poseClassifierProcessor: PoseClassifierProcessor? = null
-    private val TAG = "StreamActivity"
-    private var pushupCount = 0
+    private val TAG = "SquatActivity"
+    private var squatCount = 0
     private val mainHandler = Handler(Looper.getMainLooper())
-    
-    // Ultra-accurate push-up detection variables
+
+    // Ultra-accurate squat detection variables
     private var isDown = false
-    private var lastPushupTime = 0L
-    private val MIN_PUSHUP_INTERVAL = 800L // Increased for maximum accuracy
-    
+    private var lastSquatTime = 0L
+    private val MIN_SQUAT_INTERVAL = 800L // Minimum time between squats
+
     // Advanced detection variables
     private var downFrameCount = 0
     private var upFrameCount = 0
-    private val MIN_STABLE_FRAMES = 6 // Increased for maximum stability
-    
-    // Multi-dimensional history tracking
-    private val shoulderElbowDiffHistory = mutableListOf<Float>()
-    private val armAngleHistory = mutableListOf<Float>()
-    private val bodyAngleHistory = mutableListOf<Float>()
-    private val shoulderWristAngleHistory = mutableListOf<Float>()
+    private val MIN_STABLE_FRAMES = 6 // Minimum frames for stable detection
+
+    // Multi-dimensional history tracking for squat detection
+    private val kneeAngleHistory = mutableListOf<Float>()
+    private val hipAngleHistory = mutableListOf<Float>()
+    private val torsoAngleHistory = mutableListOf<Float>()
     private val velocityHistory = mutableListOf<Float>()
-    private val accelerationHistory = mutableListOf<Float>()
-    private val HISTORY_SIZE = 10 // Increased for better temporal analysis
-    
-    // Biomechanical validation
-    private var previousElbowY = 0f
+    private val HISTORY_SIZE = 10 // History size for smoothing
+
+    // Biomechanical validation for squats
+    private var previousKneeY = 0f
     private var previousVelocity = 0f
     private val motionPhases = mutableListOf<String>()
     private val PHASE_HISTORY_SIZE = 5
-    
+
     // Quality metrics
     private var highConfidenceFrames = 0
     private val MIN_CONFIDENCE_FRAMES = 5
     private var lastFrameTime = 0L
-    
+
     // Orientation tracking
     private var lastRotation = Surface.ROTATION_0
-    
+
     // Performance optimization variables
     private var frameSkipCounter = 0
     private val FRAME_SKIP_COUNT = 1 // Reduce skip for better accuracy
-    
+
     // Camera switching variables
     private var isUsingFrontCamera = false
     private var cameraProvider: ProcessCameraProvider? = null
 
-    // Ultra-accurate push-up detection with multiple criteria
+    // Ultra-accurate squat detection with multiple criteria
     private var hasBeenDown = false // Track if person has been in down position first
     private var lastCountedUp = false // Track if we just counted to prevent double counting
-    
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityStreamBinding.inflate(layoutInflater)
+        binding = ActivitySquatBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
         // Log workout data passed from WorkoutPoseAIFragment
         val workoutId = intent.getStringExtra("workoutId")
         val workoutName = intent.getStringExtra("workout_name")
-        Log.d(TAG, "StreamActivity started - Workout ID: $workoutId, Workout Name: $workoutName")
+        Log.d(TAG, "SquatActivity started - Workout ID: $workoutId, Workout Name: $workoutName")
 
         if (allPermissionsGranted()) {
             startCamera()
@@ -128,16 +125,16 @@ class StreamActivity : AppCompatActivity() {
         }
 
         // Update UI
-        binding.tvPushupCounter.text = getString(R.string.pushup_counter_text, 0)
+        binding.tvSquatCounter.text = getString(R.string.squat_counter_text, 0)
 
         binding.btnBack.setOnClickListener {
             finish()
         }
-        
+
         binding.btnReset.setOnClickListener {
-            resetPushupCounter()
+            resetSquatCounter()
         }
-        
+
         binding.btnSwitchCamera.setOnClickListener {
             switchCamera()
         }
@@ -151,7 +148,7 @@ class StreamActivity : AppCompatActivity() {
             bindCameraUseCases()
         }, ContextCompat.getMainExecutor(this))
     }
-    
+
     private fun bindCameraUseCases() {
         val cameraProvider = this.cameraProvider ?: return
 
@@ -160,7 +157,7 @@ class StreamActivity : AppCompatActivity() {
             .also {
                 it.setSurfaceProvider(binding.viewFinder.surfaceProvider)
             }
-        
+
         // Mirror the preview for front camera
         if (isUsingFrontCamera) {
             binding.viewFinder.scaleX = -1f // Horizontal flip
@@ -191,34 +188,34 @@ class StreamActivity : AppCompatActivity() {
                 preview,
                 imageAnalyzer
             )
-            
+
             // Update camera status indicator
             binding.tvCameraStatus.text = if (isUsingFrontCamera) "Camera: Front (Mirrored)" else "Camera: Back"
-            
+
         } catch (exc: Exception) {
             Log.e(TAG, "Use case binding failed", exc)
             Toast.makeText(this, "Failed to start camera", Toast.LENGTH_SHORT).show()
         }
     }
-    
+
     private fun switchCamera() {
         isUsingFrontCamera = !isUsingFrontCamera
         Log.d(TAG, "Switching to ${if (isUsingFrontCamera) "front" else "back"} camera")
         bindCameraUseCases()
-        
+
         // Reset pose detection state when switching cameras
         resetPoseDetectionState()
     }
-    
+
     private fun resetPoseDetectionState() {
         isDown = false
         hasBeenDown = false
         lastCountedUp = false
         downFrameCount = 0
         upFrameCount = 0
-        shoulderElbowDiffHistory.clear()
-        armAngleHistory.clear()
-        
+        kneeAngleHistory.clear()
+        hipAngleHistory.clear()
+
         Log.d(TAG, "Pose detection state reset for camera switch")
     }
 
@@ -253,7 +250,7 @@ class StreamActivity : AppCompatActivity() {
             return
         }
         frameSkipCounter = 0
-        
+
         // Clear the overlay
         binding.graphicOverlay.clear()
 
@@ -309,12 +306,10 @@ class StreamActivity : AppCompatActivity() {
         binding.graphicOverlay.setImageSourceInfo(width, height, isImageFlipped)
         binding.graphicOverlay.postInvalidate()
 
-        // Check for push-ups with orientation awareness
-        checkForPushupDirectly(pose, rotation)
+        // Check for squats with orientation awareness
+        checkForSquatDirectly(pose, rotation)
 
-        // Comment out classification for now to avoid conflicts
-        /*
-        // Run classification on a worker thread (this is just for visual feedback)
+        // Run ML classification for squat training
         val processor = poseClassifierProcessor
         if (processor != null) {
             backgroundExecutor.execute {
@@ -322,33 +317,42 @@ class StreamActivity : AppCompatActivity() {
                     Log.d(TAG, "Starting pose classification...")
                     val classificationResult = processor.getPoseResult(pose)
                     Log.d(TAG, "Classification result: $classificationResult")
-                    
+
                     // Update UI on the main thread
                     mainHandler.post {
                         // Update the counter from classification results
                         if (classificationResult.isNotEmpty()) {
                             val counterText = classificationResult[0]
                             Log.d(TAG, "Counter text: $counterText")
-                            
-                            if (counterText.contains("pushups_down")) {
-                                // Extract number from "pushups_down : X reps"
+
+                            // Check for any squat-related classification
+                            if (counterText.contains("squats_down") || counterText.contains("squat")) {
+                                // Extract number from classification result
                                 val regex = "\\d+".toRegex()
                                 val countStr = regex.find(counterText)?.value
-                                Log.d(TAG, "Found count: $countStr")
+                                Log.d(TAG, "Found ML count: $countStr")
                                 countStr?.let {
-                                    pushupCount = it.toInt()
-                                    binding.tvPushupCounter.text = getString(R.string.pushup_counter_text, pushupCount)
+                                    val mlCount = it.toInt()
+                                    if (mlCount > squatCount) {
+                                        squatCount = mlCount
+                                        binding.tvSquatCounter.text = getString(R.string.squat_counter_text, squatCount)
+                                        Log.d(TAG, "🎉 ML detected squat! Count updated to: $squatCount")
+                                    }
                                 }
                             }
-                            
+
                             // Display the pose name and confidence if available
                             if (classificationResult.size > 1) {
                                 val confidenceText = classificationResult[1]
                                 Log.d(TAG, "Confidence text: $confidenceText")
                                 binding.tvPoseStatus.text = confidenceText
+                            } else {
+                                // Show the counter text as pose status
+                                binding.tvPoseStatus.text = counterText
                             }
                         } else {
                             Log.d(TAG, "Empty classification result")
+                            binding.tvPoseStatus.text = "Detecting pose..."
                         }
                     }
                 } catch (e: Exception) {
@@ -357,84 +361,83 @@ class StreamActivity : AppCompatActivity() {
                 }
             }
         }
-        */
     }
 
-    // Ultra-accurate push-up detection with multiple criteria
-    private fun checkForPushupDirectly(pose: Pose, rotation: Int) {
+    // Ultra-accurate squat detection with multiple criteria
+    private fun checkForSquatDirectly(pose: Pose, rotation: Int) {
+        val leftHip = pose.getPoseLandmark(PoseLandmark.LEFT_HIP)
+        val rightHip = pose.getPoseLandmark(PoseLandmark.RIGHT_HIP)
+        val leftKnee = pose.getPoseLandmark(PoseLandmark.LEFT_KNEE)
+        val rightKnee = pose.getPoseLandmark(PoseLandmark.RIGHT_KNEE)
+        val leftAnkle = pose.getPoseLandmark(PoseLandmark.LEFT_ANKLE)
+        val rightAnkle = pose.getPoseLandmark(PoseLandmark.RIGHT_ANKLE)
         val leftShoulder = pose.getPoseLandmark(PoseLandmark.LEFT_SHOULDER)
         val rightShoulder = pose.getPoseLandmark(PoseLandmark.RIGHT_SHOULDER)
-        val leftElbow = pose.getPoseLandmark(PoseLandmark.LEFT_ELBOW)
-        val rightElbow = pose.getPoseLandmark(PoseLandmark.RIGHT_ELBOW)
-        val leftWrist = pose.getPoseLandmark(PoseLandmark.LEFT_WRIST)
-        val rightWrist = pose.getPoseLandmark(PoseLandmark.RIGHT_WRIST)
-        
-        if (leftShoulder != null && rightShoulder != null && leftElbow != null && 
-            rightElbow != null && leftWrist != null && rightWrist != null) {
-            
+
+        if (leftHip != null && rightHip != null && leftKnee != null &&
+            rightKnee != null && leftAnkle != null && rightAnkle != null &&
+            leftShoulder != null && rightShoulder != null) {
+
             // Reset detection state if orientation changed
             if (rotation != lastRotation) {
                 Log.d(TAG, "Orientation changed from $lastRotation to $rotation - resetting detection state")
                 downFrameCount = 0
                 upFrameCount = 0
-                shoulderElbowDiffHistory.clear()
-                armAngleHistory.clear()
+                kneeAngleHistory.clear()
+                hipAngleHistory.clear()
                 isDown = false
                 hasBeenDown = false // Reset cycle tracking
                 lastCountedUp = false
                 lastRotation = rotation
             }
-            
-            // Much stricter detection to prevent false positives
-            
-            // Higher confidence requirement
-            val allLandmarks = listOf(leftShoulder, rightShoulder, leftElbow, rightElbow, leftWrist, rightWrist)
+
+            // Higher confidence requirement for squat detection
+            val allLandmarks = listOf(leftHip, rightHip, leftKnee, rightKnee, leftAnkle, rightAnkle, leftShoulder, rightShoulder)
             val avgConfidence = allLandmarks.map { it.inFrameLikelihood }.average().toFloat()
-            
-            if (avgConfidence < 0.7f) { // Increased from 0.5f to 0.7f for better accuracy
+
+            if (avgConfidence < 0.7f) { // High confidence required
                 Log.d(TAG, "Low confidence: ${(avgConfidence*100).toInt()}%")
                 return
             }
-            
-            // Calculate elbow angles with stricter validation
-            val leftElbowAngle = calculateAngle(leftShoulder.position3D, leftElbow.position3D, leftWrist.position3D)
-            val rightElbowAngle = calculateAngle(rightShoulder.position3D, rightElbow.position3D, rightWrist.position3D)
-            val avgElbowAngle = (leftElbowAngle + rightElbowAngle) / 2
-            
-            // Check arm symmetry - both arms should be similar
-            val armSymmetry = Math.abs(leftElbowAngle - rightElbowAngle)
-            val isSymmetric = armSymmetry < 30f // Both arms should move similarly
-            
-            // Position-based detection with stricter thresholds
-            val avgElbowY = (leftElbow.position.y + rightElbow.position.y) * 0.5f
-            val avgShoulderY = (leftShoulder.position.y + rightShoulder.position.y) * 0.5f
-            val avgWristY = (leftWrist.position.y + rightWrist.position.y) * 0.5f
-            val shoulderElbowDiff = avgElbowY - avgShoulderY
-            
-            // Additional validation: wrists should be lower than shoulders in down position
-            val wristBelowShoulder = avgWristY > avgShoulderY + 0.02f
-            
-            // Add to history for smoothing (keep longer history for stability)
-            shoulderElbowDiffHistory.add(shoulderElbowDiff)
-            armAngleHistory.add(avgElbowAngle)
-            
-            if (shoulderElbowDiffHistory.size > 8) { // Increased from 5 to 8 for better smoothing
-                shoulderElbowDiffHistory.removeAt(0)
-                armAngleHistory.removeAt(0)
+
+            // Calculate knee angles for squat detection
+            val leftKneeAngle = calculateAngle(leftHip.position3D, leftKnee.position3D, leftAnkle.position3D)
+            val rightKneeAngle = calculateAngle(rightHip.position3D, rightKnee.position3D, rightAnkle.position3D)
+            val avgKneeAngle = (leftKneeAngle + rightKneeAngle) / 2
+
+            // Calculate hip angle (torso to thigh angle)
+            val avgHipX = (leftHip.position.x + rightHip.position.x) / 2
+            val avgHipY = (leftHip.position.y + rightHip.position.y) / 2
+            val avgShoulderY = (leftShoulder.position.y + rightShoulder.position.y) / 2
+            val avgKneeY = (leftKnee.position.y + rightKnee.position.y) / 2
+
+            // Check leg symmetry - both legs should be similar
+            val legSymmetry = Math.abs(leftKneeAngle - rightKneeAngle)
+            val isSymmetric = legSymmetry < 25f // Both legs should move similarly
+
+            // Add to history for smoothing
+            kneeAngleHistory.add(avgKneeAngle)
+
+            if (kneeAngleHistory.size > 8) { // Keep history for smoothing
+                kneeAngleHistory.removeAt(0)
             }
-            
-            val smoothedDiff = shoulderElbowDiffHistory.average().toFloat()
-            val smoothedAngle = armAngleHistory.average().toFloat()
-            
-            // Much stricter detection criteria to prevent false positives
-            val isDownPosition = smoothedDiff > 0.05f && // Increased threshold from 0.03f
-                                 smoothedAngle < 110f && smoothedAngle > 40f && // Stricter angle range
-                                 isSymmetric && // Both arms must be symmetric
-                                 wristBelowShoulder && // Wrists must be below shoulders
-                                 avgConfidence > 0.7f // High confidence required
-            
-            Log.d(TAG, "Detection - Diff: ${String.format("%.3f", smoothedDiff)}, Angle: ${smoothedAngle.toInt()}°, Down: $isDownPosition, HasBeenDown: $hasBeenDown, Symmetric: $isSymmetric, Confidence: ${(avgConfidence*100).toInt()}%")
-            
+
+            val smoothedKneeAngle = kneeAngleHistory.average().toFloat()
+
+            // Squat detection criteria:
+            // - Knee angle should be between 70-140 degrees for down position (more lenient)
+            // - Hip should be lower than usual (knees closer to hips)
+            // - Both legs should be symmetric
+            val isDownPosition = smoothedKneeAngle < 140f && smoothedKneeAngle > 70f && // More lenient knee range
+                    isSymmetric && // Both legs symmetric
+                    avgConfidence > 0.6f // Lowered confidence requirement
+
+            Log.d(TAG, "Squat Detection - Knee Angle: ${smoothedKneeAngle.toInt()}°, Down: $isDownPosition, HasBeenDown: $hasBeenDown, Symmetric: $isSymmetric, Confidence: ${(avgConfidence*100).toInt()}%, Knee Range OK: ${smoothedKneeAngle < 140f && smoothedKneeAngle > 70f}")
+
+            // Additional detailed logging
+            Log.d(TAG, "Body Position - avgHipY: ${String.format("%.3f", avgHipY)}, avgKneeY: ${String.format("%.3f", avgKneeY)}, avgShoulderY: ${String.format("%.3f", avgShoulderY)}")
+            Log.d(TAG, "Leg Angles - Left: ${leftKneeAngle.toInt()}°, Right: ${rightKneeAngle.toInt()}°, Symmetry Diff: ${Math.abs(leftKneeAngle - rightKneeAngle).toInt()}°")
+
             // State tracking with higher stability requirements
             if (isDownPosition) {
                 downFrameCount++
@@ -444,34 +447,34 @@ class StreamActivity : AppCompatActivity() {
                 upFrameCount++
                 downFrameCount = 0
             }
-            
+
             var stateChanged = false
-            
+
             // State changes with stricter frame requirements
-            if (!isDown && downFrameCount >= 5) { // Increased from 3 to 5 frames
+            if (!isDown && downFrameCount >= 3) { // Reduced from 5 to 3 frames
                 isDown = true
                 hasBeenDown = true // Mark that person has been in down position
                 stateChanged = true
-                Log.d(TAG, "💪 Position changed to DOWN - cycle started")
-            } else if (isDown && upFrameCount >= 5 && !lastCountedUp) { // Only count UP motion and prevent double counting
+                Log.d(TAG, "💪 Position changed to DOWN - squat cycle started")
+            } else if (isDown && upFrameCount >= 3 && !lastCountedUp) { // Reduced from 5 to 3 frames
                 // Only count if person has been down first (complete cycle) AND we haven't just counted
                 if (hasBeenDown) {
                     val currentTime = System.currentTimeMillis()
-                    
-                    if (currentTime - lastPushupTime >= MIN_PUSHUP_INTERVAL) {
-                        pushupCount++
-                        lastPushupTime = currentTime
+
+                    if (currentTime - lastSquatTime >= MIN_SQUAT_INTERVAL) {
+                        squatCount++
+                        lastSquatTime = currentTime
                         lastCountedUp = true // Prevent double counting
                         stateChanged = true
-                        
-                        Log.d(TAG, "🎉 Push-up #$pushupCount completed! UP motion detected, Angle: ${smoothedAngle.toInt()}°")
-                        
+
+                        Log.d(TAG, "🎉 Squat #$squatCount completed! UP motion detected, Knee Angle: ${smoothedKneeAngle.toInt()}°")
+
                         mainHandler.post {
-                            binding.tvPushupCounter.text = getString(R.string.pushup_counter_text, pushupCount)
+                            binding.tvSquatCounter.text = getString(R.string.squat_counter_text, squatCount)
                             binding.tvPositionStatus.text = "Position: COUNT +1 (UP)!"
-                            binding.tvPositionStatus.setTextColor(ContextCompat.getColor(this@StreamActivity, android.R.color.holo_orange_light))
+                            binding.tvPositionStatus.setTextColor(ContextCompat.getColor(this@SquatActivity, android.R.color.holo_orange_light))
                         }
-                        
+
                         // Audio feedback
                         try {
                             val toneGenerator = ToneGenerator(AudioManager.STREAM_NOTIFICATION, 80)
@@ -484,75 +487,69 @@ class StreamActivity : AppCompatActivity() {
                             // Ignore audio errors
                         }
                     }
-                    
-                    // Reset cycle tracking for next push-up
+
+                    // Reset cycle tracking for next squat
                     hasBeenDown = false
                 } else {
                     Log.d(TAG, "⚠️ Going UP but no DOWN detected first - no count")
                 }
-                
+
                 isDown = false
             }
-            
+
             // UI updates with clearer status messages
             if (stateChanged || (frameSkipCounter % 30 == 0)) {
                 mainHandler.post {
                     if (isDown) {
-                        binding.tvPositionStatus.text = "Position: Down (${smoothedAngle.toInt()}°) - Hold Position"
-                        binding.tvPositionStatus.setTextColor(ContextCompat.getColor(this@StreamActivity, android.R.color.holo_blue_light))
+                        binding.tvPositionStatus.text = "Position: Down (${smoothedKneeAngle.toInt()}°) - Hold Position"
+                        binding.tvPositionStatus.setTextColor(ContextCompat.getColor(this@SquatActivity, android.R.color.holo_blue_light))
                     } else {
                         val statusText = when {
                             lastCountedUp -> "Position: Up - Great Job!"
-                            hasBeenDown -> "Position: Up - Push Up Now!"
+                            hasBeenDown -> "Position: Up - Squat Down Now!"
                             else -> "Position: Up - Go Down First"
                         }
                         binding.tvPositionStatus.text = statusText
-                        binding.tvPositionStatus.setTextColor(ContextCompat.getColor(this@StreamActivity, android.R.color.holo_green_light))
+                        binding.tvPositionStatus.setTextColor(ContextCompat.getColor(this@SquatActivity, android.R.color.holo_green_light))
                     }
                 }
             }
-            
+
         } else {
             // Reset when landmarks are lost
             if (isDown) {
                 isDown = false
                 mainHandler.post {
-                    binding.tvPositionStatus.text = "Position: Show arms clearly"
-                    binding.tvPositionStatus.setTextColor(ContextCompat.getColor(this@StreamActivity, android.R.color.holo_red_light))
+                    binding.tvPositionStatus.text = "Position: Show full body clearly"
+                    binding.tvPositionStatus.setTextColor(ContextCompat.getColor(this@SquatActivity, android.R.color.holo_red_light))
                 }
             }
             downFrameCount = 0
             upFrameCount = 0
-            shoulderElbowDiffHistory.clear()
-            armAngleHistory.clear()
+            kneeAngleHistory.clear()
             hasBeenDown = false // Reset cycle tracking when pose is lost
             lastCountedUp = false
         }
     }
-    
-    private fun resetPushupCounter() {
-        pushupCount = 0
+
+    private fun resetSquatCounter() {
+        squatCount = 0
         isDown = false
         hasBeenDown = false
         lastCountedUp = false
-        lastPushupTime = 0L
-        
-        // Reset simplified detection variables
+        lastSquatTime = 0L
+
+        // Reset detection variables
         downFrameCount = 0
         upFrameCount = 0
-        shoulderElbowDiffHistory.clear()
-        armAngleHistory.clear()
-        
-        // Reset the pose classifier processor counter as well
-        backgroundExecutor.execute {
-            poseClassifierProcessor?.resetCounters()
-        }
-        
-        binding.tvPushupCounter.text = getString(R.string.pushup_counter_text, 0)
+        kneeAngleHistory.clear()
+        hipAngleHistory.clear()
+
+        binding.tvSquatCounter.text = getString(R.string.squat_counter_text, 0)
         binding.tvPositionStatus.text = "Position: Ready - Go Down First"
         binding.tvPositionStatus.setTextColor(ContextCompat.getColor(this, android.R.color.holo_orange_light))
-        
-        Log.d(TAG, "Push-up counter and detection state reset to 0")
+
+        Log.d(TAG, "Squat counter and detection state reset to 0")
     }
 
     private fun allPermissionsGranted() = REQUIRED_PERMISSIONS.all {
@@ -591,23 +588,23 @@ class StreamActivity : AppCompatActivity() {
     }
 
     // Calculate angle between three points in degrees
-    private fun calculateAngle(p1: com.google.mlkit.vision.common.PointF3D, 
-                              p2: com.google.mlkit.vision.common.PointF3D, 
-                              p3: com.google.mlkit.vision.common.PointF3D): Float {
+    private fun calculateAngle(p1: com.google.mlkit.vision.common.PointF3D,
+                               p2: com.google.mlkit.vision.common.PointF3D,
+                               p3: com.google.mlkit.vision.common.PointF3D): Float {
         val v1x = p1.x - p2.x
         val v1y = p1.y - p2.y
         val v2x = p3.x - p2.x
         val v2y = p3.y - p2.y
-        
+
         val dot = v1x * v2x + v1y * v2y
         val mag1 = sqrt(v1x * v1x + v1y * v1y)
         val mag2 = sqrt(v2x * v2x + v2y * v2y)
-        
+
         if (mag1 == 0f || mag2 == 0f) return 0f
-        
+
         val cosAngle = dot / (mag1 * mag2)
         val clampedCos = cosAngle.coerceIn(-1f, 1f)
-        
+
         return Math.toDegrees(kotlin.math.acos(clampedCos.toDouble())).toFloat()
     }
 }

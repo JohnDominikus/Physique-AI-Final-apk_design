@@ -48,8 +48,14 @@ public class PoseClassifierProcessor {
   // These are the labels in the given {@code POSE_SAMPLES_FILE}. You can set your own class labels
   // for your pose samples.
   private static final String PUSHUPS_CLASS = "pushups_down";
+  private static final String SQUATS_CLASS = "squats_down";
+  private static final String FRONT_RAISE_CLASS = "front_raise_down";
+  private static final String HIP_THRUST_CLASS = "hip_thrust_down";
   private static final String[] POSE_CLASSES = {
-    PUSHUPS_CLASS
+          PUSHUPS_CLASS,
+          SQUATS_CLASS,
+          FRONT_RAISE_CLASS,
+          HIP_THRUST_CLASS
   };
 
   private final boolean isStreamMode;
@@ -58,10 +64,10 @@ public class PoseClassifierProcessor {
   private List<RepetitionCounter> repCounters;
   private PoseClassifier poseClassifier;
   private String lastRepResult;
-  
+
   // Enhanced validation variables
   private int validPoseFrameCount = 0;
-  private static final int MIN_VALID_POSE_FRAMES = 5;
+  private static final int MIN_VALID_POSE_FRAMES = 3;
 
   @WorkerThread
   public PoseClassifierProcessor(Context context, boolean isStreamMode) {
@@ -70,7 +76,7 @@ public class PoseClassifierProcessor {
     if (isStreamMode) {
       emaSmoothing = new EMASmoothing();
       repCounters = new ArrayList<>();
-      lastRepResult = PUSHUPS_CLASS + " : 0 reps";
+      lastRepResult = "Exercise: 0 reps";
     }
     loadPoseSamples(context);
   }
@@ -80,12 +86,12 @@ public class PoseClassifierProcessor {
     try {
       Log.d(TAG, "Loading pose samples from " + POSE_SAMPLES_FILE);
       BufferedReader reader = new BufferedReader(
-          new InputStreamReader(context.getAssets().open(POSE_SAMPLES_FILE)));
+              new InputStreamReader(context.getAssets().open(POSE_SAMPLES_FILE)));
       String csvLine = reader.readLine();
       int sampleCount = 0;
       while (csvLine != null) {
         // If line is not a valid {@link PoseSample}, we'll get null and skip adding to the list.
-        com.example.physiqueaiapkfinal.visionutils.classification.PoseSample poseSample =  com.example.physiqueaiapkfinal.visionutils.classification.PoseSample.getPoseSample(csvLine, ",");
+        com.example.physiqueaiapkfinal.visionutils.classification.PoseSample poseSample = com.example.physiqueaiapkfinal.visionutils.classification.PoseSample.getPoseSample(csvLine, ",");
         if (poseSample != null) {
           poseSamples.add(poseSample);
           sampleCount++;
@@ -95,7 +101,7 @@ public class PoseClassifierProcessor {
         csvLine = reader.readLine();
       }
       Log.d(TAG, "Loaded " + sampleCount + " pose samples.");
-      
+
       // List all loaded sample class names
       Set<String> classes = new HashSet<>();
       for (PoseSample sample : poseSamples) {
@@ -109,7 +115,7 @@ public class PoseClassifierProcessor {
     poseClassifier = new PoseClassifier(poseSamples);
     if (isStreamMode) {
       for (String className : POSE_CLASSES) {
-        repCounters.add(new  com.example.physiqueaiapkfinal.visionutils.classification.RepetitionCounter(className));
+        repCounters.add(new com.example.physiqueaiapkfinal.visionutils.classification.RepetitionCounter(className));
         Log.d(TAG, "Added RepetitionCounter for " + className);
       }
     }
@@ -126,12 +132,12 @@ public class PoseClassifierProcessor {
   @WorkerThread
   public List<String> getPoseResult(Pose pose) {
     // Make sure we're on a worker thread
-    Preconditions.checkState(Looper.myLooper() != Looper.getMainLooper(), 
-        "getPoseResult should not be called on the main thread");
-      
+    Preconditions.checkState(Looper.myLooper() != Looper.getMainLooper(),
+            "getPoseResult should not be called on the main thread");
+
     List<String> result = new ArrayList<>();
     Log.d(TAG, "Classifying pose with " + pose.getAllPoseLandmarks().size() + " landmarks");
-    
+
     ClassificationResult classification = poseClassifier.classify(pose);
     Log.d(TAG, "Raw classification result: " + classification.getAllClasses());
 
@@ -148,15 +154,20 @@ public class PoseClassifierProcessor {
         result.add(lastRepResult);
         return result;
       }
-      
-      // Enhanced pose validation for push-ups
+
+      // Enhanced pose validation for push-ups, squats, and front raises
       boolean isPushupPose = validatePushupPose(pose, smoothedResult);
-      if (isPushupPose) {
+      boolean isSquatPose = validateSquatPose(pose, smoothedResult);
+      boolean isFrontRaisePose = validateFrontRaisePose(pose, smoothedResult);
+      boolean isHipThrustPose = validateHipThrustPose(pose, smoothedResult);
+      boolean isValidPose = isPushupPose || isSquatPose || isFrontRaisePose || isHipThrustPose;
+
+      if (isValidPose) {
         validPoseFrameCount++;
       } else {
         validPoseFrameCount = 0;
       }
-      
+
       // Only proceed with counting if we have enough consecutive valid pose frames
       if (validPoseFrameCount < MIN_VALID_POSE_FRAMES) {
         Log.d(TAG, "Not enough valid pose frames: " + validPoseFrameCount + "/" + MIN_VALID_POSE_FRAMES);
@@ -164,30 +175,30 @@ public class PoseClassifierProcessor {
         return result;
       }
 
-      for ( com.example.physiqueaiapkfinal.visionutils.classification.RepetitionCounter repCounter : repCounters) {
+      for (com.example.physiqueaiapkfinal.visionutils.classification.RepetitionCounter repCounter : repCounters) {
         String className = repCounter.getClassName();
         int repsBefore = repCounter.getNumRepeats();
         int repsAfter = repCounter.addClassificationResult(smoothedResult);
-        
+
         float currentConfidence = smoothedResult.getClassConfidence(className);
-        Log.d(TAG, "Class: " + className + ", Confidence: " + currentConfidence + 
-            ", Reps before: " + repsBefore + ", Reps after: " + repsAfter);
-        
+        Log.d(TAG, "Class: " + className + ", Confidence: " + currentConfidence +
+                ", Reps before: " + repsBefore + ", Reps after: " + repsAfter);
+
         if (repsAfter > repsBefore) {
           // Play a fun beep when rep counter updates.
           ToneGenerator tg = new ToneGenerator(AudioManager.STREAM_NOTIFICATION, 100);
           tg.startTone(ToneGenerator.TONE_PROP_BEEP);
           lastRepResult = String.format(
-              Locale.US, "%s : %d reps", repCounter.getClassName(), repsAfter);
+                  Locale.US, "%s : %d reps", repCounter.getClassName(), repsAfter);
           Log.d(TAG, "Rep count increased! New result: " + lastRepResult);
           break;
         }
       }
-      
+
       if (lastRepResult.isEmpty()) {
-        lastRepResult = "Push-ups: 0 reps";
+        lastRepResult = "Exercise: 0 reps";
       }
-      
+
       result.add(lastRepResult);
       Log.d(TAG, "Added to result: " + lastRepResult);
     }
@@ -196,13 +207,13 @@ public class PoseClassifierProcessor {
     if (!pose.getAllPoseLandmarks().isEmpty()) {
       String maxConfidenceClass = classification.getMaxConfidenceClass();
       float maxConfidence = classification.getClassConfidence(maxConfidenceClass)
-          / poseClassifier.confidenceRange();
-          
+              / poseClassifier.confidenceRange();
+
       String maxConfidenceClassResult = String.format(
-          Locale.US,
-          "%s : %.2f confidence",
-          maxConfidenceClass,
-          maxConfidence);
+              Locale.US,
+              "%s : %.2f confidence",
+              maxConfidenceClass,
+              maxConfidence);
       result.add(maxConfidenceClassResult);
       Log.d(TAG, "Added max confidence class to result: " + maxConfidenceClassResult);
     }
@@ -210,7 +221,7 @@ public class PoseClassifierProcessor {
     Log.d(TAG, "Final result: " + result);
     return result;
   }
-  
+
   // Enhanced validation method for push-up poses
   private boolean validatePushupPose(Pose pose, ClassificationResult classificationResult) {
     try {
@@ -223,38 +234,188 @@ public class PoseClassifierProcessor {
       PoseLandmark rightWrist = pose.getPoseLandmark(PoseLandmark.RIGHT_WRIST);
       PoseLandmark leftHip = pose.getPoseLandmark(PoseLandmark.LEFT_HIP);
       PoseLandmark rightHip = pose.getPoseLandmark(PoseLandmark.RIGHT_HIP);
-      
-      if (leftShoulder == null || rightShoulder == null || leftElbow == null || 
-          rightElbow == null || leftWrist == null || rightWrist == null ||
-          leftHip == null || rightHip == null) {
+
+      if (leftShoulder == null || rightShoulder == null || leftElbow == null ||
+              rightElbow == null || leftWrist == null || rightWrist == null ||
+              leftHip == null || rightHip == null) {
         Log.d(TAG, "Missing required landmarks for push-up validation");
         return false;
       }
-      
+
       // Check wrist position relative to shoulders (should be below for push-ups)
-      boolean wristsLowerThanShoulders = (leftWrist.getPosition().y > leftShoulder.getPosition().y && 
-                                         rightWrist.getPosition().y > rightShoulder.getPosition().y);
-      
+      boolean wristsLowerThanShoulders = (leftWrist.getPosition().y > leftShoulder.getPosition().y &&
+              rightWrist.getPosition().y > rightShoulder.getPosition().y);
+
       // Check if body is in horizontal position
       float shoulderY = (leftShoulder.getPosition().y + rightShoulder.getPosition().y) / 2;
       float hipY = (leftHip.getPosition().y + rightHip.getPosition().y) / 2;
       boolean isHorizontal = Math.abs(shoulderY - hipY) < 0.15f;
-      
+
       // Check minimum confidence for push-up classification
       float pushupConfidence = classificationResult.getClassConfidence(PUSHUPS_CLASS);
       boolean hasMinConfidence = pushupConfidence > 2.0f; // Minimum confidence threshold
-      
+
       boolean isValid = wristsLowerThanShoulders && isHorizontal && hasMinConfidence;
-      
-      Log.d(TAG, "Push-up pose validation - Wrists lower: " + wristsLowerThanShoulders + 
-                 ", Horizontal: " + isHorizontal + 
-                 ", Confidence: " + pushupConfidence + 
-                 ", Valid: " + isValid);
-      
+
+      Log.d(TAG, "Push-up pose validation - Wrists lower: " + wristsLowerThanShoulders +
+              ", Horizontal: " + isHorizontal +
+              ", Confidence: " + pushupConfidence +
+              ", Valid: " + isValid);
+
       return isValid;
-      
+
     } catch (Exception e) {
       Log.e(TAG, "Error in push-up pose validation: " + e.getMessage(), e);
+      return false;
+    }
+  }
+
+  // Enhanced validation method for squat poses
+  private boolean validateSquatPose(Pose pose, ClassificationResult classificationResult) {
+    try {
+      // Check if we have the necessary landmarks for squat validation
+      PoseLandmark leftHip = pose.getPoseLandmark(PoseLandmark.LEFT_HIP);
+      PoseLandmark rightHip = pose.getPoseLandmark(PoseLandmark.RIGHT_HIP);
+      PoseLandmark leftKnee = pose.getPoseLandmark(PoseLandmark.LEFT_KNEE);
+      PoseLandmark rightKnee = pose.getPoseLandmark(PoseLandmark.RIGHT_KNEE);
+      PoseLandmark leftAnkle = pose.getPoseLandmark(PoseLandmark.LEFT_ANKLE);
+      PoseLandmark rightAnkle = pose.getPoseLandmark(PoseLandmark.RIGHT_ANKLE);
+      PoseLandmark leftShoulder = pose.getPoseLandmark(PoseLandmark.LEFT_SHOULDER);
+      PoseLandmark rightShoulder = pose.getPoseLandmark(PoseLandmark.RIGHT_SHOULDER);
+
+      if (leftHip == null || rightHip == null || leftKnee == null ||
+              rightKnee == null || leftAnkle == null || rightAnkle == null ||
+              leftShoulder == null || rightShoulder == null) {
+        Log.d(TAG, "Missing required landmarks for squat validation");
+        return false;
+      }
+
+      // More lenient position checks for squats
+      float shoulderY = (leftShoulder.getPosition().y + rightShoulder.getPosition().y) / 2;
+      float hipY = (leftHip.getPosition().y + rightHip.getPosition().y) / 2;
+      float kneeY = (leftKnee.getPosition().y + rightKnee.getPosition().y) / 2;
+      float ankleY = (leftAnkle.getPosition().y + rightAnkle.getPosition().y) / 2;
+
+      // Check if person is generally upright (not horizontal like push-ups)
+      boolean isUpright = shoulderY < hipY; // Shoulders above hips is enough
+
+      // Check if legs are visible and positioned correctly
+      boolean legsAreVisible = hipY < ankleY; // Hips above ankles
+
+      // Lower confidence threshold for squat classification
+      float squatConfidence = classificationResult.getClassConfidence(SQUATS_CLASS);
+      boolean hasMinConfidence = squatConfidence > 1.0f; // Lowered threshold
+
+      boolean isValid = isUpright && legsAreVisible && hasMinConfidence;
+
+      Log.d(TAG, "Squat pose validation - Upright: " + isUpright +
+              ", Legs visible: " + legsAreVisible +
+              ", Confidence: " + squatConfidence +
+              ", Valid: " + isValid);
+
+      return isValid;
+
+    } catch (Exception e) {
+      Log.e(TAG, "Error in squat pose validation: " + e.getMessage(), e);
+      return false;
+    }
+  }
+
+  // Enhanced validation method for front raise poses
+  private boolean validateFrontRaisePose(Pose pose, ClassificationResult classificationResult) {
+    try {
+      // Check if we have the necessary landmarks for front raise validation
+      PoseLandmark leftShoulder = pose.getPoseLandmark(PoseLandmark.LEFT_SHOULDER);
+      PoseLandmark rightShoulder = pose.getPoseLandmark(PoseLandmark.RIGHT_SHOULDER);
+      PoseLandmark leftElbow = pose.getPoseLandmark(PoseLandmark.LEFT_ELBOW);
+      PoseLandmark rightElbow = pose.getPoseLandmark(PoseLandmark.RIGHT_ELBOW);
+      PoseLandmark leftWrist = pose.getPoseLandmark(PoseLandmark.LEFT_WRIST);
+      PoseLandmark rightWrist = pose.getPoseLandmark(PoseLandmark.RIGHT_WRIST);
+      PoseLandmark leftHip = pose.getPoseLandmark(PoseLandmark.LEFT_HIP);
+      PoseLandmark rightHip = pose.getPoseLandmark(PoseLandmark.RIGHT_HIP);
+
+      if (leftShoulder == null || rightShoulder == null || leftElbow == null ||
+              rightElbow == null || leftWrist == null || rightWrist == null ||
+              leftHip == null || rightHip == null) {
+        Log.d(TAG, "Missing required landmarks for front raise validation");
+        return false;
+      }
+
+      // Check if person is standing upright (not horizontal like push-ups)
+      float shoulderY = (leftShoulder.getPosition().y + rightShoulder.getPosition().y) / 2;
+      float hipY = (leftHip.getPosition().y + rightHip.getPosition().y) / 2;
+      boolean isUpright = shoulderY < hipY; // Shoulders above hips for standing position
+
+      // Check if arms are visible and positioned correctly
+      float avgWristY = (leftWrist.getPosition().y + rightWrist.getPosition().y) / 2;
+      boolean armsAreVisible = avgWristY > 0; // Basic check that arms are visible
+
+      // Lower confidence threshold for front raise classification
+      float frontRaiseConfidence = classificationResult.getClassConfidence(FRONT_RAISE_CLASS);
+      boolean hasMinConfidence = frontRaiseConfidence > 1.0f; // Lowered threshold
+
+      boolean isValid = isUpright && armsAreVisible && hasMinConfidence;
+
+      Log.d(TAG, "Front raise pose validation - Upright: " + isUpright +
+              ", Arms visible: " + armsAreVisible +
+              ", Confidence: " + frontRaiseConfidence +
+              ", Valid: " + isValid);
+
+      return isValid;
+
+    } catch (Exception e) {
+      Log.e(TAG, "Error in front raise pose validation: " + e.getMessage(), e);
+      return false;
+    }
+  }
+
+  // Enhanced validation method for hip thrust poses
+  private boolean validateHipThrustPose(Pose pose, ClassificationResult classificationResult) {
+    try {
+      // Check if we have the necessary landmarks for hip thrust validation
+      PoseLandmark leftHip = pose.getPoseLandmark(PoseLandmark.LEFT_HIP);
+      PoseLandmark rightHip = pose.getPoseLandmark(PoseLandmark.RIGHT_HIP);
+      PoseLandmark leftKnee = pose.getPoseLandmark(PoseLandmark.LEFT_KNEE);
+      PoseLandmark rightKnee = pose.getPoseLandmark(PoseLandmark.RIGHT_KNEE);
+      PoseLandmark leftAnkle = pose.getPoseLandmark(PoseLandmark.LEFT_ANKLE);
+      PoseLandmark rightAnkle = pose.getPoseLandmark(PoseLandmark.RIGHT_ANKLE);
+      PoseLandmark leftShoulder = pose.getPoseLandmark(PoseLandmark.LEFT_SHOULDER);
+      PoseLandmark rightShoulder = pose.getPoseLandmark(PoseLandmark.RIGHT_SHOULDER);
+
+      if (leftHip == null || rightHip == null || leftKnee == null ||
+              rightKnee == null || leftAnkle == null || rightAnkle == null ||
+              leftShoulder == null || rightShoulder == null) {
+        Log.d(TAG, "Missing required landmarks for hip thrust validation");
+        return false;
+      }
+
+      // Hip thrust specific position analysis
+      float shoulderY = (leftShoulder.getPosition().y + rightShoulder.getPosition().y) / 2;
+      float hipY = (leftHip.getPosition().y + rightHip.getPosition().y) / 2;
+      float kneeY = (leftKnee.getPosition().y + rightKnee.getPosition().y) / 2;
+      float ankleY = (leftAnkle.getPosition().y + rightAnkle.getPosition().y) / 2;
+
+      // Check if person is in lying/bridge position (shoulders should be at similar level or lower than hips)
+      boolean isLyingPosition = Math.abs(shoulderY - hipY) < 0.2f; // Shoulders and hips at similar height for lying position
+
+      // Check if legs are bent properly for hip thrust (knees should be between hips and ankles)
+      boolean legsBentProperly = hipY < kneeY && kneeY < ankleY; // Hip < Knee < Ankle for proper hip thrust position
+
+      // Check confidence for hip thrust classification
+      float hipThrustConfidence = classificationResult.getClassConfidence(HIP_THRUST_CLASS);
+      boolean hasMinConfidence = hipThrustConfidence > 1.0f; // Minimum confidence threshold
+
+      boolean isValid = isLyingPosition && legsBentProperly && hasMinConfidence;
+
+      Log.d(TAG, "Hip thrust pose validation - Lying position: " + isLyingPosition +
+              ", Legs bent properly: " + legsBentProperly +
+              ", Confidence: " + hipThrustConfidence +
+              ", Valid: " + isValid);
+
+      return isValid;
+
+    } catch (Exception e) {
+      Log.e(TAG, "Error in hip thrust pose validation: " + e.getMessage(), e);
       return false;
     }
   }
@@ -269,7 +430,7 @@ public class PoseClassifierProcessor {
         Log.d(TAG, "Reset counter for " + counter.getClassName());
       }
     }
-    lastRepResult = PUSHUPS_CLASS + " : 0 reps";
+    lastRepResult = "Exercise: 0 reps";
     validPoseFrameCount = 0;
     Log.d(TAG, "All counters reset");
   }

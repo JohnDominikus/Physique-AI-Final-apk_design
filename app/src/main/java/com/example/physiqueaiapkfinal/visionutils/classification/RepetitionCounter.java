@@ -26,11 +26,15 @@ public class RepetitionCounter {
   // Lower thresholds to make detection more sensitive
   private static final float DEFAULT_ENTER_THRESHOLD = 4f;  // Decreased from 6f
   private static final float DEFAULT_EXIT_THRESHOLD = 2f;   // Decreased from 3f
-  
+
   // Stricter thresholds specifically for push-ups
   private static final float PUSHUP_ENTER_THRESHOLD = 5f;   // Decreased from 7f
   private static final float PUSHUP_EXIT_THRESHOLD = 3f;    // Decreased from 4f
-  
+
+  // Specific thresholds for squats
+  private static final float SQUAT_ENTER_THRESHOLD = 2f;    // Lowered for better sensitivity
+  private static final float SQUAT_EXIT_THRESHOLD = 1f;     // Lowered for better sensitivity
+
   private static final String TAG = "RepetitionCounter";
 
   private final String className;
@@ -48,17 +52,21 @@ public class RepetitionCounter {
       this.className = className;
       this.enterThreshold = PUSHUP_ENTER_THRESHOLD;
       this.exitThreshold = PUSHUP_EXIT_THRESHOLD;
+    } else if (className.contains("squats") || className.contains("squat")) {
+      this.className = className;
+      this.enterThreshold = SQUAT_ENTER_THRESHOLD;
+      this.exitThreshold = SQUAT_EXIT_THRESHOLD;
     } else {
       this.className = className;
       this.enterThreshold = DEFAULT_ENTER_THRESHOLD;
       this.exitThreshold = DEFAULT_EXIT_THRESHOLD;
     }
-    
+
     numRepeats = 0;
     poseEntered = false;
-    Log.d(TAG, "Created counter for " + className + 
-        " with enter threshold: " + enterThreshold + 
-        ", exit threshold: " + exitThreshold);
+    Log.d(TAG, "Created counter for " + className +
+            " with enter threshold: " + enterThreshold +
+            ", exit threshold: " + exitThreshold);
   }
 
   public RepetitionCounter(String className, float enterThreshold, float exitThreshold) {
@@ -67,9 +75,9 @@ public class RepetitionCounter {
     this.exitThreshold = exitThreshold;
     numRepeats = 0;
     poseEntered = false;
-    Log.d(TAG, "Created counter for " + className + 
-        " with enter threshold: " + enterThreshold + 
-        ", exit threshold: " + exitThreshold);
+    Log.d(TAG, "Created counter for " + className +
+            " with enter threshold: " + enterThreshold +
+            ", exit threshold: " + exitThreshold);
   }
 
   /**
@@ -80,8 +88,8 @@ public class RepetitionCounter {
    */
   public int addClassificationResult(ClassificationResult classificationResult) {
     float poseConfidence = classificationResult.getClassConfidence(className);
-    Log.d(TAG, "Class: " + className + ", Confidence: " + poseConfidence + 
-        ", poseEntered: " + poseEntered + ", numRepeats: " + numRepeats);
+    Log.d(TAG, "Class: " + className + ", Confidence: " + poseConfidence +
+            ", poseEntered: " + poseEntered + ", numRepeats: " + numRepeats);
 
     if (!poseEntered) {
       poseEntered = poseConfidence > enterThreshold;
@@ -115,7 +123,7 @@ public class RepetitionCounter {
   public int getNumRepeats() {
     return numRepeats;
   }
-  
+
   public void reset() {
     numRepeats = 0;
     poseEntered = false;
@@ -123,3 +131,4 @@ public class RepetitionCounter {
     Log.d(TAG, "Reset counter for " + className);
   }
 }
+

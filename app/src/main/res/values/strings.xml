@@ -63,7 +63,6 @@
     <string name="workout_image">image\n</string>
 
 
-
     <string name="difficulty_format">Difficulty: %s</string>
     <string name="equipment_format">Equipment: %s</string>
     <string name="muscle_groups_format">Muscle Groups: %s</string>
@@ -75,9 +74,11 @@
     </plurals>
 
 
-
+    <!-- Pose Detection -->
     <string name="pushup_counter_text">Push-ups: %1$d</string>
-
+    <string name="squat_counter_text">Squats: %1$d</string>
+    <string name="front_raise_counter_text">Front Raises: %1$d</string>
+    <string name="hip_thrust_counter_text">Hip Thrusts: %1$d</string>
 
 
     <string name="your_bmi">Your BMI</string>
