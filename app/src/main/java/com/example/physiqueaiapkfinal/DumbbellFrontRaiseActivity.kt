@@ -56,7 +56,7 @@ class DumbbellFrontRaiseActivity : AppCompatActivity() {
     // Advanced detection variables
     private var raisedFrameCount = 0
     private var loweredFrameCount = 0
-    private val MIN_STABLE_FRAMES = 6 // Reduced for more responsive detection
+    private val MIN_STABLE_FRAMES = 3 // More responsive for better counting
 
     // Simplified history tracking for front raise detection
     private val shoulderAngleHistory = mutableListOf<Float>()
@@ -80,11 +80,6 @@ class DumbbellFrontRaiseActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityDumbbellFrontRaiseBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
-        // Log workout data passed from WorkoutPoseAIFragment
-        val workoutId = intent.getStringExtra("workoutId")
-        val workoutName = intent.getStringExtra("workout_name")
-        Log.d(TAG, "DumbbellFrontRaiseActivity started - Workout ID: $workoutId, Workout Name: $workoutName")
 
         if (allPermissionsGranted()) {
             startCamera()
@@ -347,7 +342,10 @@ class DumbbellFrontRaiseActivity : AppCompatActivity() {
             val isUpright = avgShoulderY < avgHipY // Shoulders above hips
 
             // 4. Check if both arms are visible and detected properly
-            val armsVisible = leftWrist.inFrameLikelihood > 0.3f && rightWrist.inFrameLikelihood > 0.3f
+            val leftArmVisible = leftWrist.inFrameLikelihood > 0.5f && leftElbow.inFrameLikelihood > 0.5f
+            val rightArmVisible = rightWrist.inFrameLikelihood > 0.5f && rightElbow.inFrameLikelihood > 0.5f
+            val armsVisible = leftArmVisible && rightArmVisible
+            val bothArmsUsed = armsVisible
 
             // Add to history for smoothing
             shoulderAngleHistory.add(wristToShoulderDiff)
@@ -357,24 +355,48 @@ class DumbbellFrontRaiseActivity : AppCompatActivity() {
 
             val smoothedDiff = shoulderAngleHistory.average().toFloat()
 
-            // ULTRA SIMPLE POSITION DETECTION:
+            // IMPROVED POSITION DETECTION with better thresholds:
             // Positive values = wrists below shoulders (lowered)
             // Near zero values = wrists at shoulder level (raised)
             // Negative values = wrists above shoulders (over-raised)
 
+            // Calculate arm straightness for better accuracy
+            val leftArmLength = sqrt((leftWrist.position.x - leftShoulder.position.x).pow(2) +
+                    (leftWrist.position.y - leftShoulder.position.y).pow(2))
+            val rightArmLength = sqrt((rightWrist.position.x - rightShoulder.position.x).pow(2) +
+                    (rightWrist.position.y - rightShoulder.position.y).pow(2))
+            val avgArmLength = (leftArmLength + rightArmLength) / 2
+
+            // Check if arms are extended (not bent)
+            val leftElbowToShoulder = sqrt((leftElbow.position.x - leftShoulder.position.x).pow(2) +
+                    (leftElbow.position.y - leftShoulder.position.y).pow(2))
+            val leftElbowToWrist = sqrt((leftWrist.position.x - leftElbow.position.x).pow(2) +
+                    (leftWrist.position.y - leftElbow.position.y).pow(2))
+            val leftArmExtension = (leftElbowToShoulder + leftElbowToWrist) / avgArmLength
+
+            val rightElbowToShoulder = sqrt((rightElbow.position.x - rightShoulder.position.x).pow(2) +
+                    (rightElbow.position.y - rightShoulder.position.y).pow(2))
+            val rightElbowToWrist = sqrt((rightWrist.position.x - rightElbow.position.x).pow(2) +
+                    (rightWrist.position.y - rightElbow.position.y).pow(2))
+            val rightArmExtension = (rightElbowToShoulder + rightElbowToWrist) / avgArmLength
+
+            val avgArmExtension = (leftArmExtension + rightArmExtension) / 2
+            val armsExtended = avgArmExtension > 1.8f // Arms should be relatively straight
+
+            // Simplified and more reliable detection
             val isLoweredPosition = (
-                    smoothedDiff > 50f && // Wrists clearly below shoulders (large positive value)
-                            isUpright && armsVisible && avgConfidence > 0.5f
+                    smoothedDiff > 60f && // Wrists clearly below shoulders - relaxed threshold
+                            isUpright && bothArmsUsed && avgConfidence > 0.5f
                     )
 
             val isRaisedPosition = (
-                    smoothedDiff >= -20f && smoothedDiff <= 50f && // Wrists at/near shoulder level
-                            isUpright && armsVisible && avgConfidence > 0.5f
+                    smoothedDiff >= -20f && smoothedDiff <= 60f && // Wider range for shoulder level
+                            isUpright && bothArmsUsed && avgConfidence > 0.5f && armsExtended
                     )
 
             val isOverRaised = (
-                    smoothedDiff < -20f && // Wrists clearly above shoulders (negative value)
-                            isUpright && armsVisible && avgConfidence > 0.5f
+                    smoothedDiff < -20f && // Wrists clearly above shoulders
+                            isUpright && avgConfidence > 0.5f
                     )
 
             // Detailed logging for debugging
@@ -386,10 +408,14 @@ class DumbbellFrontRaiseActivity : AppCompatActivity() {
             Log.d(TAG, "POSITION DIFFERENCE:")
             Log.d(TAG, "  Wrist-to-Shoulder Diff: ${String.format("%.1f", wristToShoulderDiff)} (positive=lower, negative=higher)")
             Log.d(TAG, "  Smoothed Diff: ${String.format("%.1f", smoothedDiff)}")
+            Log.d(TAG, "ARM EXTENSION:")
+            Log.d(TAG, "  Left Extension: ${String.format("%.2f", leftArmExtension)}, Right Extension: ${String.format("%.2f", rightArmExtension)}")
+            Log.d(TAG, "  Average Extension: ${String.format("%.2f", avgArmExtension)}, Arms Extended: $armsExtended (>1.8)")
             Log.d(TAG, "DETECTION RANGES:")
-            Log.d(TAG, "  LOWERED: >50 | RAISED: -20 to 50 | OVER-RAISED: <-20")
+            Log.d(TAG, "  LOWERED: >60 | RAISED: -20 to 60 | OVER-RAISED: <-20")
             Log.d(TAG, "OTHER CHECKS:")
-            Log.d(TAG, "  Is Upright: $isUpright, Arms Visible: $armsVisible")
+            Log.d(TAG, "  Is Upright: $isUpright, Both Arms Used: $bothArmsUsed")
+            Log.d(TAG, "  Left Arm Visible: $leftArmVisible, Right Arm Visible: $rightArmVisible")
             Log.d(TAG, "  Confidence: ${(avgConfidence*100).toInt()}%")
             Log.d(TAG, "POSITION DETECTION:")
             Log.d(TAG, "  Position - Raised: $isRaisedPosition, Lowered: $isLoweredPosition, Over-raised: $isOverRaised")
@@ -402,8 +428,8 @@ class DumbbellFrontRaiseActivity : AppCompatActivity() {
                 loweredFrameCount = 0
                 Log.d(TAG, "RAISED frames: $raisedFrameCount/$MIN_STABLE_FRAMES")
 
-                // NEW LOGIC: Count immediately when first reaching shoulder level from lowered position
-                if (!isRaised && hasBeenLowered && !lastCountedRaise && raisedFrameCount >= 2) {
+                // IMPROVED LOGIC: Count when reaching shoulder level with proper form
+                if (!isRaised && hasBeenLowered && !lastCountedRaise && raisedFrameCount >= 2 && armsExtended && bothArmsUsed) {
                     // Complete rep: lowered → shoulder level (count immediately!)
                     val currentTime = System.currentTimeMillis()
 
@@ -441,8 +467,8 @@ class DumbbellFrontRaiseActivity : AppCompatActivity() {
                 raisedFrameCount = 0
                 Log.d(TAG, "LOWERED frames: $loweredFrameCount/$MIN_STABLE_FRAMES")
 
-                // Set lowered state when stable
-                if (loweredFrameCount >= MIN_STABLE_FRAMES) {
+                // Set lowered state when stable (relaxed arm extension requirement for lowered position)
+                if (loweredFrameCount >= MIN_STABLE_FRAMES && bothArmsUsed) {
                     if (isRaised) {
                         isRaised = false
                         hasBeenLowered = true
@@ -463,35 +489,49 @@ class DumbbellFrontRaiseActivity : AppCompatActivity() {
                 Log.d(TAG, "IN TRANSITION - maintaining current state")
             }
 
-            // UI updates - check if we need to update display
-            if ((frameSkipCounter % 15 == 0)) {
+            // Enhanced UI updates with proper cautions
+            if ((frameSkipCounter % 10 == 0)) {
                 mainHandler.post {
                     when {
+                        !bothArmsUsed -> {
+                            if (!leftArmVisible && !rightArmVisible) {
+                                binding.tvPositionStatus.text = "⚠️ CAUTION: Use Both Arms\nBoth arms not detected"
+                            } else if (!leftArmVisible) {
+                                binding.tvPositionStatus.text = "⚠️ CAUTION: Use Both Arms\nLeft arm not detected"
+                            } else if (!rightArmVisible) {
+                                binding.tvPositionStatus.text = "⚠️ CAUTION: Use Both Arms\nRight arm not detected"
+                            } else {
+                                binding.tvPositionStatus.text = "⚠️ CAUTION: Use Both Arms\nArms not clearly visible"
+                            }
+                            binding.tvPositionStatus.setTextColor(ContextCompat.getColor(this@DumbbellFrontRaiseActivity, android.R.color.holo_red_dark))
+                        }
+                        isOverRaised -> {
+                            binding.tvPositionStatus.text = "⚠️ CAUTION: Too High!\nLower arms to shoulder level"
+                            binding.tvPositionStatus.setTextColor(ContextCompat.getColor(this@DumbbellFrontRaiseActivity, android.R.color.holo_red_light))
+                        }
+                        !armsExtended && bothArmsUsed -> {
+                            binding.tvPositionStatus.text = "⚠️ CAUTION: Straighten Arms\nKeep arms extended during exercise"
+                            binding.tvPositionStatus.setTextColor(ContextCompat.getColor(this@DumbbellFrontRaiseActivity, android.R.color.holo_red_light))
+                        }
                         isRaised -> {
-                            binding.tvPositionStatus.text = "Position: RAISED ✓ - Lower Arms"
+                            binding.tvPositionStatus.text = "✅ RAISED POSITION\nLower arms to complete rep"
                             binding.tvPositionStatus.setTextColor(ContextCompat.getColor(this@DumbbellFrontRaiseActivity, android.R.color.holo_blue_light))
                         }
                         lastCountedRaise -> {
-                            binding.tvPositionStatus.text = "Position: LOWERED ✓ - Great Job!"
+                            binding.tvPositionStatus.text = "🎉 REP COUNTED!\nGreat job! Count: $frontRaiseCount"
                             binding.tvPositionStatus.setTextColor(ContextCompat.getColor(this@DumbbellFrontRaiseActivity, android.R.color.holo_green_light))
                         }
                         hasBeenLowered -> {
-                            if (isOverRaised) {
-                                binding.tvPositionStatus.text = "Position: TOO HIGH ⚠️ - Lower to Shoulder Level"
-                                binding.tvPositionStatus.setTextColor(ContextCompat.getColor(this@DumbbellFrontRaiseActivity, android.R.color.holo_red_light))
-                            } else {
-                                binding.tvPositionStatus.text = "Position: LOWERED ✓ - Raise Arms Now!"
-                                binding.tvPositionStatus.setTextColor(ContextCompat.getColor(this@DumbbellFrontRaiseActivity, android.R.color.holo_green_light))
-                            }
+                            binding.tvPositionStatus.text = "✅ READY TO RAISE\nRaise both arms to shoulder level"
+                            binding.tvPositionStatus.setTextColor(ContextCompat.getColor(this@DumbbellFrontRaiseActivity, android.R.color.holo_green_light))
+                        }
+                        isLoweredPosition -> {
+                            binding.tvPositionStatus.text = "✅ LOWERED POSITION\nGood starting position"
+                            binding.tvPositionStatus.setTextColor(ContextCompat.getColor(this@DumbbellFrontRaiseActivity, android.R.color.holo_orange_light))
                         }
                         else -> {
-                            if (isOverRaised) {
-                                binding.tvPositionStatus.text = "Position: TOO HIGH ⚠️ - Lower to Shoulder Level"
-                                binding.tvPositionStatus.setTextColor(ContextCompat.getColor(this@DumbbellFrontRaiseActivity, android.R.color.holo_red_light))
-                            } else {
-                                binding.tvPositionStatus.text = "Position: Ready - Lower Arms First"
-                                binding.tvPositionStatus.setTextColor(ContextCompat.getColor(this@DumbbellFrontRaiseActivity, android.R.color.holo_orange_light))
-                            }
+                            binding.tvPositionStatus.text = "📍 GET READY\nLower both arms to start"
+                            binding.tvPositionStatus.setTextColor(ContextCompat.getColor(this@DumbbellFrontRaiseActivity, android.R.color.holo_orange_light))
                         }
                     }
 
