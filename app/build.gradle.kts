@@ -11,7 +11,7 @@ android {
     defaultConfig {
         applicationId = "com.example.physiqueaiapkfinal"
         minSdk = 28
-        targetSdk = 33
+        targetSdk = 34
         versionCode = 1
         versionName = "1.0"
 
@@ -74,6 +74,7 @@ android {
         buildConfig = true
     }
     
+<<<<<<< HEAD
     // Packaging options
     packaging {
         resources {
@@ -91,10 +92,12 @@ android {
         }
     }
     
+=======
+>>>>>>> 5511c1da00ed0814e5051b86e9cead76022c1b63
     sourceSets {
         getByName("main") {
             assets {
-                srcDirs("src\\main\\assets", "src\\main\\assets")
+                srcDirs("src/main/assets")
             }
         }
     }
@@ -102,11 +105,16 @@ android {
 
 dependencies {
     // Firebase (using BoM to manage versions)
+<<<<<<< HEAD
     implementation(platform("com.google.firebase:firebase-bom:32.7.0"))
+=======
+    implementation(platform("com.google.firebase:firebase-bom:33.12.0"))
+>>>>>>> 5511c1da00ed0814e5051b86e9cead76022c1b63
     implementation("com.google.firebase:firebase-auth")
     implementation("com.google.firebase:firebase-firestore")
     implementation("com.google.firebase:firebase-database-ktx")
     implementation("com.google.firebase:firebase-storage-ktx")
+<<<<<<< HEAD
     implementation("com.google.android.gms:play-services-auth:20.7.0")
     
     // Firebase Kotlin Extensions
@@ -125,11 +133,34 @@ dependencies {
 
     // CameraX
     val camerax_version = "1.3.1"
+=======
+    implementation("com.google.firebase:firebase-auth-ktx")
+    implementation("com.google.firebase:firebase-firestore-ktx")
+
+    // Google Play Services
+    implementation("com.google.android.gms:play-services-auth:21.3.0")
+
+    // AndroidX Core
+    implementation(libs.androidx.core)
+    implementation(libs.androidx.appcompat)
+    implementation(libs.material)
+    implementation(libs.androidx.constraintlayout)
+    implementation(libs.androidx.activity)
+
+    // UI Components
+    implementation("androidx.cardview:cardview:1.0.0")
+    implementation("androidx.recyclerview:recyclerview:1.4.0")
+    implementation("com.google.android.material:material:1.12.0")
+
+    // CameraX
+    val camerax_version = "1.4.2"
+>>>>>>> 5511c1da00ed0814e5051b86e9cead76022c1b63
     implementation("androidx.camera:camera-core:$camerax_version")
     implementation("androidx.camera:camera-camera2:$camerax_version")
     implementation("androidx.camera:camera-lifecycle:$camerax_version")
     implementation("androidx.camera:camera-view:$camerax_version")
 
+<<<<<<< HEAD
     // Lifecycle & Fragment
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.7.0")
     implementation("androidx.fragment:fragment-ktx:1.6.2")
@@ -160,6 +191,28 @@ dependencies {
 
     // Core
     implementation("androidx.core:core-ktx:1.12.0")
+=======
+    // Lifecycle & ViewModel
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.7")
+    implementation("androidx.fragment:fragment-ktx:1.8.6")
+
+    // Navigation
+    implementation(libs.androidx.navigation.fragment.ktx)
+    implementation(libs.androidx.navigation.ui.ktx)
+    implementation(libs.androidx.work.runtime.ktx)
+
+    // ML Kit
+    implementation("com.google.mlkit:pose-detection:18.0.0-beta5")
+    implementation("com.google.mlkit:pose-detection-accurate:18.0.0-beta5")
+    implementation("com.google.android.odml:image:1.0.0-beta1")
+
+    // Image Loading
+    implementation("com.github.bumptech.glide:glide:4.16.0")
+    annotationProcessor("com.github.bumptech.glide:compiler:4.16.0")
+
+    // Utilities
+    implementation("com.google.guava:guava:32.1.2-android")
+>>>>>>> 5511c1da00ed0814e5051b86e9cead76022c1b63
 
     // Testing
     testImplementation("junit:junit:4.13.2")
