@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="@dimen/spacing_md"
+    app:cardCornerRadius="@dimen/card_corner_radius_medium"
+    app:cardElevation="@dimen/card_elevation_low"
+    app:cardBackgroundColor="?attr/surfaceColor"
+    app:strokeColor="@color/theme_neutral_light"
+    app:strokeWidth="1dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:padding="@dimen/spacing_lg">
+
+        <!-- Activity Icon -->
+        <androidx.cardview.widget.CardView
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginEnd="@dimen/spacing_md"
+            app:cardCornerRadius="24dp"
+            app:cardElevation="2dp"
+            app:cardBackgroundColor="@color/theme_accent_light">
+
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_gravity="center"
+                android:src="@drawable/ic_training"
+                app:tint="@color/theme_accent" />
+        </androidx.cardview.widget.CardView>
+
+        <!-- Activity Details -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <!-- Activity Name -->
+            <TextView
+                android:id="@+id/tvActivityName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Running (6 mph)"
+                android:textSize="@dimen/text_body_large"
+                android:textStyle="bold"
+                android:textColor="?attr/textColorPrimary"
+                android:layout_marginBottom="@dimen/spacing_xs" />
+
+            <!-- Duration and Time -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+
+                <TextView
+                    android:id="@+id/tvDuration"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="30 min"
+                    android:textSize="@dimen/text_body_medium"
+                    android:textColor="?attr/textColorSecondary"
+                    android:drawableStart="@drawable/timer"
+                    android:drawablePadding="@dimen/spacing_xs"
+                    android:gravity="center_vertical" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text=" • "
+                    android:textSize="@dimen/text_body_medium"
+                    android:textColor="?attr/textColorSecondary" />
+
+                <TextView
+                    android:id="@+id/tvTime"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="14:30"
+                    android:textSize="@dimen/text_body_medium"
+                    android:textColor="?attr/textColorSecondary" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- Calories Burned -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="end"
+            android:layout_marginStart="@dimen/spacing_md">
+
+            <TextView
+                android:id="@+id/tvCalories"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="300 cal"
+                android:textSize="@dimen/text_body_large"
+                android:textStyle="bold"
+                android:textColor="@color/theme_accent"
+                android:drawableStart="@drawable/fire"
+                android:drawablePadding="@dimen/spacing_xs"
+                android:gravity="center_vertical" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="burned"
+                android:textSize="@dimen/text_body_small"
+                android:textColor="?attr/textColorSecondary"
+                android:layout_marginTop="@dimen/spacing_xs" />
+        </LinearLayout>
+    </LinearLayout>
+</androidx.cardview.widget.CardView> 

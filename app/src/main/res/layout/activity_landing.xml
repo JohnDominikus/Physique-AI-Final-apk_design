@@ -1,13 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
+<androidx.constraintlayout.widget.ConstraintLayout 
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/rootLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#FFFFFF"
-    android:padding="32dp"
+    android:background="@drawable/modern_landing_background"
     tools:context=".LandingActivity">
 
     <ScrollView
@@ -24,122 +23,243 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:gravity="center_horizontal"
-            android:paddingVertical="24dp"
-            android:paddingHorizontal="8dp">
+            android:paddingHorizontal="32dp"
+            android:paddingVertical="56dp">
 
-            <!-- Logo -->
-            <ImageView
-                android:id="@+id/imgLogo"
+            <!-- Logo Card Section -->
+            <androidx.cardview.widget.CardView
                 android:layout_width="180dp"
                 android:layout_height="180dp"
-                android:layout_marginBottom="16dp"
-                android:scaleType="centerInside"
-                android:background="#FFFFFF"
-                android:src="@drawable/physiqueailogo" />
+                android:layout_marginBottom="32dp"
+                app:cardCornerRadius="90dp"
+                app:cardElevation="24dp"
+                app:cardBackgroundColor="@color/absolute_white">
 
-            <!-- Welcome Message -->
+                <ImageView
+                    android:id="@+id/imgLogo"
+                    android:layout_width="130dp"
+                    android:layout_height="130dp"
+                    android:layout_gravity="center"
+                    android:src="@drawable/physiqueailogo"
+                    android:scaleType="centerInside" />
+
+            </androidx.cardview.widget.CardView>
+
+            <!-- Welcome Section -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Welcome to"
-                android:textColor="#000000"
-                android:textSize="20sp"
-                android:layout_marginBottom="4dp"
-                android:textStyle="normal"
-                android:letterSpacing="0.2" />
+                android:textColor="#E0FFFFFF"
+                android:textSize="18sp"
+                android:fontFamily="@font/poppins_medium"
+                android:layout_marginBottom="8dp" />
 
-            <!-- App Title -->
             <TextView
                 android:id="@+id/txtAppDescription"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="32dp"
-                android:text="Physique Ai"
-                android:textColor="#000000"
-                android:textSize="26sp"
+                android:text="PHYSIQUE AI"
+                android:textColor="@color/absolute_white"
+                android:textSize="36sp"
                 android:textStyle="bold"
-                android:letterSpacing="0.3" />
+                android:fontFamily="@font/poppins_bold"
+                android:letterSpacing="0.02"
+                android:layout_marginBottom="12dp" />
 
-            <!-- Sign In Button -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Your AI Fitness Companion"
+                android:textColor="#C0FFFFFF"
+                android:textSize="16sp"
+                android:fontFamily="@font/poppins_medium"
+                android:layout_marginBottom="48dp"
+                android:gravity="center" />
+
+            <!-- Action Buttons Section -->
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnSignIn"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
+                android:layout_height="64dp"
+                android:layout_marginBottom="20dp"
                 android:text="Sign In"
-                android:textColor="#FFFFFF"
+                android:textColor="@color/primary"
                 android:textSize="18sp"
-                android:elevation="4dp"
-                app:backgroundTint="#007BFF"
-                app:cornerRadius="50dp"
+                android:textStyle="bold"
+                android:fontFamily="@font/poppins_semibold"
+                android:letterSpacing="0.02"
+                app:backgroundTint="@color/absolute_white"
+                app:cornerRadius="32dp"
+                app:elevation="12dp"
+                app:strokeColor="@android:color/transparent"
+                app:strokeWidth="0dp"
+                app:icon="@drawable/person"
                 app:iconGravity="textStart"
-                app:iconPadding="16dp" />
+                app:iconPadding="12dp"
+                app:iconTint="@color/primary" />
 
-            <!-- Sign Up Button -->
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/txtSignUp"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="24dp"
-                android:text="Sign Up"
-                android:textColor="#FFFFFF"
+                android:layout_height="64dp"
+                android:layout_marginBottom="32dp"
+                android:text="Create Account"
+                android:textColor="@color/absolute_white"
                 android:textSize="18sp"
                 android:textStyle="bold"
-                android:elevation="4dp"
-                app:backgroundTint="#28A745"
-                app:cornerRadius="50dp"
+                android:fontFamily="@font/poppins_semibold"
+                android:letterSpacing="0.02"
+                app:backgroundTint="@color/transparent"
+                app:strokeColor="@color/absolute_white"
+                app:strokeWidth="3dp"
+                app:cornerRadius="32dp"
+                app:icon="@drawable/add"
                 app:iconGravity="textStart"
-                app:iconPadding="16dp" />
+                app:iconPadding="12dp"
+                app:iconTint="@color/absolute_white" />
 
-            <!-- Divider with Or -->
+            <!-- Divider Section -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="24dp"
+                android:layout_marginVertical="24dp"
                 android:gravity="center_vertical"
                 android:orientation="horizontal">
 
                 <View
                     android:layout_width="0dp"
-                    android:layout_height="1dp"
+                    android:layout_height="2dp"
                     android:layout_weight="1"
-                    android:background="#000000" />
+                    android:background="#60FFFFFF" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Or Sign in with Google"
-                    android:textColor="#000000"
+                    android:text="Or continue with"
+                    android:textColor="#B0FFFFFF"
                     android:textSize="14sp"
-                    android:paddingHorizontal="12dp"
-                    android:letterSpacing="0.2" />
+                    android:fontFamily="@font/poppins_medium"
+                    android:paddingHorizontal="20dp" />
 
                 <View
                     android:layout_width="0dp"
-                    android:layout_height="1dp"
+                    android:layout_height="2dp"
                     android:layout_weight="1"
-                    android:background="#000000" />
+                    android:background="#60FFFFFF" />
+
             </LinearLayout>
 
-            <!-- Google Sign-In Button -->
+            <!-- Google Sign In Button -->
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnGoogleSignIn"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="24dp"
-                android:text="Sign in with Google"
-                android:textColor="#000000"
-                android:textSize="16sp"
+                android:layout_height="64dp"
+                android:layout_marginBottom="32dp"
+                android:text="Continue with Google"
+                android:textColor="@color/text_primary_light"
+                android:textSize="18sp"
                 android:textStyle="bold"
-                android:elevation="4dp"
-                android:backgroundTint="#FFFFFF"
-                app:strokeColor="#C7C7C7"
-                app:strokeWidth="2dp"
-                app:cornerRadius="50dp"
+                android:fontFamily="@font/poppins_semibold"
+                android:letterSpacing="0.02"
+                app:backgroundTint="@color/absolute_white"
+                app:cornerRadius="32dp"
+                app:elevation="12dp"
                 app:icon="@drawable/google"
-                app:iconPadding="12dp"
                 app:iconGravity="textStart"
+                app:iconPadding="12dp"
                 app:iconTint="@null" />
+
+            <!-- Feature Preview Section -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center"
+                android:layout_marginTop="24dp">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:padding="12dp">
+
+                    <ImageView
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:src="@drawable/excercise"
+                        android:layout_marginBottom="8dp"
+                        app:tint="#C0FFFFFF" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="AI Workouts"
+                        android:textColor="#C0FFFFFF"
+                        android:textSize="12sp"
+                        android:fontFamily="@font/poppins_medium"
+                        android:gravity="center" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:padding="12dp">
+
+                    <ImageView
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:src="@drawable/dietary"
+                        android:layout_marginBottom="8dp"
+                        app:tint="#C0FFFFFF" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Nutrition"
+                        android:textColor="#C0FFFFFF"
+                        android:textSize="12sp"
+                        android:fontFamily="@font/poppins_medium"
+                        android:gravity="center" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:padding="12dp">
+
+                    <ImageView
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:src="@drawable/pose"
+                        android:layout_marginBottom="8dp"
+                        app:tint="#C0FFFFFF" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Pose AI"
+                        android:textColor="#C0FFFFFF"
+                        android:textSize="12sp"
+                        android:fontFamily="@font/poppins_medium"
+                        android:gravity="center" />
+
+                </LinearLayout>
+
+            </LinearLayout>
+
         </LinearLayout>
+
     </ScrollView>
-</androidx.constraintlayout.widget.ConstraintLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout> 

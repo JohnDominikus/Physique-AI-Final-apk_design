@@ -1,24 +1,89 @@
 <resources>
+    <!-- ============================================ -->
+    <!-- MODERN SPACING SYSTEM (4dp grid) -->
+    <!-- ============================================ -->
+    
+    <!-- Base spacing units -->
+    <dimen name="spacing_xs">4dp</dimen>        <!-- Extra small -->
+    <dimen name="spacing_sm">8dp</dimen>        <!-- Small -->
+    <dimen name="spacing_md">12dp</dimen>       <!-- Medium -->
+    <dimen name="spacing_lg">16dp</dimen>       <!-- Large -->
+    <dimen name="spacing_xl">20dp</dimen>       <!-- Extra large -->
+    <dimen name="spacing_xxl">24dp</dimen>      <!-- 2X large -->
+    <dimen name="spacing_xxxl">32dp</dimen>     <!-- 3X large -->
+    <dimen name="spacing_huge">48dp</dimen>     <!-- Huge -->
+
+    <!-- ============================================ -->
+    <!-- MODERN TYPOGRAPHY SCALE -->
+    <!-- ============================================ -->
+    
+    <!-- Headlines -->
+    <dimen name="text_display_large">57sp</dimen>     <!-- Display Large -->
+    <dimen name="text_display_medium">45sp</dimen>    <!-- Display Medium -->
+    <dimen name="text_display_small">36sp</dimen>     <!-- Display Small -->
+    
+    <!-- Headlines -->
+    <dimen name="text_headline_large">32sp</dimen>    <!-- Headline Large -->
+    <dimen name="text_headline_medium">28sp</dimen>   <!-- Headline Medium -->
+    <dimen name="text_headline_small">24sp</dimen>    <!-- Headline Small -->
+    
+    <!-- Titles -->
+    <dimen name="text_title_large">22sp</dimen>       <!-- Title Large -->
+    <dimen name="text_title_medium">16sp</dimen>      <!-- Title Medium -->
+    <dimen name="text_title_small">14sp</dimen>       <!-- Title Small -->
+    
+    <!-- Body text -->
+    <dimen name="text_body_large">16sp</dimen>        <!-- Body Large -->
+    <dimen name="text_body_medium">14sp</dimen>       <!-- Body Medium -->
+    <dimen name="text_body_small">12sp</dimen>        <!-- Body Small -->
+    
+    <!-- Labels -->
+    <dimen name="text_label_large">14sp</dimen>       <!-- Label Large -->
+    <dimen name="text_label_medium">12sp</dimen>      <!-- Label Medium -->
+    <dimen name="text_label_small">11sp</dimen>       <!-- Label Small -->
+
+    <!-- ============================================ -->
+    <!-- MODERN COMPONENT DIMENSIONS -->
+    <!-- ============================================ -->
+    
+    <!-- Buttons -->
+    <dimen name="button_height_large">56dp</dimen>    <!-- Large button -->
+    <dimen name="button_height_medium">48dp</dimen>   <!-- Medium button -->
+    <dimen name="button_height_small">40dp</dimen>    <!-- Small button -->
+    <dimen name="button_corner_radius">12dp</dimen>   <!-- Modern rounded corners -->
+    <dimen name="button_elevation">2dp</dimen>        <!-- Subtle elevation -->
+    <dimen name="button_icon_size">24dp</dimen>       <!-- Button icon size -->
+
+    <!-- Input fields -->
+    <dimen name="input_height">56dp</dimen>           <!-- Standard input height -->
+    <dimen name="input_corner_radius">16dp</dimen>    <!-- Rounded input fields -->
+    <dimen name="input_padding_horizontal">16dp</dimen>
+    <dimen name="input_padding_vertical">16dp</dimen>
+    
+    <!-- Cards -->
+    <dimen name="card_corner_radius_small">8dp</dimen>   <!-- Small cards -->
+    <dimen name="card_corner_radius_medium">12dp</dimen> <!-- Medium cards -->
+    <dimen name="card_corner_radius_large">16dp</dimen>  <!-- Large cards -->
+    <dimen name="card_elevation_low">2dp</dimen>         <!-- Subtle elevation -->
+    <dimen name="card_elevation_medium">4dp</dimen>      <!-- Medium elevation -->
+    <dimen name="card_elevation_high">8dp</dimen>        <!-- High elevation -->
+    <dimen name="card_padding">16dp</dimen>              <!-- Internal card padding -->
+
+    <!-- Icons -->
+    <dimen name="icon_size_small">16dp</dimen>        <!-- Small icons -->
+    <dimen name="icon_size_medium">24dp</dimen>       <!-- Medium icons -->
+    <dimen name="icon_size_large">32dp</dimen>        <!-- Large icons -->
+    <dimen name="icon_size_xlarge">48dp</dimen>       <!-- Extra large icons -->
+
+    <!-- Touch targets -->
+    <dimen name="touch_target_min">48dp</dimen>       <!-- Minimum touch target -->
+    
+    <!-- Screen margins -->
+    <dimen name="screen_margin_horizontal">20dp</dimen> <!-- Horizontal screen margins -->
+    <dimen name="screen_margin_vertical">16dp</dimen>   <!-- Vertical screen margins -->
+
+    <!-- ============================================ -->
+    <!-- LEGACY DIMENSIONS (Keep for compatibility) -->
+    <!-- ============================================ -->
     <dimen name="fab_margin">16dp</dimen>
-       <!-- Card Dimensions -->
-        <dimen name="card_corner_radius">8dp</dimen>
-        <dimen name="card_elevation">4dp</dimen>
-        <dimen name="card_margin">8dp</dimen>
-        <dimen name="card_padding">12dp</dimen>
-
-        <!-- Text Sizes -->
-        <dimen name="text_size_headline">20sp</dimen>
-        <dimen name="text_size_title">16sp</dimen>
-        <dimen name="text_size_body">14sp</dimen>
-        <dimen name="text_size_caption">12sp</dimen>
-
-        <!-- Spacing -->
-        <dimen name="spacing_large">16dp</dimen>
-        <dimen name="spacing_medium">8dp</dimen>
-        <dimen name="spacing_small">4dp</dimen>
-
-        <!-- Tab Layout -->
-        <dimen name="tab_indicator_height">4dp</dimen>
-        <dimen name="tab_padding">16dp</dimen>
-
 </resources>

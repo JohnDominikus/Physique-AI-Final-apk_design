@@ -1,157 +1,194 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
-    <color name="white">#FFFFFFFF</color>
-
-    <color name="colorPrimary">#27332A</color> <!-- Example color (purple) -->
-    <color name="teal_700">#018786</color>
-    <color name="primarydark">#2C3E50</color>
-    <color name="primary_light">#3498DB</color>
-    <color name="primary_blue">#2980B9</color>
-
-    <!-- Background Colors -->
-    <color name="background_light">#F5F7FA</color>
-
-
-    <!-- Text Colors -->
-
-    <color name="text_success">#27AE60</color>
-    <color name="text_error">#E74C3C</color>
-
-    <!-- Success Colors -->
-    <color name="success_primary">#27AE60</color>
-    <color name="success_light">#D5F4E6</color>
-
-    <!-- Accent Colors -->
-    <color name="accent_purple">#9B59B6</color>
-    <color name="accent_orange">#E67E22</color>
-
-    <!-- Water Colors -->
-    <color name="water_primary">#3498DB</color>
-    <color name="water_secondary">#2980B9</color>
-    <color name="water_light">#E8F4FD</color>
-
-    <!-- Neutral Colors -->
-
-    <!-- Button Colors -->
-    <color name="button_primary">#3498DB</color>
-    <color name="button_success">#27AE60</color>
-    <color name="button_accent">#9B59B6</color>
-    <color name="secondaryColor">#03DAC5</color>
-    <color name="primaryColor">#6200EE</color>
-    <color name="primary">#6200EE</color>
-    <color name="green_primary">#2E7D32</color> <!-- Dark green -->
-    <color name="green_secondary">#66BB6A</color> <!-- Light green -->
-    <color name="colorOutline">#A5D6A7</color> <!-- Outline color -->
-    <color name="black">#000000</color>
-    <color name="blue">#2196F3</color>
-    <color name="green">#4CAF50</color>
-    <color name="violet">#9C27B0</color>
-    <color name="ash_grey">#B0BEC5</color>
-    <color name="orange">#FF5722</color>
-    <color name="red">#FF1100</color>
-    <color name="purple">#4B0662</color>
-    <color name="lightGray">#F0F0F0</color>  <!-- Light Gray color -->
-
-    <!-- Normal button color -->
-        <color name="pressedGreen">#388E3C</color> <!-- Darker green for pressed state -->
-        <color name="hoverGreen">#66BB6A</color>   <!-- Lighter green for hover/focused state -->
-
-
-        <color name="green_pressed">#388E3C</color>
-        <color name="green_focused">#66BB6A</color>
-
-
-    <color name="colorHint">#A0A0A0</color> <!-- Change this to your desired hint color -->
-    <color name="backgroundColor">#FFFFFF</color>
-    <color name="textColor">#000000</color>
-    <color name="hintColor">#888888</color>
-    <color name="buttonColor">#3F51B5</color>
-
-
-
-
-    <!-- Background and Surface Colors -->
-    <color name="colorBackground">#FFFFFF</color> <!-- White -->
-    <color name="colorSurface">#FFFFFF</color> <!-- White -->
-
+    <!-- ============================================ -->
+    <!-- PROFESSIONAL PREMIUM GYM COLOR SYSTEM -->
+    <!-- ============================================ -->
+    
+    <!-- Primary Brand Colors (Premium Red Palette) -->
+    <color name="primary">#D32F2F</color>
+    <color name="primary_variant">#B71C1C</color>
+    <color name="secondary">#D32F2F</color>
+    <color name="accent">#FF5252</color>
+    
+    <!-- Professional Red Shades -->
+    <color name="fitness_crimson_red">#D32F2F</color>
+    <color name="fitness_dark_red">#B71C1C</color>
+    <color name="fitness_bright_red">#FF5252</color>
+    <color name="fitness_light_red">#FFCDD2</color>
+    <color name="fitness_deep_red">#B71C1C</color>
+    <color name="fitness_coral_red">#FF8A80</color>
+    
+    <!-- Modern Surface Colors (Light Theme) -->
+    <color name="surface_light">#FFFFFF</color>
+    <color name="background_light">#FFFFFF</color>
+    <color name="background_secondary">#FFFFFF</color>
+    <color name="card_light">#FFFFFF</color>
+    <color name="card_elevated">#FFFFFF</color>
+    <color name="card_secondary">#FFFFFF</color>
+    
+    <!-- Professional Text Colors (High Contrast) -->
+    <color name="text_primary_light">#000000</color>
+    <color name="text_secondary_light">#D32F2F</color>
+    <color name="text_tertiary_light">#757575</color>
+    <color name="text_hint_light">#BDBDBD</color>
+    <color name="text_on_primary_light">#FFFFFF</color>
+    
+    <!-- Dark Theme Colors -->
+    <color name="surface_dark">#FFFFFF</color>
+    <color name="background_dark">#FFFFFF</color>
+    <color name="card_dark">#FFFFFF</color>
+    <color name="text_primary_dark">#000000</color>
+    <color name="text_secondary_dark">#D32F2F</color>
+    <color name="text_tertiary_dark">#757575</color>
+    <color name="text_on_primary_dark">#FFFFFF</color>
+    
+    <!-- Professional Component Colors -->
+    <color name="divider_light">#E0E0E0</color>
+    <color name="divider_dark">#BDBDBD</color>
+    <color name="border_light">#E0E0E0</color>
+    <color name="border_focus">#D32F2F</color>
+    
+    <!-- Modern Button Colors -->
+    <color name="button_primary">#D32F2F</color>
+    <color name="button_primary_hover">#B71C1C</color>
+    <color name="button_primary_pressed">#B71C1C</color>
+    <color name="button_primary_dark">#B71C1C</color>
+    <color name="button_secondary">#FFFFFF</color>
+    <color name="button_secondary_hover">#F5F5F5</color>
+    <color name="button_outline">#D32F2F</color>
+    <color name="button_surface_dark">#FFFFFF</color>
+    
+    <!-- Status Colors (Professional) -->
+    <color name="success">#388E3C</color>
+    <color name="success_light">#E8F5E9</color>
+    <color name="warning">#FFA000</color>
+    <color name="warning_light">#FFF8E1</color>
+    <color name="error">#D32F2F</color>
+    <color name="error_light">#FFCDD2</color>
+    <color name="info">#1976D2</color>
+    <color name="info_light">#E3F2FD</color>
+    
+    <!-- Workout Category Colors (Professional) -->
+    <color name="workout_strength">#D32F2F</color>
+    <color name="workout_cardio">#FF5252</color>
+    <color name="workout_flexibility">#388E3C</color>
+    <color name="workout_endurance">#1976D2</color>
+    
+    <!-- Premium Gray Scale -->
+    <color name="gray_50">#F7FAFC</color>
+    <color name="gray_100">#EDF2F7</color>
+    <color name="gray_200">#E2E8F0</color>
+    <color name="gray_300">#CBD5E0</color>
+    <color name="gray_400">#A0AEC0</color>
+    <color name="gray_500">#718096</color>
+    <color name="gray_600">#4A5568</color>
+    <color name="gray_700">#2D3748</color>
+    <color name="gray_800">#1A202C</color>
+    <color name="gray_900">#171923</color>
+    
+    <!-- Utility Colors -->
+    <color name="absolute_white">#FFFFFF</color>
+    <color name="absolute_black">#000000</color>
+    <color name="transparent">#00000000</color>
+    <color name="overlay_light">#0A000000</color>
+    <color name="overlay_medium">#1A000000</color>
+    <color name="overlay_dark">#4D000000</color>
+    
+    <!-- Navigation Colors -->
+    <color name="nav_selected">#D32F2F</color>
+    <color name="nav_unselected">#757575</color>
+    <color name="nav_unselected_dark">#BDBDBD</color>
+    <color name="nav_background">#FFFFFF</color>
+    <color name="nav_item_icon_color">#757575</color>
+    <color name="nav_item_text_color">#757575</color>
+    
+    <!-- Input Colors -->
+    <color name="input_background_light">#FFFFFF</color>
+    <color name="input_border_light">#E0E0E0</color>
+    <color name="input_border_focus">#D32F2F</color>
+    <color name="input_background_dark">#FFFFFF</color>
+    <color name="input_border_dark">#BDBDBD</color>
+    
     <!-- Chip Colors -->
-
-
-    <!-- Text Colors -->
-    <color name="textColorPrimary">#212121</color> <!-- Primary text color -->
-    <color name="textColorSecondary">#757575</color> <!-- Secondary text color -->
-
-
-    <color name="light_gray">#F1F1F1</color>
-
-    <color name="dark_gray">#666666</color>
-
-
-    <color name="colorAccent">#03DAC5</color>
-    <color name="card_background">#FAFAFA</color>
-
-    <color name="Male">#3F51B5</color> <!-- Example color -->
-    <color name="Female">#E91E63</color>
-
-    <color name="chip_background_color">#FF6200EE</color> <!-- Purple color example -->
-
-
-    <color name="chip_stroke_color">#BDBDBD</color> <!-- Light gray stroke color -->
-
-    <!-- Background color for the chip when not selected -->
-
-
-    <!-- Selected background color for the chip -->
-    <color name="chip_selected_background_color">#E0E0E0</color>
-
-    <!-- Primary and Secondary Colors -->
-
-    <color name="colorPrimaryVariant">#3700B3</color>
-    <color name="colorSecondary">#03DAC5</color>
-
-    <!-- Chip Background and Stroke -->
-
-    <color name="colorChipStroke">#0097A7</color> <!-- Dark blue stroke -->
-    <color name="colorChipBackground">#E0F7FA</color>
-    <color name="nav_item_active_color">#009688</color> <!-- Teal color for active items -->
-    <color name="nav_item_inactive_color">#B0B0B0</color> <!-- Light grey for inactive icons -->
-
-    <!-- Icon color when inactive -->
-    <color name="nav_item_icon_color">#B0B0B0</color> <!-- Light grey color for inactive icons -->
-
-    <!-- Icon color when active -->
-    <color name="nav_item_selected_icon">#009688</color> <!-- Teal color for active icons -->
-
-    <!-- Text color for inactive items -->
-    <color name="nav_item_text_color">#B0B0B0</color> <!-- Light grey text for inactive items -->
-
-    <!-- Text color for active items -->
-    <color name="nav_item_selected_text">#FFFFFF</color> <!-- White text for active items -->
-
-    <color name="background_green">#E6F4EA</color> <!-- light green -->
-    <color name="boy_blue">#4A90E2</color>
-    <color name="girl_pink">#FF69B4</color>
-
-
-    <color name="primaryText">#1C1F2A</color>
-    <color name="buttonGreenStart">#66BB6A</color>
-    <color name="buttonGreenEnd">#43A047</color>
-
-
-    <color name="alwaysBlack">#000000</color>
-<color name="alwaysWhite">#FFFFFF</color>
-<color name="cardBg">#F5F5F5</color>
-
-<color name="primaryDark">#1565C0</color>
-<color name="accent">#FF4081</color>
-
-    <color name="blue_700">#1976D2</color>        <!-- Save icon tint, accent -->
-    <color name="gray_600">#757575</color>
-    <color name="divider">#E0E0E0</color>
-    <color name="edittext_bg">#F5F5F5</color>
-    <color name="text_primary">#222222</color>    <!-- Main text (dark gray) -->
-    <color name="text_secondary">#444444</color>  <!-- Secondary text -->
-    <color name="text_hint">#888888</color>
-    <color name="background">#FFFFFF</color>
+    <color name="chip_background_light">#FFFFFF</color>
+    <color name="chip_background_selected">#FFCDD2</color>
+    <color name="chip_border_light">#E0E0E0</color>
+    <color name="chip_text_light">#000000</color>
+    <color name="chip_text_selected">#D32F2F</color>
+    
+    <!-- Professional Gradients -->
+    <color name="gradient_red_start">#D32F2F</color>
+    <color name="gradient_red_middle">#FF5252</color>
+    <color name="gradient_red_end">#FF8A80</color>
+    <color name="gradient_surface_start">#FFFFFF</color>
+    <color name="gradient_surface_end">#FFFFFF</color>
+    
+    <!-- Legacy Support Colors -->
+    <color name="colorPrimary">#D32F2F</color>
+    <color name="colorPrimaryVariant">#B71C1C</color>
+    <color name="colorSecondary">#D32F2F</color>
+    <color name="colorAccent">#FF5252</color>
+    <color name="primaryColor">#D32F2F</color>
+    <color name="secondaryColor">#D32F2F</color>
+    <color name="textColorSecondary">#D32F2F</color>
+    
+    <!-- Material Design Legacy -->
+    <color name="teal_200">#80CBC4</color>
+    <color name="teal_700">#00796B</color>
+    <color name="black">#000000</color>
+    <color name="white">#FFFFFF</color>
+    <color name="purple_200">#FFBB86FC</color>
+    <color name="purple_500">#FF6200EE</color>
+    <color name="purple_700">#FF3700B3</color>
+    
+    <!-- Additional Professional Colors -->
+    <color name="green">#38A169</color>
+    <color name="blue">#3182CE</color>
+    <color name="red">#E53E3E</color>
+    <color name="orange">#DD6B20</color>
+    <color name="green_pressed">#2F855A</color>
+    <color name="green_focused">#38A169</color>
+    <color name="lightGray">#F7FAFC</color>
+    <color name="ash_grey">#718096</color>
+    <color name="Male">#3182CE</color>
+    <color name="Female">#E53E3E</color>
+    <color name="boy_blue">#3182CE</color>
+    <color name="girl_pink">#ED64A6</color>
+    <color name="cardBg">#FFFFFF</color>
+    
+    <!-- Theme Specific Professional Colors -->
+    <color name="theme_primary">#FF9800</color>
+    <color name="theme_primary_light">#FED7D7</color>
+    <color name="theme_primary_dark">#FF9800</color>
+    <color name="theme_secondary">#3F51B5</color>
+    <color name="theme_secondary_light">#FFE5E5</color>
+    <color name="theme_secondary_dark">#3F51B5</color>
+    <color name="theme_accent">#FF8A80</color>
+    <color name="theme_accent_light">#FFEBEE</color>
+    <color name="theme_neutral">#718096</color>
+    <color name="theme_neutral_light">#F7FAFC</color>
+    <color name="theme_neutral_dark">#2D3748</color>
+    <color name="theme_surface">#FFFFFF</color>
+    <color name="theme_surface_variant">#F8FAFC</color>
+    <color name="theme_success">#38A169</color>
+    <color name="theme_warning">#D69E2E</color>
+    <color name="warning_dark">#B7791F</color>
+    <color name="theme_error">#E53E3E</color>
+    <color name="theme_info">#3182CE</color>
+    
+    <!-- Meal Category Colors -->
+    <color name="meal_breakfast">#D69E2E</color>
+    <color name="meal_lunch">#38A169</color>
+    <color name="meal_dinner">#E53E3E</color>
+    <color name="meal_snack">#9F7AEA</color>
+    
+    <!-- Status Colors -->
+    <color name="status_completed">#38A169</color>
+    <color name="status_in_progress">#D69E2E</color>
+    <color name="status_pending">#718096</color>
+    <color name="status_missed">#E53E3E</color>
+    
+    <!-- Professional Aliases -->
+    <color name="chip_stroke_color">#E2E8F0</color>
+    <color name="chip_background_color">#F7FAFC</color>
 </resources>

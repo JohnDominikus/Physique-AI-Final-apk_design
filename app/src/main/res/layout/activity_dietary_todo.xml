@@ -1,0 +1,319 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background_light"
+    android:fillViewport="true"
+    tools:context=".DietaryTodoActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="@dimen/spacing_lg">
+
+        <!-- Header -->
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/spacing_lg"
+            app:cardCornerRadius="@dimen/card_corner_radius_large"
+            app:cardElevation="@dimen/card_elevation_medium"
+            app:cardBackgroundColor="@color/theme_secondary">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:padding="@dimen/spacing_xl">
+
+                <ImageView
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:src="@drawable/dietary"
+                    android:layout_marginBottom="@dimen/spacing_sm"
+                    app:tint="@android:color/white" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Meal Planner"
+                    android:textSize="@dimen/text_title_large"
+                    android:textStyle="bold"
+                    android:textColor="@android:color/white" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Smart meal planning with allergy protection"
+                    android:textSize="@dimen/text_body_medium"
+                    android:textColor="@android:color/white"
+                    android:alpha="0.8"
+                    android:gravity="center"
+                    android:layout_marginTop="@dimen/spacing_xs" />
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+        <!-- Loading Progress Bar -->
+        <androidx.cardview.widget.CardView
+            android:id="@+id/cardLoading"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/spacing_lg"
+            android:visibility="visible"
+            app:cardCornerRadius="@dimen/card_corner_radius_medium"
+            app:cardElevation="@dimen/card_elevation_low"
+            app:cardBackgroundColor="@color/surface_light">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="@dimen/spacing_lg"
+                android:gravity="center">
+
+                <ProgressBar
+                    android:id="@+id/progressBar"
+                    style="?android:attr/progressBarStyleHorizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="@dimen/spacing_sm"
+                    android:progress="0"
+                    android:max="100"
+                    android:progressTint="@color/theme_secondary"
+                    android:progressBackgroundTint="@color/theme_secondary_light" />
+
+                <TextView
+                    android:id="@+id/tvLoadingText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Loading meal data..."
+                    android:textSize="@dimen/text_body_small"
+                    android:textColor="@color/text_secondary_light"
+                    android:gravity="center" />
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+        <!-- Allergy Warning Card -->
+        <androidx.cardview.widget.CardView
+            android:id="@+id/cardAllergyWarning"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/spacing_lg"
+            android:visibility="gone"
+            app:cardCornerRadius="@dimen/card_corner_radius_medium"
+            app:cardElevation="@dimen/card_elevation_low"
+            app:cardBackgroundColor="@color/warning_light"
+            app:strokeColor="@color/warning"
+            app:strokeWidth="2dp">
+
+            <TextView
+                android:id="@+id/tvAllergyWarning"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="@dimen/spacing_lg"
+                android:textSize="@dimen/text_body_medium"
+                android:textColor="@color/warning_dark"
+                android:lineSpacingExtra="4dp" />
+        </androidx.cardview.widget.CardView>
+
+        <!-- Add Meal Form -->
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/spacing_lg"
+            app:cardCornerRadius="@dimen/card_corner_radius_large"
+            app:cardElevation="@dimen/card_elevation_medium"
+            app:cardBackgroundColor="@color/surface_light"
+            app:strokeColor="@color/theme_secondary_light"
+            app:strokeWidth="1dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="@dimen/spacing_xl">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Add New Meal"
+                    android:textSize="@dimen/text_title_medium"
+                    android:textStyle="bold"
+                    android:textColor="@color/text_primary_light"
+                    android:layout_marginBottom="@dimen/spacing_lg" />
+
+                <!-- Meal Search Bar -->
+                <EditText
+                    android:id="@+id/etMealSearch"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Search meal..."
+                    android:inputType="text"
+                    android:layout_marginBottom="8dp" />
+
+                <!-- Meal Selection -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Select Meal:"
+                    android:textSize="@dimen/text_body_medium"
+                    android:textStyle="bold"
+                    android:textColor="@color/text_primary_light"
+                    android:layout_marginBottom="@dimen/spacing_sm" />
+
+                <Spinner
+                    android:id="@+id/spinnerMeal"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:layout_marginBottom="@dimen/spacing_lg"
+                    android:background="@drawable/rounded_spinner" />
+
+                <!-- Meal Type Selection -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Meal Type:"
+                    android:textSize="@dimen/text_body_medium"
+                    android:textStyle="bold"
+                    android:textColor="@color/text_primary_light"
+                    android:layout_marginBottom="@dimen/spacing_sm" />
+
+                <Spinner
+                    android:id="@+id/spinnerMealType"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:layout_marginBottom="@dimen/spacing_lg"
+                    android:background="@drawable/rounded_spinner" />
+
+                <!-- Date and Time Selection -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="@dimen/spacing_xl">
+
+                    <!-- Date Selection -->
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:layout_marginEnd="@dimen/spacing_sm">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Date:"
+                            android:textSize="@dimen/text_body_medium"
+                            android:textStyle="bold"
+                            android:textColor="@color/text_primary_light"
+                            android:layout_marginBottom="@dimen/spacing_sm" />
+
+                        <Button
+                            android:id="@+id/btnSelectDate"
+                            android:layout_width="match_parent"
+                            android:layout_height="@dimen/button_height_medium"
+                            android:text="Select Date"
+                            android:textSize="@dimen/text_body_small"
+                            android:textColor="@color/theme_secondary"
+                            android:backgroundTint="@android:color/transparent"
+                            app:strokeColor="@color/theme_secondary"
+                            app:strokeWidth="2dp"
+                            app:cornerRadius="12dp"
+                            app:icon="@drawable/ic_calendar"
+                            app:iconTint="@color/theme_secondary"
+                            app:iconGravity="textStart"
+                            app:iconPadding="@dimen/spacing_xs" />
+                    </LinearLayout>
+
+                    <!-- Time Selection -->
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:layout_marginStart="@dimen/spacing_sm">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Time:"
+                            android:textSize="@dimen/text_body_medium"
+                            android:textStyle="bold"
+                            android:textColor="@color/text_primary_light"
+                            android:layout_marginBottom="@dimen/spacing_sm" />
+
+                        <Button
+                            android:id="@+id/btnSelectTime"
+                            android:layout_width="match_parent"
+                            android:layout_height="@dimen/button_height_medium"
+                            android:text="Select Time"
+                            android:textSize="@dimen/text_body_small"
+                            android:textColor="@color/theme_secondary"
+                            android:backgroundTint="@android:color/transparent"
+                            app:strokeColor="@color/theme_secondary"
+                            app:strokeWidth="2dp"
+                            app:cornerRadius="12dp"
+                            app:icon="@drawable/timer"
+                            app:iconTint="@color/theme_secondary"
+                            app:iconGravity="textStart"
+                            app:iconPadding="@dimen/spacing_xs" />
+                    </LinearLayout>
+                </LinearLayout>
+
+                <!-- Add Button -->
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnAddMeal"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/button_height_large"
+                    android:text="Add to Meal Plan"
+                    android:textSize="@dimen/text_body_large"
+                    android:textStyle="bold"
+                    android:backgroundTint="@color/theme_secondary"
+                    app:elevation="6dp"
+                    app:cornerRadius="16dp"
+                    app:icon="@drawable/add"
+                    app:iconGravity="textStart"
+                    app:iconPadding="@dimen/spacing_sm" />
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+        <!-- Meal Todo List -->
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:cardCornerRadius="@dimen/card_corner_radius_large"
+            app:cardElevation="@dimen/card_elevation_medium"
+            app:cardBackgroundColor="@color/surface_light"
+            app:strokeColor="@color/theme_accent_light"
+            app:strokeWidth="1dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="@dimen/spacing_xl">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Today's Meal Plan"
+                    android:textSize="@dimen/text_title_medium"
+                    android:textStyle="bold"
+                    android:textColor="@color/text_primary_light"
+                    android:layout_marginBottom="@dimen/spacing_lg" />
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/recyclerMealTodos"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:nestedScrollingEnabled="false"
+                    tools:listitem="@layout/item_meal_todo" />
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+    </LinearLayout>
+</ScrollView> 

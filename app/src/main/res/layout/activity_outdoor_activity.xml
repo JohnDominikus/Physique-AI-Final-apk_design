@@ -1,0 +1,287 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background_light"
+    android:fillViewport="true"
+    tools:context=".OutdoorActivityActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="@dimen/spacing_lg">
+
+        <!-- Header -->
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/spacing_lg"
+            app:cardCornerRadius="@dimen/card_corner_radius_large"
+            app:cardElevation="@dimen/card_elevation_medium"
+            app:cardBackgroundColor="@color/theme_accent">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:padding="@dimen/spacing_xl">
+
+                <ImageView
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:src="@drawable/ic_training"
+                    android:layout_marginBottom="@dimen/spacing_sm"
+                    app:tint="@android:color/white" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Outdoor Activity Tracker"
+                    android:textSize="@dimen/text_title_large"
+                    android:textStyle="bold"
+                    android:textColor="@android:color/white" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Track calories burned from outdoor activities"
+                    android:textSize="@dimen/text_body_medium"
+                    android:textColor="@android:color/white"
+                    android:alpha="0.8"
+                    android:gravity="center"
+                    android:layout_marginTop="@dimen/spacing_xs" />
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+        <!-- Activity Logger -->
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/spacing_lg"
+            app:cardCornerRadius="@dimen/card_corner_radius_large"
+            app:cardElevation="@dimen/card_elevation_medium"
+            app:cardBackgroundColor="@color/surface_light"
+            app:strokeColor="@color/theme_accent_light"
+            app:strokeWidth="1dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="@dimen/spacing_xl">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Log New Activity"
+                    android:textSize="@dimen/text_title_medium"
+                    android:textStyle="bold"
+                    android:textColor="?attr/textColorPrimary"
+                    android:layout_marginBottom="@dimen/spacing_lg" />
+
+                <!-- Activity Selection -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Select Activity:"
+                    android:textSize="@dimen/text_body_medium"
+                    android:textStyle="bold"
+                    android:textColor="?attr/textColorPrimary"
+                    android:layout_marginBottom="@dimen/spacing_sm" />
+
+                <Spinner
+                    android:id="@+id/spinnerActivity"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:layout_marginBottom="@dimen/spacing_lg"
+                    android:background="@drawable/rounded_spinner" />
+
+                <!-- Duration Input -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Duration (minutes):"
+                    android:textSize="@dimen/text_body_medium"
+                    android:textStyle="bold"
+                    android:textColor="?attr/textColorPrimary"
+                    android:layout_marginBottom="@dimen/spacing_sm" />
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="@dimen/spacing_lg"
+                    app:boxBackgroundMode="outline"
+                    app:boxCornerRadiusTopStart="12dp"
+                    app:boxCornerRadiusTopEnd="12dp"
+                    app:boxCornerRadiusBottomStart="12dp"
+                    app:boxCornerRadiusBottomEnd="12dp"
+                    app:boxStrokeColor="@color/theme_accent"
+                    app:hintTextColor="@color/theme_accent">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/etDuration"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="Enter duration in minutes"
+                        android:inputType="number"
+                        android:textSize="@dimen/text_body_medium"
+                        android:textColor="?attr/textColorPrimary" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <!-- Calories Estimate -->
+                <androidx.cardview.widget.CardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="@dimen/spacing_lg"
+                    app:cardCornerRadius="@dimen/card_corner_radius_medium"
+                    app:cardElevation="@dimen/card_elevation_low"
+                    app:cardBackgroundColor="@color/theme_accent_light"
+                    app:strokeColor="@color/theme_accent"
+                    app:strokeWidth="1dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:padding="@dimen/spacing_lg">
+
+                        <ImageView
+                            android:layout_width="32dp"
+                            android:layout_height="32dp"
+                            android:src="@drawable/fire"
+                            android:layout_marginEnd="@dimen/spacing_md"
+                            app:tint="@color/theme_accent" />
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Estimated Calories Burned:"
+                                android:textSize="@dimen/text_body_medium"
+                                android:textColor="?attr/textColorSecondary" />
+
+                            <TextView
+                                android:id="@+id/tvCaloriesEstimate"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="0 calories"
+                                android:textSize="@dimen/text_title_medium"
+                                android:textStyle="bold"
+                                android:textColor="@color/theme_accent" />
+                        </LinearLayout>
+                    </LinearLayout>
+                </androidx.cardview.widget.CardView>
+
+                <!-- Log Activity Button -->
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnLogActivity"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/button_height_large"
+                    android:text="Log Activity"
+                    android:textSize="@dimen/text_body_large"
+                    android:textStyle="bold"
+                    android:backgroundTint="@color/theme_accent"
+                    app:elevation="6dp"
+                    app:cornerRadius="16dp"
+                    app:icon="@drawable/add"
+                    app:iconGravity="textStart"
+                    app:iconPadding="@dimen/spacing_sm" />
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+        <!-- Today's Activity Logs -->
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:cardCornerRadius="@dimen/card_corner_radius_large"
+            app:cardElevation="@dimen/card_elevation_medium"
+            app:cardBackgroundColor="@color/surface_light"
+            app:strokeColor="@color/theme_primary_light"
+            app:strokeWidth="1dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="@dimen/spacing_xl">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="@dimen/spacing_lg">
+
+                    <ImageView
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:src="@drawable/timer"
+                        android:layout_marginEnd="@dimen/spacing_sm"
+                        app:tint="@color/theme_primary" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Today's Activities"
+                        android:textSize="@dimen/text_title_medium"
+                        android:textStyle="bold"
+                        android:textColor="?attr/textColorPrimary" />
+                </LinearLayout>
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/recyclerActivityLogs"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:nestedScrollingEnabled="false"
+                    tools:listitem="@layout/item_activity_log" />
+
+                <!-- Empty State -->
+                <LinearLayout
+                    android:id="@+id/layoutEmptyState"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:padding="@dimen/spacing_xl"
+                    android:visibility="gone"
+                    tools:visibility="visible">
+
+                    <ImageView
+                        android:layout_width="64dp"
+                        android:layout_height="64dp"
+                        android:src="@drawable/ic_training"
+                        android:alpha="0.3"
+                        android:layout_marginBottom="@dimen/spacing_md"
+                        app:tint="@color/theme_neutral" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="No activities logged today"
+                        android:textSize="@dimen/text_body_medium"
+                        android:textColor="?attr/textColorSecondary"
+                        android:gravity="center" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Start logging your outdoor activities!"
+                        android:textSize="@dimen/text_body_small"
+                        android:textColor="?attr/textColorSecondary"
+                        android:gravity="center"
+                        android:layout_marginTop="@dimen/spacing_xs" />
+                </LinearLayout>
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+    </LinearLayout>
+</ScrollView> 

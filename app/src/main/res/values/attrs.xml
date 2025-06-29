@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- ============================================ -->
+    <!-- CUSTOM THEME ATTRIBUTES -->
+    <!-- ============================================ -->
+    
+    <!-- Text color attributes -->
+    <attr name="textColorPrimary" format="color" />
+    <attr name="textColorSecondary" format="color" />
+    <attr name="textColorTertiary" format="color" />
+    <attr name="textColorOnPrimary" format="color" />
+    
+    <!-- Surface color attributes -->
+    <attr name="surfaceColor" format="color" />
+    <attr name="surfaceColorVariant" format="color" />
+    <attr name="backgroundColor" format="color" />
+    <attr name="cardColor" format="color" />
+    <attr name="dividerColor" format="color" />
+    
+    <!-- Button color attributes -->
+    <attr name="buttonPrimaryColor" format="color" />
+    <attr name="buttonSurfaceColor" format="color" />
+    
+    <!-- Input field color attributes -->
+    <attr name="inputBackgroundColor" format="color" />
+    <attr name="inputBorderColor" format="color" />
+    
+    <!-- Navigation color attributes -->
+    <attr name="navSelectedColor" format="color" />
+    <attr name="navUnselectedColor" format="color" />
+</resources> 

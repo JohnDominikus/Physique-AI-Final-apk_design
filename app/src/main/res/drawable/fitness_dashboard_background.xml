@@ -1,0 +1,58 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    
+    <!-- Professional Dashboard Base -->
+    <item>
+        <shape android:shape="rectangle">
+            <gradient
+                android:angle="180"
+                android:startColor="#F8FAFC"
+                android:centerColor="#FFFFFF"
+                android:endColor="#F1F5F9"
+                android:type="linear" />
+        </shape>
+    </item>
+    
+    <!-- Modern Dashboard Pattern -->
+    <item android:top="0dp" android:left="0dp">
+        <shape android:shape="oval">
+            <gradient
+                android:angle="315"
+                android:startColor="#05E53E3E"
+                android:centerColor="#03E53E3E"
+                android:endColor="#00E53E3E"
+                android:type="radial"
+                android:gradientRadius="700dp" />
+        </shape>
+    </item>
+    
+    <!-- Professional Clean Accent -->
+    <item android:bottom="0dp" android:right="0dp">
+        <shape android:shape="oval">
+            <gradient
+                android:angle="135"
+                android:startColor="#04FF6B6B"
+                android:centerColor="#02FF6B6B"
+                android:endColor="#00FF6B6B"
+                android:type="radial"
+                android:gradientRadius="550dp" />
+        </shape>
+    </item>
+    
+    <!-- Subtle Modern Texture -->
+    <item android:top="100dp" android:left="200dp">
+        <shape android:shape="oval">
+            <solid android:color="#02000000" />
+            <size android:width="300dp" android:height="300dp" />
+        </shape>
+    </item>
+    
+    <!-- Clean Light Enhancement -->
+    <item android:bottom="150dp" android:right="150dp">
+        <shape android:shape="oval">
+            <solid android:color="#02FFFFFF" />
+            <size android:width="250dp" android:height="250dp" />
+        </shape>
+    </item>
+    
+</layer-list>

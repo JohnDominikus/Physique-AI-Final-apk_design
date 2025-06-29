@@ -1,9 +1,367 @@
-<resources>
-    <!-- Base application theme. -->
-    <style name="Base.Theme.Physiqueaiapkfinal" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Customize your light theme here. -->
-        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+
+    <!-- ============================================ -->
+    <!-- PROFESSIONAL PREMIUM FITNESS THEME SYSTEM -->
+    <!-- ============================================ -->
+
+    <!-- Main Application Theme - Professional Light -->
+    <style name="Theme.Physiqueaiapkfinal" parent="Theme.Material3.DayNight.NoActionBar">
+        <!-- ========== PRIMARY BRAND COLORS ========== -->
+        <item name="colorPrimary">@color/primary</item>
+        <item name="colorPrimaryVariant">@color/primary_variant</item>
+        <item name="colorSecondary">@color/secondary</item>
+        <item name="colorAccent">@color/accent</item>
+        
+        <!-- ========== SURFACE COLORS ========== -->
+        <item name="colorSurface">@color/surface_light</item>
+        <item name="android:colorBackground">@color/background_light</item>
+        <item name="colorSurfaceVariant">@color/background_secondary</item>
+        
+        <!-- ========== TEXT COLORS (High Contrast) ========== -->
+        <item name="colorOnPrimary">@color/text_on_primary_light</item>
+        <item name="colorOnSecondary">@color/text_on_primary_light</item>
+        <item name="colorOnSurface">@color/text_primary_light</item>
+        <item name="colorOnBackground">@color/text_primary_light</item>
+        <item name="android:textColorPrimary">@color/text_primary_light</item>
+        <item name="android:textColorSecondary">@color/text_secondary_light</item>
+        <item name="android:textColorTertiary">@color/text_tertiary_light</item>
+        <item name="android:textColorHint">@color/text_hint_light</item>
+        
+        <!-- ========== COMPONENT STYLING ========== -->
+        <item name="colorControlNormal">@color/border_light</item>
+        <item name="colorControlActivated">@color/border_focus</item>
+        <item name="colorControlHighlight">@color/accent</item>
+        
+        <!-- ========== STATUS BAR & NAVIGATION ========== -->
+        <item name="android:statusBarColor">@color/surface_light</item>
+        <item name="android:navigationBarColor">@color/surface_light</item>
+        <item name="android:windowLightStatusBar">true</item>
+        <item name="android:windowLightNavigationBar">true</item>
+        
+        <!-- ========== WINDOW STYLING ========== -->
+        <item name="android:windowBackground">@color/background_light</item>
+        <item name="android:windowActionBar">false</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowContentTransitions">true</item>
+        <item name="android:windowAllowEnterTransitionOverlap">true</item>
+        <item name="android:windowAllowReturnTransitionOverlap">true</item>
+        <item name="android:windowSharedElementEnterTransition">@android:transition/move</item>
+        <item name="android:windowSharedElementExitTransition">@android:transition/move</item>
+        
+        <!-- ========== MATERIAL DESIGN 3 COMPONENTS ========== -->
+        <item name="materialButtonStyle">@style/Widget.App.Button</item>
+        <item name="materialCardViewStyle">@style/Widget.App.CardView</item>
+        <item name="textInputStyle">@style/Widget.App.TextInputLayout</item>
+        <item name="chipStyle">@style/Widget.App.Chip</item>
+        <item name="bottomNavigationStyle">@style/Widget.App.BottomNavigation</item>
+        
+        <!-- ========== TOOLBAR STYLING ========== -->
+        <item name="toolbarStyle">@style/Widget.App.Toolbar</item>
+        <item name="actionBarStyle">@style/Widget.App.ActionBar</item>
+        
+        <!-- ========== TYPOGRAPHY SYSTEM ========== -->
+        <item name="textAppearanceHeadline1">@style/TextAppearance.App.Headline1</item>
+        <item name="textAppearanceHeadline2">@style/TextAppearance.App.Headline2</item>
+        <item name="textAppearanceHeadline3">@style/TextAppearance.App.Headline3</item>
+        <item name="textAppearanceHeadline4">@style/TextAppearance.App.Headline4</item>
+        <item name="textAppearanceHeadline5">@style/TextAppearance.App.Headline5</item>
+        <item name="textAppearanceHeadline6">@style/TextAppearance.App.Headline6</item>
+        <item name="textAppearanceSubtitle1">@style/TextAppearance.App.Subtitle1</item>
+        <item name="textAppearanceSubtitle2">@style/TextAppearance.App.Subtitle2</item>
+        <item name="textAppearanceBody1">@style/TextAppearance.App.Body1</item>
+        <item name="textAppearanceBody2">@style/TextAppearance.App.Body2</item>
+        <item name="textAppearanceCaption">@style/TextAppearance.App.Caption</item>
+        <item name="textAppearanceButton">@style/TextAppearance.App.Button</item>
+        
+        <!-- ========== PROGRESS & LOADING ========== -->
+        <item name="android:progressBarStyle">@style/Widget.App.ProgressBar</item>
+        <item name="android:progressBarStyleHorizontal">@style/Widget.App.ProgressBar.Horizontal</item>
+        
+        <!-- ========== DIALOG STYLING ========== -->
+        <item name="materialAlertDialogTheme">@style/ThemeOverlay.App.MaterialAlertDialog</item>
+        <item name="alertDialogTheme">@style/ThemeOverlay.App.MaterialAlertDialog</item>
+        
+        <!-- ========== FAB STYLING ========== -->
+        <item name="floatingActionButtonStyle">@style/Widget.App.FloatingActionButton</item>
+        
+        <!-- ========== RIPPLE EFFECTS ========== -->
+        <item name="android:colorControlHighlight">@color/overlay_light</item>
+        <item name="rippleColor">@color/overlay_medium</item>
     </style>
 
-    <style name="Theme.Physiqueaiapkfinal" parent="Base.Theme.Physiqueaiapkfinal" />
+    <!-- ============================================ -->
+    <!-- PROFESSIONAL DARK THEME -->
+    <!-- ============================================ -->
+    
+    <style name="Theme.Physiqueaiapkfinal.Dark" parent="Theme.Material3.DayNight.NoActionBar">
+        <!-- ========== PRIMARY BRAND COLORS ========== -->
+        <item name="colorPrimary">@color/primary</item>
+        <item name="colorPrimaryVariant">@color/primary_variant</item>
+        <item name="colorSecondary">@color/secondary</item>
+        <item name="colorAccent">@color/accent</item>
+        
+        <!-- ========== SURFACE COLORS ========== -->
+        <item name="colorSurface">@color/surface_dark</item>
+        <item name="android:colorBackground">@color/background_dark</item>
+        <item name="colorSurfaceVariant">@color/card_dark</item>
+        
+        <!-- ========== TEXT COLORS ========== -->
+        <item name="colorOnPrimary">@color/text_on_primary_dark</item>
+        <item name="colorOnSecondary">@color/text_on_primary_dark</item>
+        <item name="colorOnSurface">@color/text_primary_dark</item>
+        <item name="colorOnBackground">@color/text_primary_dark</item>
+        <item name="android:textColorPrimary">@color/text_primary_dark</item>
+        <item name="android:textColorSecondary">@color/text_secondary_dark</item>
+        <item name="android:textColorTertiary">@color/text_tertiary_dark</item>
+        
+        <!-- ========== STATUS BAR & NAVIGATION ========== -->
+        <item name="android:statusBarColor">@color/surface_dark</item>
+        <item name="android:navigationBarColor">@color/surface_dark</item>
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:windowLightNavigationBar">false</item>
+        
+        <!-- ========== WINDOW STYLING ========== -->
+        <item name="android:windowBackground">@color/background_dark</item>
+    </style>
+
+    <!-- ============================================ -->
+    <!-- SPLASH SCREEN THEME -->
+    <!-- ============================================ -->
+    
+    <style name="Theme.Physiqueaiapkfinal.Splash" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="android:windowBackground">@drawable/modern_splash_background</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:windowLightNavigationBar">false</item>
+        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
+    </style>
+
+    <!-- ============================================ -->
+    <!-- PROFESSIONAL COMPONENT STYLES -->
+    <!-- ============================================ -->
+
+    <!-- Modern Button Styles -->
+    <style name="Widget.App.Button" parent="Widget.Material3.Button">
+        <item name="android:textAppearance">@style/TextAppearance.App.Button</item>
+        <item name="android:fontFamily">@font/poppins_semibold</item>
+        <item name="android:letterSpacing">0.02</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:minHeight">56dp</item>
+        <item name="android:paddingStart">24dp</item>
+        <item name="android:paddingEnd">24dp</item>
+        <item name="cornerRadius">16dp</item>
+        <item name="android:elevation">2dp</item>
+        <item name="android:stateListAnimator">@null</item>
+        <item name="rippleColor">@color/overlay_light</item>
+    </style>
+
+    <style name="Widget.App.Button.Primary" parent="Widget.App.Button">
+        <item name="backgroundTint">@color/button_primary</item>
+        <item name="android:textColor">@color/absolute_white</item>
+        <item name="rippleColor">@color/overlay_light</item>
+    </style>
+
+    <style name="Widget.App.Button.Secondary" parent="Widget.App.Button">
+        <item name="backgroundTint">@color/button_secondary</item>
+        <item name="android:textColor">@color/text_primary_light</item>
+        <item name="strokeWidth">2dp</item>
+        <item name="strokeColor">@color/button_outline</item>
+    </style>
+
+    <!-- Modern Card Styles -->
+    <style name="Widget.App.CardView" parent="Widget.Material3.CardView.Elevated">
+        <item name="cardCornerRadius">16dp</item>
+        <item name="cardElevation">4dp</item>
+        <item name="cardBackgroundColor">@color/card_light</item>
+        <item name="contentPadding">20dp</item>
+        <item name="android:layout_margin">8dp</item>
+        <item name="rippleColor">@color/overlay_light</item>
+        <item name="android:foreground">?android:attr/selectableItemBackground</item>
+    </style>
+
+    <!-- Modern Text Input Styles -->
+    <style name="Widget.App.TextInputLayout" parent="Widget.Material3.TextInputLayout.OutlinedBox">
+        <item name="android:textAppearance">@style/TextAppearance.App.Body1</item>
+        <item name="android:fontFamily">@font/poppins_medium</item>
+        <item name="boxCornerRadiusBottomEnd">12dp</item>
+        <item name="boxCornerRadiusBottomStart">12dp</item>
+        <item name="boxCornerRadiusTopEnd">12dp</item>
+        <item name="boxCornerRadiusTopStart">12dp</item>
+        <item name="boxStrokeWidth">2dp</item>
+        <item name="boxStrokeColor">@color/input_border_light</item>
+        <item name="hintTextColor">@color/text_hint_light</item>
+        <item name="android:textColorHint">@color/text_hint_light</item>
+        <item name="android:layout_marginBottom">16dp</item>
+    </style>
+
+    <!-- Modern Chip Styles -->
+    <style name="Widget.App.Chip" parent="Widget.Material3.Chip.Filter">
+        <item name="android:fontFamily">@font/poppins_medium</item>
+        <item name="android:textColor">@color/chip_text_light</item>
+        <item name="chipBackgroundColor">@color/chip_background_light</item>
+        <item name="chipStrokeColor">@color/chip_border_light</item>
+        <item name="chipStrokeWidth">1dp</item>
+        <item name="chipCornerRadius">20dp</item>
+        <item name="android:layout_margin">4dp</item>
+        <item name="chipMinHeight">40dp</item>
+        <item name="android:paddingStart">16dp</item>
+        <item name="android:paddingEnd">16dp</item>
+    </style>
+
+    <!-- Modern Toolbar Styles -->
+    <style name="Widget.App.Toolbar" parent="Widget.Material3.Toolbar">
+        <item name="android:background">@color/surface_light</item>
+        <item name="android:elevation">4dp</item>
+        <item name="titleTextAppearance">@style/TextAppearance.App.Headline6</item>
+        <item name="android:theme">@style/ThemeOverlay.MaterialComponents.Light</item>
+        <item name="popupTheme">@style/ThemeOverlay.MaterialComponents.Light</item>
+    </style>
+
+    <!-- Modern ActionBar Styles -->
+    <style name="Widget.App.ActionBar" parent="Widget.Material3.ActionBar.Solid">
+        <item name="android:background">@color/surface_light</item>
+        <item name="elevation">4dp</item>
+        <item name="titleTextStyle">@style/TextAppearance.App.Headline6</item>
+    </style>
+
+    <!-- Modern Bottom Navigation -->
+    <style name="Widget.App.BottomNavigation" parent="Widget.Material3.BottomNavigationView">
+        <item name="android:background">@color/nav_background</item>
+        <item name="itemIconTint">@color/nav_unselected</item>
+        <item name="itemTextColor">@color/nav_unselected</item>
+        <item name="itemActiveIndicatorStyle">@style/Widget.App.BottomNavigation.ActiveIndicator</item>
+        <item name="android:elevation">8dp</item>
+        <item name="labelVisibilityMode">labeled</item>
+    </style>
+
+    <style name="Widget.App.BottomNavigation.ActiveIndicator" parent="Widget.Material3.BottomNavigationView.ActiveIndicator">
+        <item name="android:color">@color/nav_selected</item>
+    </style>
+
+    <!-- Modern Progress Bar -->
+    <style name="Widget.App.ProgressBar" parent="Widget.Material3.CircularProgressIndicator">
+        <item name="indicatorColor">@color/primary</item>
+        <item name="trackColor">@color/gray_200</item>
+        <item name="indicatorSize">40dp</item>
+        <item name="trackThickness">4dp</item>
+    </style>
+
+    <style name="Widget.App.ProgressBar.Horizontal" parent="Widget.Material3.LinearProgressIndicator">
+        <item name="indicatorColor">@color/primary</item>
+        <item name="trackColor">@color/gray_200</item>
+        <item name="trackThickness">8dp</item>
+        <item name="trackCornerRadius">4dp</item>
+    </style>
+
+    <!-- Modern FAB -->
+    <style name="Widget.App.FloatingActionButton" parent="Widget.Material3.FloatingActionButton.Primary">
+        <item name="backgroundTint">@color/primary</item>
+        <item name="tint">@color/absolute_white</item>
+        <item name="elevation">6dp</item>
+        <item name="android:layout_margin">16dp</item>
+    </style>
+
+    <!-- Modern Dialog -->
+    <style name="ThemeOverlay.App.MaterialAlertDialog" parent="ThemeOverlay.Material3.MaterialAlertDialog">
+        <item name="colorSurface">@color/card_light</item>
+        <item name="colorOnSurface">@color/text_primary_light</item>
+        <item name="android:backgroundDimAmount">0.6</item>
+        <item name="materialAlertDialogTitleTextStyle">@style/TextAppearance.App.Headline6</item>
+        <item name="materialAlertDialogBodyTextStyle">@style/TextAppearance.App.Body1</item>
+    </style>
+
+    <!-- ============================================ -->
+    <!-- PROFESSIONAL TYPOGRAPHY SYSTEM -->
+    <!-- ============================================ -->
+
+    <style name="TextAppearance.App.Headline1" parent="TextAppearance.Material3.HeadlineLarge">
+        <item name="android:fontFamily">@font/poppins_bold</item>
+        <item name="android:textSize">32sp</item>
+        <item name="android:textColor">@color/text_primary_light</item>
+        <item name="android:letterSpacing">-0.02</item>
+        <item name="android:lineSpacingExtra">4dp</item>
+    </style>
+
+    <style name="TextAppearance.App.Headline2" parent="TextAppearance.Material3.HeadlineMedium">
+        <item name="android:fontFamily">@font/poppins_bold</item>
+        <item name="android:textSize">28sp</item>
+        <item name="android:textColor">@color/text_primary_light</item>
+        <item name="android:letterSpacing">-0.01</item>
+        <item name="android:lineSpacingExtra">2dp</item>
+    </style>
+
+    <style name="TextAppearance.App.Headline3" parent="TextAppearance.Material3.HeadlineSmall">
+        <item name="android:fontFamily">@font/poppins_semibold</item>
+        <item name="android:textSize">24sp</item>
+        <item name="android:textColor">@color/text_primary_light</item>
+        <item name="android:letterSpacing">0</item>
+    </style>
+
+    <style name="TextAppearance.App.Headline4" parent="TextAppearance.Material3.TitleLarge">
+        <item name="android:fontFamily">@font/poppins_semibold</item>
+        <item name="android:textSize">20sp</item>
+        <item name="android:textColor">@color/text_primary_light</item>
+        <item name="android:letterSpacing">0.01</item>
+    </style>
+
+    <style name="TextAppearance.App.Headline5" parent="TextAppearance.Material3.TitleMedium">
+        <item name="android:fontFamily">@font/poppins_semibold</item>
+        <item name="android:textSize">18sp</item>
+        <item name="android:textColor">@color/text_primary_light</item>
+        <item name="android:letterSpacing">0.01</item>
+    </style>
+
+    <style name="TextAppearance.App.Headline6" parent="TextAppearance.Material3.TitleSmall">
+        <item name="android:fontFamily">@font/poppins_semibold</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:textColor">@color/text_primary_light</item>
+        <item name="android:letterSpacing">0.02</item>
+    </style>
+
+    <style name="TextAppearance.App.Subtitle1" parent="TextAppearance.Material3.BodyLarge">
+        <item name="android:fontFamily">@font/poppins_medium</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:textColor">@color/text_secondary_light</item>
+        <item name="android:letterSpacing">0.01</item>
+    </style>
+
+    <style name="TextAppearance.App.Subtitle2" parent="TextAppearance.Material3.BodyMedium">
+        <item name="android:fontFamily">@font/poppins_medium</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:textColor">@color/text_secondary_light</item>
+        <item name="android:letterSpacing">0.02</item>
+    </style>
+
+    <style name="TextAppearance.App.Body1" parent="TextAppearance.Material3.BodyLarge">
+        <item name="android:fontFamily">@font/poppins_medium</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:textColor">@color/text_primary_light</item>
+        <item name="android:letterSpacing">0.01</item>
+        <item name="android:lineSpacingExtra">2dp</item>
+    </style>
+
+    <style name="TextAppearance.App.Body2" parent="TextAppearance.Material3.BodyMedium">
+        <item name="android:fontFamily">@font/poppins_medium</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:textColor">@color/text_secondary_light</item>
+        <item name="android:letterSpacing">0.02</item>
+        <item name="android:lineSpacingExtra">1dp</item>
+    </style>
+
+    <style name="TextAppearance.App.Caption" parent="TextAppearance.Material3.BodySmall">
+        <item name="android:fontFamily">@font/poppins_medium</item>
+        <item name="android:textSize">12sp</item>
+        <item name="android:textColor">@color/text_tertiary_light</item>
+        <item name="android:letterSpacing">0.03</item>
+    </style>
+
+    <style name="TextAppearance.App.Button" parent="TextAppearance.Material3.LabelLarge">
+        <item name="android:fontFamily">@font/poppins_semibold</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:letterSpacing">0.02</item>
+        <item name="android:textAllCaps">false</item>
+    </style>
+
 </resources>

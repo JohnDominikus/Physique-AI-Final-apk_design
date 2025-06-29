@@ -47,21 +47,8 @@ class LoginActivity : AppCompatActivity() {
         val etEmail = findViewById<EditText>(R.id.etEmail)
         val etPassword = findViewById<EditText>(R.id.etPassword)
         val btnLogin = findViewById<Button>(R.id.btnLogin)
-        val passwordToggle = findViewById<ImageView>(R.id.passwordToggle)
 
-        // Toggle password visibility
-        passwordToggle.setOnClickListener {
-            isPasswordVisible = !isPasswordVisible
-            etPassword.inputType = if (isPasswordVisible) {
-                InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD
-            } else {
-                InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
-            }
-            etPassword.setSelection(etPassword.text.length)
-            passwordToggle.setImageResource(
-                if (isPasswordVisible) R.drawable.ic_eye else R.drawable.ic_eye_open
-            )
-        }
+        // Password visibility toggle is automatically handled by Material TextInputLayout
 
         // Handle login button click
         btnLogin.setOnClickListener {

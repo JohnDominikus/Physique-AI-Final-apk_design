@@ -1,0 +1,88 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    
+    <!-- Pressed State -->
+    <item android:state_pressed="true">
+        <layer-list>
+            <item>
+                <shape android:shape="rectangle">
+                    <gradient
+                        android:angle="90"
+                        android:startColor="@color/button_primary_pressed"
+                        android:endColor="@color/button_primary_hover"
+                        android:type="linear" />
+                    <corners android:radius="16dp" />
+                </shape>
+            </item>
+            <!-- Pressed Overlay -->
+            <item>
+                <shape android:shape="rectangle">
+                    <solid android:color="@color/overlay_medium" />
+                    <corners android:radius="16dp" />
+                </shape>
+            </item>
+        </layer-list>
+    </item>
+    
+    <!-- Focused State -->
+    <item android:state_focused="true">
+        <layer-list>
+            <item>
+                <shape android:shape="rectangle">
+                    <gradient
+                        android:angle="90"
+                        android:startColor="@color/button_primary"
+                        android:endColor="@color/button_primary_hover"
+                        android:type="linear" />
+                    <corners android:radius="16dp" />
+                </shape>
+            </item>
+            <!-- Focus Ring -->
+            <item>
+                <shape android:shape="rectangle">
+                    <stroke 
+                        android:width="2dp" 
+                        android:color="@color/absolute_white" />
+                    <corners android:radius="16dp" />
+                </shape>
+            </item>
+        </layer-list>
+    </item>
+    
+    <!-- Disabled State -->
+    <item android:state_enabled="false">
+        <shape android:shape="rectangle">
+            <solid android:color="@color/gray_300" />
+            <corners android:radius="16dp" />
+        </shape>
+    </item>
+    
+    <!-- Default State -->
+    <item>
+        <layer-list>
+            <item>
+                <shape android:shape="rectangle">
+                    <gradient
+                        android:angle="90"
+                        android:startColor="@color/button_primary"
+                        android:centerColor="@color/fitness_bright_red"
+                        android:endColor="@color/button_primary_hover"
+                        android:type="linear" />
+                    <corners android:radius="16dp" />
+                </shape>
+            </item>
+            <!-- Professional Highlight -->
+            <item android:top="1dp">
+                <shape android:shape="rectangle">
+                    <gradient
+                        android:angle="90"
+                        android:startColor="@color/overlay_light"
+                        android:endColor="@color/transparent"
+                        android:type="linear" />
+                    <corners android:radius="16dp" />
+                </shape>
+            </item>
+        </layer-list>
+    </item>
+    
+</selector>

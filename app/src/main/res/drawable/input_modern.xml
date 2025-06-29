@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    
+    <!-- Focused State -->
+    <item android:state_focused="true">
+        <layer-list>
+            <item>
+                <shape android:shape="rectangle">
+                    <solid android:color="@color/input_background_light" />
+                    <corners android:radius="12dp" />
+                    <stroke 
+                        android:width="2dp" 
+                        android:color="@color/input_border_focus" />
+                </shape>
+            </item>
+            <!-- Professional Focus Glow -->
+            <item>
+                <shape android:shape="rectangle">
+                    <gradient
+                        android:angle="90"
+                        android:startColor="@color/overlay_light"
+                        android:centerColor="@color/transparent"
+                        android:endColor="@color/transparent"
+                        android:type="linear" />
+                    <corners android:radius="12dp" />
+                </shape>
+            </item>
+        </layer-list>
+    </item>
+    
+    <!-- Error State -->
+    <item android:state_enabled="false">
+        <shape android:shape="rectangle">
+            <solid android:color="@color/gray_100" />
+            <corners android:radius="12dp" />
+            <stroke 
+                android:width="1dp" 
+                android:color="@color/gray_300" />
+        </shape>
+    </item>
+    
+    <!-- Default State -->
+    <item>
+        <layer-list>
+            <item>
+                <shape android:shape="rectangle">
+                    <solid android:color="@color/input_background_light" />
+                    <corners android:radius="12dp" />
+                    <stroke 
+                        android:width="1dp" 
+                        android:color="@color/input_border_light" />
+                </shape>
+            </item>
+            <!-- Professional Subtle Highlight -->
+            <item android:top="1dp">
+                <shape android:shape="rectangle">
+                    <gradient
+                        android:angle="90"
+                        android:startColor="@color/overlay_light"
+                        android:centerColor="@color/transparent"
+                        android:endColor="@color/transparent"
+                        android:type="linear" />
+                    <corners android:radius="12dp" />
+                </shape>
+            </item>
+        </layer-list>
+    </item>
+    
+</selector> 

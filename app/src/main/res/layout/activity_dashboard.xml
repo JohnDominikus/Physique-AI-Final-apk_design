@@ -1,295 +1,813 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
+<LinearLayout 
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white"
-    tools:context=".DashboardActivity">
+    android:orientation="vertical"
+    android:background="@color/background_light">
 
-    <androidx.core.widget.NestedScrollView
-        android:id="@+id/scrollView"
-        android:layout_width="0dp"
+    <!-- Header with Dropdown -->
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="80dp"
+            android:background="@drawable/fitness_dashboard_background"
+            android:gravity="center_vertical"
+            android:paddingHorizontal="20dp">
+            
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Physique AI Dashboard"
+                android:textColor="@color/text_primary_light"
+                android:textSize="24sp"
+                android:fontFamily="@font/poppins_bold" />
+        </LinearLayout>
+        
+        <!-- Profile Button -->
+        <ImageView
+            android:id="@+id/btnProfileMenu"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:layout_marginEnd="20dp"
+            android:src="@drawable/person"
+            android:background="@drawable/circle_background"
+            android:padding="8dp"
+            android:clickable="true"
+            android:focusable="true"
+            app:tint="@color/absolute_white"
+            android:contentDescription="Profile menu" />
+        
+        <!-- Dropdown Menu -->
+        <androidx.cardview.widget.CardView
+            android:id="@+id/dropdownMenu"
+            android:layout_width="220dp"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/btnProfileMenu"
+            android:layout_alignEnd="@id/btnProfileMenu"
+            android:layout_marginTop="12dp"
+            android:layout_marginEnd="8dp"
+            android:visibility="gone"
+            app:cardCornerRadius="20dp"
+            app:cardElevation="16dp"
+            app:cardBackgroundColor="@color/surface_light"
+            app:strokeColor="@color/theme_neutral_light"
+            app:strokeWidth="1dp">
+            
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="12dp">
+                
+                <!-- About App -->
+                <LinearLayout
+                    android:id="@+id/menuAbout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:padding="16dp"
+                    android:background="@drawable/menu_item_background"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:layout_marginBottom="4dp">
+                    
+                    <ImageView
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:src="@drawable/ic_info"
+                        android:layout_marginEnd="16dp"
+                        app:tint="@color/theme_primary" />
+                    
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="About App"
+                        android:textSize="16sp"
+                        android:textColor="@color/text_primary_light"
+                        android:fontFamily="@font/poppins_medium" />
+                        
+                    <ImageView
+                        android:layout_width="16dp"
+                        android:layout_height="16dp"
+                        android:src="@drawable/ic_arrow_forward"
+                        app:tint="@color/text_secondary_light" />
+                </LinearLayout>
+                
+                <!-- Settings -->
+                <LinearLayout
+                    android:id="@+id/menuSettings"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:padding="16dp"
+                    android:background="@drawable/menu_item_background"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:layout_marginBottom="4dp">
+                    
+                    <ImageView
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:src="@drawable/settings"
+                        android:layout_marginEnd="16dp"
+                        app:tint="@color/theme_primary" />
+                    
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Profile Settings"
+                        android:textSize="16sp"
+                        android:textColor="@color/text_primary_light"
+                        android:fontFamily="@font/poppins_medium" />
+                        
+                    <ImageView
+                        android:layout_width="16dp"
+                        android:layout_height="16dp"
+                        android:src="@drawable/ic_arrow_forward"
+                        app:tint="@color/text_secondary_light" />
+                </LinearLayout>
+                
+                <!-- Divider -->
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@color/divider_light"
+                    android:layout_marginHorizontal="8dp"
+                    android:layout_marginVertical="8dp" />
+                
+                <!-- Logout -->
+                <LinearLayout
+                    android:id="@+id/menuLogout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:padding="16dp"
+                    android:background="@drawable/menu_item_background"
+                    android:clickable="true"
+                    android:focusable="true">
+                    
+                    <ImageView
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:src="@drawable/logout"
+                        android:layout_marginEnd="16dp"
+                        app:tint="@color/theme_error" />
+                    
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Logout"
+                        android:textSize="16sp"
+                        android:textColor="@color/theme_error"
+                        android:fontFamily="@font/poppins_medium" />
+                        
+                    <ImageView
+                        android:layout_width="16dp"
+                        android:layout_height="16dp"
+                        android:src="@drawable/ic_arrow_forward"
+                        app:tint="@color/theme_error" />
+                </LinearLayout>
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+    </RelativeLayout>
+        
+    <ScrollView
+        android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:fillViewport="true"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/bottom_navigation"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
-
+        android:layout_weight="1"
+        android:fillViewport="true">
+        
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:padding="16dp">
+            
+            <!-- Welcome Card with User's Full Name -->
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="24dp"
+                app:cardCornerRadius="24dp"
+                app:cardElevation="8dp"
+                app:cardBackgroundColor="@color/surface_light">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:padding="24dp">
+                    <ImageView
+                        android:id="@+id/ivProfileImage"
+                        android:layout_width="80dp"
+                        android:layout_height="80dp"
+                        android:src="@drawable/profile"
+                        android:scaleType="centerCrop"
+                        android:background="@drawable/circle_background"
+                        android:elevation="8dp"
+                        android:contentDescription="Profile image"
+                        android:layout_marginEnd="20dp"
+                        android:padding="4dp" />
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+                        <TextView
+                            android:id="@+id/tvWelcome"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Welcome back!"
+                            android:textSize="28sp"
+                            android:textStyle="bold"
+                            android:textColor="@color/text_primary_light"
+                            android:fontFamily="@font/poppins_bold" />
+                        <TextView
+                            android:id="@+id/tvFullName"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="John Doe"
+                            android:textSize="22sp"
+                            android:textStyle="bold"
+                            android:textColor="@color/text_primary_light"
+                            android:fontFamily="@font/poppins_semibold"
+                            android:layout_marginBottom="4dp" />
+                        <TextView
+                            android:id="@+id/tvEmail"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="user@email.com"
+                            android:textSize="16sp"
+                            android:textColor="@color/text_primary_light"
+                            android:alpha="0.9"
+                            android:layout_marginBottom="8dp" />
+                        <TextView
+                            android:id="@+id/tvMotivation"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Keep pushing your limits! "
+                            android:textSize="14sp"
+                            android:textColor="@color/text_secondary_light"
+                            android:alpha="0.8" />
+                    </LinearLayout>
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
 
-            <!-- Dashboard Title -->
+            <!-- Progress Stats Cards Row -->
             <TextView
-                android:id="@+id/tvDashboardTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Dashboard"
-                android:textSize="24sp"
-                android:textColor="@android:color/black"
+                android:text="Your Progress"
+                android:textSize="20sp"
                 android:textStyle="bold"
+                android:textColor="@color/text_primary_light"
+                android:fontFamily="@font/poppins_semibold"
                 android:layout_marginBottom="16dp" />
-
-            <!-- Profile Section -->
+                
             <LinearLayout
-                android:id="@+id/llProfile"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:layout_marginBottom="16dp">
-
-                <ImageView
-                    android:id="@+id/ivProfile"
-                    android:layout_width="70dp"
-                    android:layout_height="70dp"
-                    android:src="@drawable/profile"
-                    android:contentDescription="@string/profile_image_description"
-                    android:background="@drawable/circle_background"
-                    android:layout_marginEnd="12dp" />
-
-                <LinearLayout
+                android:layout_marginBottom="24dp">
+                
+                <!-- BMI Card -->
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/cardBMI"
                     android:layout_width="0dp"
-                    android:layout_height="wrap_content"
+                    android:layout_height="120dp"
                     android:layout_weight="1"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:id="@+id/tvUserName"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="John Doe"
-                        android:textSize="20sp"
-                        android:textColor="@android:color/black"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:id="@+id/tvBmiStatus"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="BMI: 24.0"
-                        android:textSize="14sp"
-                        android:textColor="@android:color/darker_gray"
-                        android:layout_marginTop="4dp" />
-
+                    android:layout_marginEnd="8dp"
+                    app:cardCornerRadius="20dp"
+                    app:cardElevation="6dp"
+                    app:cardBackgroundColor="@color/theme_primary"
+                    android:foreground="?android:attr/selectableItemBackground"
+                    android:clickable="true">
+                    
                     <LinearLayout
-                        android:id="@+id/llPhysicalLevel"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:layout_marginTop="4dp">
-
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:orientation="vertical"
+                        android:gravity="center"
+                        android:padding="16dp">
+                        
                         <ImageView
-                            android:id="@+id/ivStar"
-                            android:layout_width="18dp"
-                            android:layout_height="18dp"
-                            android:src="@drawable/star"
-                            android:visibility="gone" />
-
-                        <ImageView
-                            android:id="@+id/ivVerified"
-                            android:layout_width="18dp"
-                            android:layout_height="18dp"
-                            android:src="@drawable/verified"
-                            android:visibility="gone" />
-
-                        <ImageView
-                            android:id="@+id/ivMuscles"
-                            android:layout_width="18dp"
-                            android:layout_height="18dp"
-                            android:src="@drawable/verified"
-                            android:visibility="gone" />
-
+                            android:layout_width="28dp"
+                            android:layout_height="28dp"
+                            android:src="@drawable/bmi"
+                            app:tint="@color/absolute_white"
+                            android:layout_marginBottom="8dp" />
+                            
                         <TextView
-                            android:id="@+id/tvPhysicalLevel"
+                            android:id="@+id/tvBMIValue"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Level: Beginner"
+                            android:text="22.5"
+                            android:textColor="@color/absolute_white"
+                            android:textSize="20sp"
+                            android:textStyle="bold"
+                            android:fontFamily="@font/poppins_bold" />
+                            
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="BMI"
+                            android:textColor="@color/absolute_white"
                             android:textSize="14sp"
-                            android:textColor="@color/green"
-                            android:layout_marginStart="8dp" />
+                            android:alpha="0.9" />
+                    </LinearLayout>
+                </androidx.cardview.widget.CardView>
+                
+                <!-- Workouts Card -->
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/cardWorkouts"
+                    android:layout_width="0dp"
+                    android:layout_height="120dp"
+                    android:layout_weight="1"
+                    android:layout_marginHorizontal="4dp"
+                    app:cardCornerRadius="20dp"
+                    app:cardElevation="6dp"
+                    app:cardBackgroundColor="@color/theme_secondary"
+                    android:foreground="?android:attr/selectableItemBackground"
+                    android:clickable="true">
+                    
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:orientation="vertical"
+                        android:gravity="center"
+                        android:padding="16dp">
+                        
+                        <ImageView
+                            android:layout_width="28dp"
+                            android:layout_height="28dp"
+                            android:src="@drawable/excercise"
+                            app:tint="@color/absolute_white"
+                            android:layout_marginBottom="8dp" />
+                            
+                        <TextView
+                            android:id="@+id/tvWorkoutCount"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="5"
+                            android:textColor="@color/absolute_white"
+                            android:textSize="20sp"
+                            android:textStyle="bold"
+                            android:fontFamily="@font/poppins_bold" />
+                            
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="This Week"
+                            android:textColor="@color/absolute_white"
+                            android:textSize="14sp"
+                            android:alpha="0.9" />
+                    </LinearLayout>
+                </androidx.cardview.widget.CardView>
+                
+                <!-- Calories Card -->
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/cardCalories"
+                    android:layout_width="0dp"
+                    android:layout_height="120dp"
+                    android:layout_weight="1"
+                    android:layout_marginStart="8dp"
+                    app:cardCornerRadius="20dp"
+                    app:cardElevation="6dp"
+                    app:cardBackgroundColor="@color/theme_primary"
+                    android:foreground="?android:attr/selectableItemBackground"
+                    android:clickable="true">
+                    
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:orientation="vertical"
+                        android:gravity="center"
+                        android:padding="16dp">
+                        
+                        <ImageView
+                            android:layout_width="28dp"
+                            android:layout_height="28dp"
+                            android:src="@drawable/fire"
+                            app:tint="@color/absolute_white"
+                            android:layout_marginBottom="8dp" />
+                            
+                        <TextView
+                            android:id="@+id/tvCaloriesBurned"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="1,250"
+                            android:textColor="@color/absolute_white"
+                            android:textSize="20sp"
+                            android:textStyle="bold"
+                            android:fontFamily="@font/poppins_bold" />
+                            
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Calories"
+                            android:textColor="@color/absolute_white"
+                            android:textSize="14sp"
+                            android:alpha="0.9" />
+                    </LinearLayout>
+                </androidx.cardview.widget.CardView>
+            </LinearLayout>
+
+            <!-- Todo Card - Simple View -->
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="24dp"
+                app:cardCornerRadius="20dp"
+                app:cardElevation="4dp"
+                app:cardBackgroundColor="@color/surface_light">
+                
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="20dp">
+                    
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:layout_marginBottom="16dp">
+                        
+                        <ImageView
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:src="@drawable/task"
+                            app:tint="@color/theme_primary"
+                            android:layout_marginEnd="12dp" />
+                            
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Today's Todo"
+                            android:textSize="18sp"
+                            android:textStyle="bold"
+                            android:textColor="@color/text_primary_light"
+                            android:fontFamily="@font/poppins_semibold" />
+                            
+                        <TextView
+                            android:id="@+id/tvTodoCount"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="3 tasks"
+                            android:textSize="14sp"
+                            android:textColor="@color/text_secondary_light"
+                            android:fontFamily="@font/poppins_medium" />
+                    </LinearLayout>
+                    
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="View your todo list and track your daily progress"
+                        android:textSize="14sp"
+                        android:textColor="@color/text_primary_light"
+                        android:layout_marginBottom="16dp" />
+                    
+                    <Button
+                        android:id="@+id/btnViewTodo"
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:text="View Todo List"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        android:backgroundTint="@color/text_secondary_light"
+                        android:textColor="@color/absolute_white"
+                        android:fontFamily="@font/poppins_medium" />
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <!-- Today's Progress Section -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Today's Progress"
+                android:textColor="@color/text_primary_light"
+                android:textSize="20sp"
+                android:fontFamily="@font/poppins_semibold"
+                android:layout_marginBottom="16dp" />
+                
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="20dp"
+                app:cardCornerRadius="20dp"
+                app:cardElevation="4dp"
+                app:cardBackgroundColor="@color/surface_light">
+                
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="20dp">
+                    
+                    <!-- Calories Progress -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:layout_marginBottom="16dp">
+                        
+                        <ImageView
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:src="@drawable/fire"
+                            app:tint="@color/theme_primary"
+                            android:layout_marginEnd="12dp" />
+                            
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Calories Burned"
+                            android:textSize="16sp"
+                            android:textColor="@color/text_primary_light"
+                            android:fontFamily="@font/poppins_medium" />
+                            
+                        <TextView
+                            android:id="@+id/tvCaloriesProgress"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="1,250 / 2,000"
+                            android:textSize="16sp"
+                            android:textColor="@color/theme_primary"
+                            android:fontFamily="@font/poppins_semibold" />
+                    </LinearLayout>
+                    
+                    <ProgressBar
+                        android:id="@+id/progressCalories"
+                        style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+                        android:layout_width="match_parent"
+                        android:layout_height="8dp"
+                        android:progress="62"
+                        android:progressTint="@color/theme_primary"
+                        android:layout_marginBottom="20dp" />
+                    
+                    <!-- Workouts Progress -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:layout_marginBottom="16dp">
+                        
+                        <ImageView
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:src="@drawable/excercise"
+                            app:tint="@color/theme_secondary"
+                            android:layout_marginEnd="12dp" />
+                            
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Workouts Completed"
+                            android:textSize="16sp"
+                            android:textColor="@color/text_primary_light"
+                            android:fontFamily="@font/poppins_medium" />
+                            
+                        <TextView
+                            android:id="@+id/tvWorkoutsProgress"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="2 / 3"
+                            android:textSize="16sp"
+                            android:textColor="@color/theme_secondary"
+                            android:fontFamily="@font/poppins_semibold" />
+                    </LinearLayout>
+                    
+                    <ProgressBar
+                        android:id="@+id/progressWorkouts"
+                        style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+                        android:layout_width="match_parent"
+                        android:layout_height="8dp"
+                        android:progress="66"
+                        android:progressTint="@color/theme_secondary" />
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <!-- Quick Actions -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Quick Actions"
+                android:textColor="@color/text_primary_light"
+                android:textSize="20sp"
+                android:fontFamily="@font/poppins_semibold"
+                android:layout_marginBottom="16dp" />
+                
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="24dp">
+                
+                <!-- Start Workout Button -->
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/cardStartWorkout"
+                    android:layout_width="0dp"
+                    android:layout_height="80dp"
+                    android:layout_weight="1"
+                    android:layout_marginEnd="6dp"
+                    app:cardCornerRadius="16dp"
+                    app:cardElevation="4dp"
+                    app:cardBackgroundColor="@color/surface_light"
+                    android:foreground="?android:attr/selectableItemBackground"
+                    android:clickable="true">
+                    
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:orientation="vertical"
+                        android:gravity="center"
+                        android:padding="8dp">
+                        
+                        <ImageView
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:src="@drawable/excercise"
+                            app:tint="@color/theme_primary"
+                            android:layout_marginBottom="4dp" />
+                            
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Workout"
+                            android:textColor="@color/text_primary_light"
+                            android:textSize="12sp"
+                            android:textStyle="bold"
+                            android:gravity="center"
+                            android:fontFamily="@font/poppins_medium" />
+                    </LinearLayout>
+                </androidx.cardview.widget.CardView>
+                
+                <!-- BMI Calculator Button -->
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/cardBMICalc"
+                    android:layout_width="0dp"
+                    android:layout_height="80dp"
+                    android:layout_weight="1"
+                    android:layout_marginHorizontal="6dp"
+                    app:cardCornerRadius="16dp"
+                    app:cardElevation="4dp"
+                    app:cardBackgroundColor="@color/surface_light"
+                    android:foreground="?android:attr/selectableItemBackground"
+                    android:clickable="true">
+                    
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:orientation="vertical"
+                        android:gravity="center"
+                        android:padding="8dp">
+                        
+                        <ImageView
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:src="@drawable/bmi"
+                            app:tint="@color/theme_primary"
+                            android:layout_marginBottom="4dp" />
+                            
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="BMI Calc"
+                            android:textColor="@color/text_primary_light"
+                            android:textSize="12sp"
+                            android:textStyle="bold"
+                            android:gravity="center"
+                            android:fontFamily="@font/poppins_medium" />
+                    </LinearLayout>
+                </androidx.cardview.widget.CardView>
+                
+                <!-- Pose AI Button -->
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/cardPoseAI"
+                    android:layout_width="0dp"
+                    android:layout_height="80dp"
+                    android:layout_weight="1"
+                    android:layout_marginStart="6dp"
+                    app:cardCornerRadius="16dp"
+                    app:cardElevation="4dp"
+                    app:cardBackgroundColor="@color/surface_light"
+                    android:foreground="?android:attr/selectableItemBackground"
+                    android:clickable="true">
+                    
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:orientation="vertical"
+                        android:gravity="center"
+                        android:padding="8dp">
+                        
+                        <ImageView
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:src="@drawable/pose"
+                            app:tint="@color/theme_primary"
+                            android:layout_marginBottom="4dp" />
+                            
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Pose AI"
+                            android:textColor="@color/text_primary_light"
+                            android:textSize="12sp"
+                            android:textStyle="bold"
+                            android:gravity="center"
+                            android:fontFamily="@font/poppins_medium" />
+                    </LinearLayout>
+                </androidx.cardview.widget.CardView>
+            </LinearLayout>
+
+            <!-- Recent Activities -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Recent Activities"
+                android:textColor="@color/text_primary_light"
+                android:textSize="20sp"
+                android:fontFamily="@font/poppins_semibold"
+                android:layout_marginBottom="16dp" />
+                
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="20dp"
+                app:cardCornerRadius="20dp"
+                app:cardElevation="4dp"
+                app:cardBackgroundColor="@color/surface_light">
+                
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="20dp">
+                    
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/rvRecentActivities"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        tools:listitem="@layout/item_activity_log" />
+                        
+                    <LinearLayout
+                        android:id="@+id/layoutEmptyState"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:gravity="center"
+                        android:padding="20dp"
+                        android:visibility="gone">
+                        
+                        <ImageView
+                            android:layout_width="48dp"
+                            android:layout_height="48dp"
+                            android:src="@drawable/excercise"
+                            app:tint="@color/text_secondary_light"
+                            android:layout_marginBottom="12dp" />
+                            
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="No recent activities"
+                            android:textSize="16sp"
+                            android:textColor="@color/text_secondary_light"
+                            android:fontFamily="@font/poppins_medium" />
                     </LinearLayout>
                 </LinearLayout>
-
-                <ImageView
-                    android:id="@+id/ivSettings"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:contentDescription="Settings"
-                    android:src="@drawable/settings" />
-            </LinearLayout>
-
-            <!-- Welcome Message -->
-            <TextView
-                android:id="@+id/tvWelcome"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Welcome! Let's start your fitness journey!"
-                android:textSize="16sp"
-                android:textColor="@android:color/darker_gray"
-                android:layout_marginBottom="24dp" />
-
-            <!-- To-Do List -->
-            <LinearLayout
-                android:id="@+id/llTodoList"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:background="@color/light_gray"
-                android:padding="12dp"
-                android:layout_marginBottom="16dp">
-
-                <TextView
-                    android:id="@+id/tvTodoTitle"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="To-Do List"
-                    android:textSize="18sp"
-                    android:textColor="@android:color/black"
-                    android:textStyle="bold"
-                    android:layout_marginBottom="8dp" />
-
-                <TextView
-                    android:id="@+id/tvTodoContent"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="1. Buy groceries\n2. Finish workout plan\n3. Check email"
-                    android:textSize="14sp"
-                    android:textColor="@android:color/darker_gray"
-                    android:layout_marginTop="8dp" />
-            </LinearLayout>
-
-            <!-- Workout Progress -->
-            <LinearLayout
-                android:id="@+id/llWorkoutProgress"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:background="@color/light_gray"
-                android:padding="12dp"
-                android:layout_marginBottom="16dp">
-
-                <TextView
-                    android:id="@+id/tvWorkoutTitle"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Your Workout Progress"
-                    android:textSize="18sp"
-                    android:textColor="@android:color/black"
-                    android:textStyle="bold"
-                    android:layout_marginBottom="8dp" />
-
-                <ProgressBar
-                    android:id="@+id/progressWorkout"
-                    style="@android:style/Widget.ProgressBar.Horizontal"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:progress="50"
-                    android:max="100"
-                    android:progressTint="@color/green" />
-
-                <TextView
-                    android:id="@+id/tvWorkoutProgressPercent"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="50% completed"
-                    android:textSize="14sp"
-                    android:textColor="@android:color/darker_gray"
-                    android:layout_marginTop="4dp" />
-            </LinearLayout>
-
-            <!-- Meal Progress -->
-            <LinearLayout
-                android:id="@+id/llMealProgress"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:background="@color/light_gray"
-                android:padding="12dp"
-                android:layout_marginBottom="16dp">
-
-                <TextView
-                    android:id="@+id/tvMealTitle"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Your Meal Progress"
-                    android:textSize="18sp"
-                    android:textColor="@android:color/black"
-                    android:textStyle="bold"
-                    android:layout_marginBottom="8dp" />
-
-                <ProgressBar
-                    android:id="@+id/progressMeal"
-                    style="@android:style/Widget.ProgressBar.Horizontal"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:progress="70"
-                    android:max="100"
-                    android:progressTint="@color/green" />
-
-                <TextView
-                    android:id="@+id/tvMealProgressPercent"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="70% goal met"
-                    android:textSize="14sp"
-                    android:textColor="@android:color/darker_gray"
-                    android:layout_marginTop="4dp" />
-            </LinearLayout>
-
-            <!-- To-Do Progress -->
-            <LinearLayout
-                android:id="@+id/llTodoProgress"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:background="@color/light_gray"
-                android:padding="12dp"
-                android:layout_marginBottom="24dp">
-
-                <TextView
-                    android:id="@+id/tvTodoProgressTitle"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Your To-Do Progress"
-                    android:textSize="18sp"
-                    android:textColor="@android:color/black"
-                    android:textStyle="bold"
-                    android:layout_marginBottom="8dp" />
-
-                <ProgressBar
-                    android:id="@+id/progressTodo"
-                    style="@android:style/Widget.ProgressBar.Horizontal"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:progress="30"
-                    android:max="100"
-                    android:progressTint="@color/green" />
-
-                <TextView
-                    android:id="@+id/tvTodoProgressPercent"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="30% completed"
-                    android:textSize="14sp"
-                    android:textColor="@android:color/darker_gray"
-                    android:layout_marginTop="4dp" />
-            </LinearLayout>
+            </androidx.cardview.widget.CardView>
         </LinearLayout>
-    </androidx.core.widget.NestedScrollView>
+    </ScrollView>
 
+    <!-- Bottom Navigation -->
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottom_navigation"
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="?android:attr/windowBackground"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:menu="@menu/bottom_navigation_menu" />
-</androidx.constraintlayout.widget.ConstraintLayout>
+        android:background="@color/surface_light"
+        app:menu="@menu/bottom_navigation_menu"
+        app:itemIconTint="@color/bottom_nav_selector"
+        app:itemTextColor="@color/bottom_nav_selector" />
+</LinearLayout> 

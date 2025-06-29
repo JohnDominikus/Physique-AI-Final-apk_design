@@ -28,6 +28,27 @@
     <string name="search_meals_hint">Search for meals</string>
     <string name="add_meal">Add Meal</string>
     <string name="nutrition_summary_default">Nutrition summary</string>
+    
+    <!-- BMI Results -->
+    <string name="your_bmi">Your BMI</string>
+    <string name="normal_bmi_range">Normal BMI Range: 18.5 - 24.9</string>
+    <string name="bmi_status">BMI Status</string>
+    <string name="bmi_status_normal">Normal Weight</string>
+    <string name="bmi_categories">BMI Categories</string>
+    <string name="underweight">Underweight</string>
+    <string name="underweight_value">&lt; 18.5</string>
+    <string name="normal">Normal</string>
+    <string name="normal_value">18.5 - 24.9</string>
+    <string name="overweight">Overweight</string>
+    <string name="overweight_value">25.0 - 29.9</string>
+    <string name="obese">Obese</string>
+    <string name="obese_value">&gt;= 30.0</string>
+    <string name="save_bmi">Save BMI Result</string>
+    <string name="back_to_calculator">Back to Calculator</string>
+    
+    <!-- Workout -->
+    <string name="workout_image">Workout image</string>
+    <string name="remove_from_liked">Remove from liked workouts</string>
 
     <!-- Tasks -->
     <string name="today_tasks_message">Your tasks today: %d</string>
@@ -40,7 +61,6 @@
     <string name="task_delete_failed">Failed to delete task</string>
     <string name="task_update_failed">Failed to update task</string>
     <string name="load_tasks_error">Failed to load tasks: %s</string>
-
     <string name="task_name_hint">Task Name</string>
     <string name="task_type_hint">Task Type</string>
     <string name="task_name">Name: %1$s</string>
@@ -59,20 +79,10 @@
     <string name="search_workouts">Search workouts</string>
     <string name="select_type">Select Type</string>
     <string name="start">START</string>
-    <string name="remove_from_liked">unliked   workout</string>
-    <string name="workout_image">image\n</string>
-
-
     <string name="difficulty_format">Difficulty: %s</string>
     <string name="equipment_format">Equipment: %s</string>
     <string name="muscle_groups_format">Muscle Groups: %s</string>
     <string name="target_format">Target: %s</string>
-    <!-- Plurals -->
-    <plurals name="task_count">
-        <item quantity="one">%d Task</item>
-        <item quantity="other">%d Tasks</item>
-    </plurals>
-
 
     <!-- Pose Detection -->
     <string name="pushup_counter_text">Push-ups: %1$d</string>
@@ -80,27 +90,16 @@
     <string name="front_raise_counter_text">Front Raises: %1$d</string>
     <string name="hip_thrust_counter_text">Hip Thrusts: %1$d</string>
 
-
-    <string name="your_bmi">Your BMI</string>
-    <string name="normal_bmi_range">Normal BMI weight range for the height:</string>
-    <string name="bmi_status">BMI status icon</string>
-    <string name="bmi_status_normal">Your BMI is in the normal range</string>
-    <string name="bmi_categories">BMI Categories</string>
-    <string name="underweight">Underweight</string>
-    <string name="underweight_value"> 18.5</string>
-    <string name="normal">Normal</string>
-    <string name="normal_value">18.5 - 24.9</string>
-    <string name="overweight">Overweight</string>
-    <string name="overweight_value">25 - 29.9</string>
-    <string name="obese">Obese</string>
-    <string name="obese_value"> 30</string>
-    <string name="save_bmi">Save BMI</string>
-    <string name="back_to_calculator">Back to BMI Calculator</string>
-
-
+    <!-- Water Reminder -->
     <string name="water_reminder_title">💧 Time to Drink Water!</string>
     <string name="water_reminder_message">Remember to drink %dml of water</string>
     <string name="mark_as_done">I drank it</string>
     <string name="water_intake_recorded">✓ Recorded %dml water intake</string>
     <string name="water_intake_failed">Failed to record water intake</string>
+
+    <!-- Plurals -->
+    <plurals name="task_count">
+        <item quantity="one">%d Task</item>
+        <item quantity="other">%d Tasks</item>
+    </plurals>
 </resources>

@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    
+    <!-- Professional Light Base -->
+    <item>
+        <shape android:shape="rectangle">
+            <gradient
+                android:angle="170"
+                android:startColor="#FFFFFF"
+                android:centerColor="#F8FAFC"
+                android:endColor="#F1F5F9"
+                android:type="linear" />
+        </shape>
+    </item>
+    
+    <!-- Premium Brand Accent -->
+    <item android:top="0dp" android:right="0dp">
+        <shape android:shape="oval">
+            <gradient
+                android:angle="225"
+                android:startColor="#08E53E3E"
+                android:centerColor="#05E53E3E"
+                android:endColor="#00E53E3E"
+                android:type="radial"
+                android:gradientRadius="600dp" />
+        </shape>
+    </item>
+    
+    <!-- Modern Light Pattern -->
+    <item android:bottom="0dp" android:left="0dp">
+        <shape android:shape="oval">
+            <gradient
+                android:angle="45"
+                android:startColor="#06FF6B6B"
+                android:centerColor="#03FF6B6B"
+                android:endColor="#00FF6B6B"
+                android:type="radial"
+                android:gradientRadius="500dp" />
+        </shape>
+    </item>
+    
+    <!-- Professional Subtle Texture -->
+    <item android:top="150dp" android:right="120dp">
+        <shape android:shape="oval">
+            <solid android:color="#04000000" />
+            <size android:width="400dp" android:height="400dp" />
+        </shape>
+    </item>
+    
+    <!-- Clean Modern Overlay -->
+    <item android:bottom="200dp" android:left="80dp">
+        <shape android:shape="oval">
+            <solid android:color="#03FFFFFF" />
+            <size android:width="350dp" android:height="350dp" />
+        </shape>
+    </item>
+    
+</layer-list> 

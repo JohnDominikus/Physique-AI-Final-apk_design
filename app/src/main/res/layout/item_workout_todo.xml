@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="@dimen/spacing_md"
+    app:cardCornerRadius="@dimen/card_corner_radius_medium"
+    app:cardElevation="@dimen/card_elevation_low"
+    app:cardBackgroundColor="@color/surface_light"
+    app:strokeColor="@color/theme_neutral_light"
+    app:strokeWidth="1dp"
+    android:id="@+id/cardTodo"
+    android:stateListAnimator="@null">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:padding="@dimen/spacing_lg">
+
+        <!-- Completion Checkbox with enhanced styling -->
+        <CheckBox
+            android:id="@+id/cbCompleted"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="@dimen/spacing_md"
+            android:buttonTint="@color/theme_primary"
+            android:scaleX="1.2"
+            android:scaleY="1.2" />
+
+        <!-- Workout Type Icon with completion indicator -->
+        <FrameLayout
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_marginEnd="8dp">
+
+            <ImageView
+                android:id="@+id/ivType"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:src="@drawable/ic_training"
+                android:contentDescription="Type icon"
+                app:tint="@color/theme_primary" />
+
+            <!-- Completion overlay -->
+            <ImageView
+                android:id="@+id/ivCompletionOverlay"
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:layout_gravity="end|bottom"
+                android:src="@drawable/ic_check_circle"
+                android:background="@drawable/circle_background"
+                android:padding="2dp"
+                android:visibility="gone"
+                app:tint="@color/absolute_white" />
+        </FrameLayout>
+
+        <!-- Workout Details -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <!-- Workout Name with completion styling -->
+            <TextView
+                android:id="@+id/tvWorkoutName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Push-ups"
+                android:textSize="@dimen/text_body_large"
+                android:textStyle="bold"
+                android:textColor="@color/text_primary_light"
+                android:layout_marginBottom="@dimen/spacing_xs" />
+
+            <!-- Workout Details (Reps/Time) -->
+            <TextView
+                android:id="@+id/tvDetails"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="20 reps or 5:00"
+                android:textSize="@dimen/text_body_medium"
+                android:textColor="@color/text_secondary_light"
+                android:layout_marginBottom="@dimen/spacing_xs" />
+
+            <!-- Muscle Groups -->
+            <TextView
+                android:id="@+id/tvMuscles"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Targets: Chest, Arms"
+                android:textSize="@dimen/text_body_small"
+                android:textColor="@color/theme_secondary"
+                android:textStyle="italic" />
+        </LinearLayout>
+
+        <!-- Calories and Status -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="end">
+
+            <!-- Estimated Calories -->
+            <TextView
+                android:id="@+id/tvCalories"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="50 cal"
+                android:textSize="@dimen/text_body_medium"
+                android:textStyle="bold"
+                android:textColor="@color/theme_accent"
+                android:layout_marginBottom="@dimen/spacing_xs" />
+
+            <!-- Status Indicator with enhanced styling -->
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:background="@drawable/status_background"
+                android:paddingHorizontal="8dp"
+                android:paddingVertical="4dp">
+
+                <ImageView
+                    android:id="@+id/ivStatusIcon"
+                    android:layout_width="12dp"
+                    android:layout_height="12dp"
+                    android:layout_marginEnd="4dp"
+                    android:src="@drawable/ic_timer"
+                    app:tint="@color/theme_warning" />
+
+                <TextView
+                    android:id="@+id/tvStatus"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="⏳ Pending"
+                    android:textSize="@dimen/text_body_small"
+                    android:textColor="@color/theme_warning"
+                    android:textStyle="bold" />
+            </LinearLayout>
+        </LinearLayout>
+    </LinearLayout>
+</androidx.cardview.widget.CardView> 

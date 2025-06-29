@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<selector xmlns:android="http://schemas.android.com/apk/res/android">
-    <shape xmlns:android="http://schemas.android.com/apk/res/android"
-        android:shape="oval">
-
-        <solid android:color="@color/secondaryColor" />
-        <!-- Increased the size to make the circle bigger to account for padding -->
-        <size android:width="76dp" android:height="76dp" />
-        <stroke android:width="2dp" android:color="@color/primaryColor" />
-
-    </shape>
-</selector>
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="oval">
+    
+    <solid android:color="@color/status_completed" />
+    
+    <size
+        android:width="16dp"
+        android:height="16dp" />
+    
+</shape>

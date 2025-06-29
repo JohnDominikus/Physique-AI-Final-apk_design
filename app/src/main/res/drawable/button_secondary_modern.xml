@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    
+    <!-- Pressed State -->
+    <item android:state_pressed="true">
+        <layer-list>
+            <item>
+                <shape android:shape="rectangle">
+                    <solid android:color="@color/button_secondary_hover" />
+                    <corners android:radius="16dp" />
+                    <stroke 
+                        android:width="2dp" 
+                        android:color="@color/button_primary" />
+                </shape>
+            </item>
+            <!-- Pressed Overlay -->
+            <item>
+                <shape android:shape="rectangle">
+                    <solid android:color="@color/overlay_light" />
+                    <corners android:radius="16dp" />
+                </shape>
+            </item>
+        </layer-list>
+    </item>
+    
+    <!-- Focused State -->
+    <item android:state_focused="true">
+        <layer-list>
+            <item>
+                <shape android:shape="rectangle">
+                    <solid android:color="@color/button_secondary" />
+                    <corners android:radius="16dp" />
+                    <stroke 
+                        android:width="2dp" 
+                        android:color="@color/button_primary" />
+                </shape>
+            </item>
+            <!-- Focus Ring -->
+            <item>
+                <shape android:shape="rectangle">
+                    <stroke 
+                        android:width="1dp" 
+                        android:color="@color/button_primary"
+                        android:dashWidth="4dp"
+                        android:dashGap="2dp" />
+                    <corners android:radius="18dp" />
+                </shape>
+            </item>
+        </layer-list>
+    </item>
+    
+    <!-- Disabled State -->
+    <item android:state_enabled="false">
+        <shape android:shape="rectangle">
+            <solid android:color="@color/gray_100" />
+            <corners android:radius="16dp" />
+            <stroke 
+                android:width="1dp" 
+                android:color="@color/gray_300" />
+        </shape>
+    </item>
+    
+    <!-- Default State -->
+    <item>
+        <layer-list>
+            <item>
+                <shape android:shape="rectangle">
+                    <solid android:color="@color/button_secondary" />
+                    <corners android:radius="16dp" />
+                    <stroke 
+                        android:width="2dp" 
+                        android:color="@color/button_outline" />
+                </shape>
+            </item>
+            <!-- Professional Subtle Highlight -->
+            <item android:top="1dp">
+                <shape android:shape="rectangle">
+                    <gradient
+                        android:angle="90"
+                        android:startColor="@color/overlay_light"
+                        android:endColor="@color/transparent"
+                        android:type="linear" />
+                    <corners android:radius="16dp" />
+                </shape>
+            </item>
+        </layer-list>
+    </item>
+    
+</selector> 

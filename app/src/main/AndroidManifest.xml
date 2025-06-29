@@ -1,20 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.physiqueaiapkfinal">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <!-- 🔹 Required Permissions -->
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
     <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" />
     <uses-permission android:name="android.permission.READ_MEDIA_AUDIO" />
-    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" /> <!-- 🔹 Camera Features -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+    
+    <!-- Camera Features -->
     <uses-feature
         android:name="android.hardware.camera"
         android:required="true" />
     <uses-feature
         android:name="android.hardware.camera.any"
-        android:required="true" /> <!-- For Android 12L and below (API 32-) -->
+        android:required="true" />
+    
+    <!-- For Android 12L and below (API 32-) -->
     <uses-permission
         android:name="android.permission.READ_EXTERNAL_STORAGE"
         android:maxSdkVersion="32" />
@@ -27,91 +33,222 @@
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
         android:icon="@mipmap/ic_launcher"
-        android:label="Physique Ai"
+        android:label="Physique AI"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.Physiqueaiapkfinal">
-        <activity
-            android:name=".DumbbellFrontRaiseActivity"
-            android:exported="false" />
-        <activity
-            android:name=".HipThrustsActivity"
-            android:exported="false" />
-        <activity
-            android:name=".SquatActivity"
-            android:exported="false" /> <!-- 🔹 Launcher Activity -->
-        <activity
-            android:name=".LandingActivity"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity> <!-- 🔹 Auth Activities -->
-        <activity
-            android:name=".RegisterActivity"
-            android:exported="true" />
-        <activity
-            android:name=".LoginActivity"
-            android:exported="true" />
-        <activity
-            android:name=".ForgotPasswordActivity"
-            android:exported="true" />
-        <activity
-            android:name=".ForgotPasswordNewPasswordActivity"
-            android:exported="true" /> <!-- 🔹 Main Functional Activities -->
-        <activity
-            android:name=".DashboardActivity"
-            android:exported="true" />
-        <activity
-            android:name=".ProfileActivity"
-            android:exported="false" />
-        <activity
-            android:name=".PhysicalActivity"
-            android:exported="true" />
-        <activity
-            android:name=".MedicalActivity"
-            android:exported="true" />
-        <activity
-            android:name=".WorkoutListActivity"
-            android:exported="true" />
-        <activity
-            android:name=".PoseActivity"
-            android:exported="true" />
-        <activity
-            android:name=".BmiCalculatorActivity"
-            android:exported="true" />
-        <activity
-            android:name=".ResultActivity"
-            android:exported="true" />
+        android:theme="@style/Theme.Physiqueaiapkfinal"
+        android:hardwareAccelerated="true"
+        android:largeHeap="true"
+        android:usesCleartextTraffic="false"
+        android:requestLegacyExternalStorage="false"
+        android:networkSecurityConfig="@xml/network_security_config"
+        android:resizeableActivity="false"
+        android:maxAspectRatio="2.4"
+        android:name=".PhysiqueAiApplication"
+        android:allowClearUserData="true"
+        android:allowTaskReparenting="false"
+        android:persistent="false">
+        
+        <!-- 🔹 Launcher Activity -->
         <activity
             android:name=".SplashActivity"
-            android:exported="true" />
+            android:exported="true"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.Physiqueaiapkfinal"
+            android:noHistory="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        
+        <!-- 🔹 Landing Activity -->
+        <activity
+            android:name=".LandingActivity"
+            android:exported="true"
+            android:screenOrientation="portrait"
+            android:launchMode="singleTop"
+            android:theme="@style/Theme.Physiqueaiapkfinal" />
+        
+        <!-- 🔹 Auth Activities -->
+        <activity
+            android:name=".RegisterActivity"
+            android:exported="true"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustResize"
+            android:parentActivityName=".LandingActivity"
+            android:launchMode="singleTask" />
+        
+        <activity
+            android:name=".LoginActivity"
+            android:exported="true"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustResize"
+            android:parentActivityName=".LandingActivity" />
+        
+        <activity
+            android:name=".ForgotPasswordActivity"
+            android:exported="true"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustResize"
+            android:parentActivityName=".LoginActivity" />
+        
+        <activity
+            android:name=".ForgotPasswordNewPasswordActivity"
+            android:exported="true"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustResize"
+            android:parentActivityName=".ForgotPasswordActivity" />
+        
+        <!-- 🔹 Main Functional Activities -->
+        <activity
+            android:name=".DashboardActivity"
+            android:exported="true"
+            android:screenOrientation="portrait"
+            android:launchMode="singleTop" />
+        
+        <activity
+            android:name=".ProfileActivity"
+            android:exported="false"
+            android:screenOrientation="portrait"
+            android:parentActivityName=".DashboardActivity" />
+        
+        <activity
+            android:name=".AboutActivity"
+            android:exported="false"
+            android:screenOrientation="portrait"
+            android:parentActivityName=".DashboardActivity" />
+        
+        <activity
+            android:name=".PhysicalActivity"
+            android:exported="true"
+            android:screenOrientation="portrait" />
+        
+        <activity
+            android:name=".MedicalActivity"
+            android:exported="true"
+            android:screenOrientation="portrait" />
+        
+        <activity
+            android:name=".WorkoutListActivity"
+            android:exported="true"
+            android:screenOrientation="portrait"
+            android:parentActivityName=".DashboardActivity" />
+        
+        <activity
+            android:name=".PoseActivity"
+            android:exported="true"
+            android:screenOrientation="portrait"
+            android:hardwareAccelerated="true" />
+        
+        <activity
+            android:name=".BmiCalculatorActivity"
+            android:exported="true"
+            android:screenOrientation="portrait"
+            android:parentActivityName=".DashboardActivity" />
+        
+        <activity
+            android:name=".ResultActivity"
+            android:exported="true"
+            android:screenOrientation="portrait" />
+        
         <activity
             android:name=".ExerciseDetailActivity"
-            android:exported="true" /> <!-- 🔹 Recipe Activities -->
+            android:exported="true"
+            android:screenOrientation="portrait"
+            android:parentActivityName=".WorkoutListActivity" />
+        
+        <!-- 🔹 Workout Exercise Activities -->
+        <activity
+            android:name=".DumbbellFrontRaiseActivity"
+            android:exported="false"
+            android:screenOrientation="portrait"
+            android:hardwareAccelerated="true"
+            android:parentActivityName=".ExerciseDetailActivity" />
+        
+        <activity
+            android:name=".HipThrustsActivity"
+            android:exported="false"
+            android:screenOrientation="portrait"
+            android:hardwareAccelerated="true"
+            android:parentActivityName=".ExerciseDetailActivity" />
+        
+        <activity
+            android:name=".SquatActivity"
+            android:exported="false"
+            android:screenOrientation="portrait"
+            android:hardwareAccelerated="true"
+            android:parentActivityName=".ExerciseDetailActivity" />
+        
+        <!-- 🔹 Recipe Activities -->
         <activity
             android:name=".RecipeListActivity"
-            android:exported="false" />
+            android:exported="false"
+            android:screenOrientation="portrait"
+            android:parentActivityName=".DashboardActivity" />
+        
         <activity
             android:name=".RecipeDetailActivity"
-            android:exported="false" />
+            android:exported="false"
+            android:screenOrientation="portrait"
+            android:parentActivityName=".RecipeListActivity" />
+        
         <activity
             android:name=".LikedRecipesActivity"
-            android:exported="false" /> <!-- 🔹 Workout Detail Activities -->
+            android:exported="false"
+            android:screenOrientation="portrait"
+            android:parentActivityName=".DashboardActivity" />
+
+        <!-- 🔹 Workout Detail Activities -->
         <activity
             android:name=".WorkoutDetailActivity"
-            android:exported="false" />
+            android:exported="false"
+            android:screenOrientation="portrait"
+            android:parentActivityName=".WorkoutListActivity" />
+        
         <activity
             android:name=".LikedWorkoutsActivity"
-            android:exported="false" /> <!-- 🔹 Stream -->
+            android:exported="false"
+            android:screenOrientation="portrait"
+            android:parentActivityName=".DashboardActivity" />
+
+        <!-- 🔹 Stream Activity -->
         <activity
             android:name=".StreamActivity"
-            android:exported="false" />
+            android:exported="false"
+            android:screenOrientation="portrait"
+            android:hardwareAccelerated="true"
+            android:parentActivityName=".DashboardActivity" />
+        
         <activity
             android:name=".WorkoutTaskActivity"
-            android:exported="false" />
+            android:exported="false"
+            android:screenOrientation="portrait" />
+
+        <!-- 🔹 TODO Activities -->
+        <activity
+            android:name=".TodoHubActivity"
+            android:exported="false"
+            android:screenOrientation="portrait"
+            android:parentActivityName=".DashboardActivity" />
+        
+        <activity
+            android:name=".WorkoutTodoActivity"
+            android:exported="false"
+            android:screenOrientation="portrait"
+            android:parentActivityName=".TodoHubActivity" />
+        
+        <activity
+            android:name=".DietaryTodoActivity"
+            android:exported="false"
+            android:screenOrientation="portrait"
+            android:parentActivityName=".TodoHubActivity" />
+        
+        <activity
+            android:name=".OutdoorActivityActivity"
+            android:exported="false"
+            android:screenOrientation="portrait"
+            android:parentActivityName=".TodoHubActivity" />
     </application>
 
 </manifest>

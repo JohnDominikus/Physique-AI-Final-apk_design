@@ -1,0 +1,528 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background_light"
+    android:orientation="vertical"
+    android:padding="@dimen/spacing_lg">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <!-- Header -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="@dimen/spacing_xl">
+
+            <ImageButton
+                android:id="@+id/btnBack"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:src="@drawable/back"
+                android:background="?android:attr/selectableItemBackgroundBorderless"
+                android:contentDescription="Back"
+                app:tint="@color/text_primary_light" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Workout Todo"
+                android:textSize="@dimen/text_title_large"
+                android:textStyle="bold"
+                android:textColor="@color/text_primary_light"
+                android:gravity="center"
+                android:layout_marginEnd="48dp" />
+        </LinearLayout>
+
+        <!-- Progress Overview Card -->
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/spacing_lg"
+            app:cardCornerRadius="@dimen/card_corner_radius_large"
+            app:cardElevation="@dimen/card_elevation_medium"
+            app:cardBackgroundColor="@color/surface_light">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="@dimen/spacing_xl">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Today's Progress"
+                    android:textSize="@dimen/text_title_medium"
+                    android:textStyle="bold"
+                    android:textColor="@color/text_primary_light"
+                    android:layout_marginBottom="@dimen/spacing_lg" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:weightSum="3">
+
+                    <!-- Completed -->
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:gravity="center">
+
+                        <TextView
+                            android:id="@+id/tvCompletedCount"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="0"
+                            android:textSize="@dimen/text_display_medium"
+                            android:textStyle="bold"
+                            android:textColor="@color/theme_primary" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Completed"
+                            android:textSize="@dimen/text_body_small"
+                            android:textColor="@color/text_secondary_light" />
+                    </LinearLayout>
+
+                    <!-- Pending -->
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:gravity="center">
+
+                        <TextView
+                            android:id="@+id/tvPendingCount"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="0"
+                            android:textSize="@dimen/text_display_medium"
+                            android:textStyle="bold"
+                            android:textColor="@color/theme_warning" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Pending"
+                            android:textSize="@dimen/text_body_small"
+                            android:textColor="@color/text_secondary_light" />
+                    </LinearLayout>
+
+                    <!-- Total Time -->
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:gravity="center">
+
+                        <TextView
+                            android:id="@+id/tvTotalTime"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="0m"
+                            android:textSize="@dimen/text_display_medium"
+                            android:textStyle="bold"
+                            android:textColor="@color/theme_secondary" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Total Time"
+                            android:textSize="@dimen/text_body_small"
+                            android:textColor="@color/text_secondary_light" />
+                    </LinearLayout>
+                </LinearLayout>
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+        <!-- Add Workout Card -->
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/spacing_lg"
+            app:cardCornerRadius="@dimen/card_corner_radius_large"
+            app:cardElevation="@dimen/card_elevation_medium"
+            app:cardBackgroundColor="@color/surface_light">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="@dimen/spacing_xl">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Add New Workout"
+                    android:textSize="@dimen/text_title_medium"
+                    android:textStyle="bold"
+                    android:textColor="@color/text_primary_light"
+                    android:layout_marginBottom="@dimen/spacing_lg" />
+
+                <!-- Workout Search Bar -->
+                <EditText
+                    android:id="@+id/etWorkoutSearch"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Search workout..."
+                    android:inputType="text"
+                    android:layout_marginBottom="8dp" />
+
+                <!-- Workout Selection -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="@dimen/spacing_lg">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Exercise:"
+                        android:textSize="@dimen/text_body_medium"
+                        android:textColor="@color/text_secondary_light"
+                        android:layout_marginEnd="@dimen/spacing_md" />
+
+                    <Spinner
+                        android:id="@+id/spinnerWorkout"
+                        android:layout_width="0dp"
+                        android:layout_height="48dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/rounded_spinner"
+                        android:padding="@dimen/spacing_md"
+                        android:layout_marginStart="@dimen/spacing_sm" />
+                </LinearLayout>
+
+                <!-- Warning Text -->
+                <TextView
+                    android:id="@+id/tvWarning"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="@dimen/text_body_small"
+                    android:textColor="@color/theme_warning"
+                    android:padding="@dimen/spacing_sm"
+                    android:background="@color/warning_light"
+                    android:visibility="gone"
+                    android:layout_marginBottom="@dimen/spacing_lg" />
+
+                <!-- Sets Input -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="@dimen/spacing_lg">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Sets:"
+                        android:textSize="@dimen/text_body_medium"
+                        android:textColor="@color/text_secondary_light"
+                        android:layout_marginEnd="@dimen/spacing_md" />
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical">
+
+                        <ImageButton
+                            android:id="@+id/btnMinusSets"
+                            android:layout_width="40dp"
+                            android:layout_height="40dp"
+                            android:src="@drawable/minus"
+                            android:background="?android:attr/selectableItemBackgroundBorderless"
+                            android:contentDescription="Decrease sets"
+                            app:tint="@color/theme_primary" />
+
+                        <EditText
+                            android:id="@+id/etSets"
+                            android:layout_width="60dp"
+                            android:layout_height="40dp"
+                            android:hint="0"
+                            android:inputType="number"
+                            android:gravity="center"
+                            android:textSize="@dimen/text_body_medium"
+                            android:textColor="@color/text_primary_light"
+                            android:background="@drawable/rounded_edittext"
+                            android:layout_marginHorizontal="@dimen/spacing_sm" />
+
+                        <ImageButton
+                            android:id="@+id/btnPlusSets"
+                            android:layout_width="40dp"
+                            android:layout_height="40dp"
+                            android:src="@drawable/add"
+                            android:background="?android:attr/selectableItemBackgroundBorderless"
+                            android:contentDescription="Increase sets"
+                            app:tint="@color/theme_primary" />
+                    </LinearLayout>
+                </LinearLayout>
+
+                <!-- Reps Input -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="@dimen/spacing_lg">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Reps:"
+                        android:textSize="@dimen/text_body_medium"
+                        android:textColor="@color/text_secondary_light"
+                        android:layout_marginEnd="@dimen/spacing_md" />
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical">
+
+                        <ImageButton
+                            android:id="@+id/btnMinusReps"
+                            android:layout_width="40dp"
+                            android:layout_height="40dp"
+                            android:src="@drawable/minus"
+                            android:background="?android:attr/selectableItemBackgroundBorderless"
+                            android:contentDescription="Decrease reps"
+                            app:tint="@color/theme_primary" />
+
+                        <EditText
+                            android:id="@+id/etReps"
+                            android:layout_width="60dp"
+                            android:layout_height="40dp"
+                            android:hint="0"
+                            android:inputType="number"
+                            android:gravity="center"
+                            android:textSize="@dimen/text_body_medium"
+                            android:textColor="@color/text_primary_light"
+                            android:background="@drawable/rounded_edittext"
+                            android:layout_marginHorizontal="@dimen/spacing_sm" />
+
+                        <ImageButton
+                            android:id="@+id/btnPlusReps"
+                            android:layout_width="40dp"
+                            android:layout_height="40dp"
+                            android:src="@drawable/add"
+                            android:background="?android:attr/selectableItemBackgroundBorderless"
+                            android:contentDescription="Increase reps"
+                            app:tint="@color/theme_primary" />
+                    </LinearLayout>
+                </LinearLayout>
+
+                <!-- Time Input -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="@dimen/spacing_lg">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Time:"
+                        android:textSize="@dimen/text_body_medium"
+                        android:textColor="@color/text_secondary_light"
+                        android:layout_marginEnd="@dimen/spacing_md" />
+
+                    <!-- Minutes -->
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:layout_marginEnd="@dimen/spacing_md">
+
+                        <ImageButton
+                            android:id="@+id/btnMinusMinutes"
+                            android:layout_width="40dp"
+                            android:layout_height="40dp"
+                            android:src="@drawable/minus"
+                            android:background="?android:attr/selectableItemBackgroundBorderless"
+                            android:contentDescription="Decrease minutes"
+                            app:tint="@color/theme_primary" />
+
+                        <EditText
+                            android:id="@+id/etMinutes"
+                            android:layout_width="50dp"
+                            android:layout_height="40dp"
+                            android:hint="0"
+                            android:inputType="number"
+                            android:gravity="center"
+                            android:textSize="@dimen/text_body_medium"
+                            android:textColor="@color/text_primary_light"
+                            android:background="@drawable/rounded_edittext"
+                            android:layout_marginHorizontal="@dimen/spacing_xs" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="m"
+                            android:textSize="@dimen/text_body_small"
+                            android:textColor="@color/text_secondary_light"
+                            android:layout_marginEnd="@dimen/spacing_xs" />
+
+                        <ImageButton
+                            android:id="@+id/btnPlusMinutes"
+                            android:layout_width="40dp"
+                            android:layout_height="40dp"
+                            android:src="@drawable/add"
+                            android:background="?android:attr/selectableItemBackgroundBorderless"
+                            android:contentDescription="Increase minutes"
+                            app:tint="@color/theme_primary" />
+                    </LinearLayout>
+
+                    <!-- Seconds -->
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical">
+
+                        <ImageButton
+                            android:id="@+id/btnMinusSeconds"
+                            android:layout_width="40dp"
+                            android:layout_height="40dp"
+                            android:src="@drawable/minus"
+                            android:background="?android:attr/selectableItemBackgroundBorderless"
+                            android:contentDescription="Decrease seconds"
+                            app:tint="@color/theme_primary" />
+
+                        <EditText
+                            android:id="@+id/etSeconds"
+                            android:layout_width="50dp"
+                            android:layout_height="40dp"
+                            android:hint="0"
+                            android:inputType="number"
+                            android:gravity="center"
+                            android:textSize="@dimen/text_body_medium"
+                            android:textColor="@color/text_primary_light"
+                            android:background="@drawable/rounded_edittext"
+                            android:layout_marginHorizontal="@dimen/spacing_xs" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="s"
+                            android:textSize="@dimen/text_body_small"
+                            android:textColor="@color/text_secondary_light"
+                            android:layout_marginEnd="@dimen/spacing_xs" />
+
+                        <ImageButton
+                            android:id="@+id/btnPlusSeconds"
+                            android:layout_width="40dp"
+                            android:layout_height="40dp"
+                            android:src="@drawable/add"
+                            android:background="?android:attr/selectableItemBackgroundBorderless"
+                            android:contentDescription="Increase seconds"
+                            app:tint="@color/theme_primary" />
+                    </LinearLayout>
+                </LinearLayout>
+
+                <!-- Date Selection -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="@dimen/spacing_xl">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Date:"
+                        android:textSize="@dimen/text_body_medium"
+                        android:textColor="@color/text_secondary_light"
+                        android:layout_marginEnd="@dimen/spacing_md" />
+
+                    <Button
+                        android:id="@+id/btnSelectDate"
+                        android:layout_width="0dp"
+                        android:layout_height="48dp"
+                        android:layout_weight="1"
+                        android:text="Select Date"
+                        android:textSize="@dimen/text_body_medium"
+                        android:textColor="@color/text_primary_light"
+                        android:background="@drawable/rounded_edittext"
+                        style="?android:attr/borderlessButtonStyle" />
+                </LinearLayout>
+
+                <!-- Add Button -->
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnAddWorkout"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/button_height_large"
+                    android:text="Add to Workout Plan"
+                    android:textSize="@dimen/text_body_large"
+                    android:textStyle="bold"
+                    android:backgroundTint="@color/theme_primary"
+                    app:elevation="6dp"
+                    app:cornerRadius="16dp"
+                    app:icon="@drawable/add"
+                    app:iconGravity="textStart"
+                    app:iconPadding="@dimen/spacing_sm" />
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+        <!-- Workout Todo List -->
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:cardCornerRadius="@dimen/card_corner_radius_large"
+            app:cardElevation="@dimen/card_elevation_medium"
+            app:cardBackgroundColor="@color/surface_light">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="@dimen/spacing_xl">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Today's Workout Plan"
+                    android:textSize="@dimen/text_title_medium"
+                    android:textStyle="bold"
+                    android:textColor="@color/text_primary_light"
+                    android:layout_marginBottom="@dimen/spacing_lg" />
+
+                <ProgressBar
+                    android:id="@+id/progressBar"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    style="?android:attr/progressBarStyleHorizontal"
+                    android:progress="0"
+                    android:max="100"
+                    android:layout_marginBottom="8dp" />
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/recyclerWorkoutTodos"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:nestedScrollingEnabled="false"
+                    tools:listitem="@layout/item_workout_todo" />
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+    </LinearLayout>
+</ScrollView> 

@@ -1,9 +1,71 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
-
-    <style name="AppTheme.Light.NoNight" parent="Theme.MaterialComponents.DayNight.NoActionBar">
-        <item name="backgroundTint">@color/white</item>
+    <!-- ============================================ -->
+    <!-- PROFESSIONAL DARK THEME -->
+    <!-- ============================================ -->
+    <style name="Base.Theme.Physiqueaiapkfinal" parent="Theme.Material3.DayNight.NoActionBar">
+        <!-- ========== PRIMARY BRAND COLORS ========== -->
+        <item name="colorPrimary">@color/primary</item>
+        <item name="colorPrimaryVariant">@color/primary_variant</item>
+        <item name="colorSecondary">@color/secondary</item>
+        <item name="colorAccent">@color/accent</item>
+        
+        <!-- ========== SURFACE COLORS ========== -->
+        <item name="android:colorBackground">@color/background_dark</item>
+        <item name="colorSurface">@color/surface_dark</item>
+        <item name="colorSurfaceVariant">@color/card_dark</item>
+        <item name="colorOnSurface">@color/text_primary_dark</item>
+        <item name="colorOnBackground">@color/text_primary_dark</item>
+        
+        <!-- ========== TEXT COLORS ========== -->
+        <item name="colorOnPrimary">@color/text_on_primary_dark</item>
+        <item name="colorOnSecondary">@color/text_on_primary_dark</item>
+        <item name="android:textColorPrimary">@color/text_primary_dark</item>
+        <item name="android:textColorSecondary">@color/text_secondary_dark</item>
+        <item name="android:textColorTertiary">@color/text_tertiary_dark</item>
+        <item name="android:textColorHint">@color/text_tertiary_dark</item>
+        
+        <!-- ========== COMPONENT STYLING ========== -->
+        <item name="colorControlNormal">@color/input_border_dark</item>
+        <item name="colorControlActivated">@color/border_focus</item>
+        <item name="colorControlHighlight">@color/accent</item>
+        
+        <!-- ========== STATUS BAR & NAVIGATION ========== -->
+        <item name="android:statusBarColor">@color/surface_dark</item>
+        <item name="android:navigationBarColor">@color/surface_dark</item>
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:windowLightNavigationBar">false</item>
+        
+        <!-- ========== WINDOW STYLING ========== -->
+        <item name="android:windowBackground">@color/background_dark</item>
+        <item name="android:windowActionBar">false</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowContentTransitions">true</item>
+        <item name="android:windowAllowEnterTransitionOverlap">true</item>
+        <item name="android:windowAllowReturnTransitionOverlap">true</item>
+        
+        <!-- ========== MATERIAL DESIGN 3 COMPONENTS ========== -->
+        <item name="materialButtonStyle">@style/Widget.App.Button</item>
+        <item name="materialCardViewStyle">@style/Widget.App.CardView</item>
+        <item name="textInputStyle">@style/Widget.App.TextInputLayout</item>
+        <item name="chipStyle">@style/Widget.App.Chip</item>
+        <item name="bottomNavigationStyle">@style/Widget.App.BottomNavigation</item>
+        
+        <!-- ========== RIPPLE EFFECTS ========== -->
+        <item name="android:colorControlHighlight">@color/overlay_dark</item>
+        <item name="rippleColor">@color/overlay_medium</item>
+        
+        <!-- ========== PREVENT FORCED DARK MODE ========== -->
         <item name="android:forceDarkAllowed" tools:targetApi="29">false</item>
     </style>
 
+    <!-- ============================================ -->
+    <!-- LEGACY LIGHT THEME (Compatibility) -->
+    <!-- ============================================ -->
+    <style name="AppTheme.Light.NoNight" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="android:colorBackground">@color/background_light</item>
+        <item name="colorSurface">@color/surface_light</item>
+        <item name="android:forceDarkAllowed" tools:targetApi="29">false</item>
+    </style>
+    
 </resources>

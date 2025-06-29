@@ -1,0 +1,961 @@
+package com.example.physiqueaiapkfinal
+
+import android.app.DatePickerDialog
+import android.app.TimePickerDialog
+import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
+import android.text.Editable
+import android.text.TextWatcher
+import android.util.Log
+import android.widget.*
+import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import androidx.core.content.ContextCompat
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.ListenerRegistration
+import java.text.SimpleDateFormat
+import java.util.*
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
+
+// Import UserMedicalInfo from DietaryTodoActivity
+
+// Data Models
+data class WorkoutItem(
+    val id: String = "",
+    val name: String = "",
+    val gif_url: String = "",
+    val muscle_groups: List<String> = listOf(),
+    val safety_warning: String = "",
+    val calories_per_minute: Int = 0
+)
+
+data class WorkoutTodo(
+    val id: String = UUID.randomUUID().toString(),
+    val workoutId: String = "",
+    val workoutName: String = "",
+    val sets: Int = 0,
+    val reps: Int = 0,
+    val minutes: Int = 0,
+    val seconds: Int = 0,
+    val scheduledDate: String = "",
+    val isCompleted: Boolean = false,
+    val userId: String = "",
+    val createdAt: Long = System.currentTimeMillis(),
+    val muscleGroups: List<String> = listOf(),
+    val safetyWarning: String = "",
+    val estimatedCalories: Int = 0,
+    val durationMinutes: Int = 0
+)
+
+
+
+class WorkoutTodoActivity : AppCompatActivity() {
+    
+    private lateinit var workoutSpinner: Spinner
+    private lateinit var etSets: EditText
+    private lateinit var etReps: EditText
+    private lateinit var etMinutes: EditText
+    private lateinit var etSeconds: EditText
+    private lateinit var btnSelectDate: Button
+    private lateinit var btnAddWorkout: Button
+    private lateinit var recyclerView: RecyclerView
+    private lateinit var tvWarning: TextView
+    private lateinit var progressBar: ProgressBar
+    private lateinit var cardLoading: androidx.cardview.widget.CardView
+    private lateinit var tvLoadingText: TextView
+    private lateinit var btnPlusReps: ImageButton
+    private lateinit var btnMinusReps: ImageButton
+    private lateinit var btnPlusMinutes: ImageButton
+    private lateinit var btnMinusMinutes: ImageButton
+    private lateinit var btnPlusSeconds: ImageButton
+    private lateinit var btnMinusSeconds: ImageButton
+    private lateinit var btnPlusSets: ImageButton
+    private lateinit var btnMinusSets: ImageButton
+    private lateinit var etWorkoutSearch: EditText
+    
+    private val firestore = FirebaseFirestore.getInstance()
+    private val userId = FirebaseAuth.getInstance().currentUser?.uid ?: ""
+    private val workoutList = mutableListOf<WorkoutItem>()
+    private val todoList = mutableListOf<WorkoutTodo>()
+    private lateinit var adapter: WorkoutTodoAdapter
+    private var selectedDate: String = ""
+    private var userMedicalInfo: UserMedicalInfo? = null
+    private var todoListener: ListenerRegistration? = null
+    
+    // Async handling
+    private val backgroundExecutor: ExecutorService = Executors.newFixedThreadPool(3)
+    private val mainHandler = Handler(Looper.getMainLooper())
+    
+    // Loading states
+    private var isDataLoaded = false
+    private var loadedComponents = 0
+    private val totalComponents = 3 // workouts, medical info, todo list
+    
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_workout_todo)
+        
+        try {
+        initViews()
+        setupRecyclerView()
+        setupClickListeners()
+            
+            // Load data asynchronously
+            loadDataAsync()
+        } catch (e: Exception) {
+            handleError("Initialization error", e)
+        }
+    }
+    
+    private fun initViews() {
+        try {
+            workoutSpinner = findViewById(R.id.spinnerWorkout)
+            etSets = findViewById(R.id.etSets)
+            etReps = findViewById(R.id.etReps)
+            etMinutes = findViewById(R.id.etMinutes)
+            etSeconds = findViewById(R.id.etSeconds)
+            btnSelectDate = findViewById(R.id.btnSelectDate)
+            btnAddWorkout = findViewById(R.id.btnAddWorkout)
+            recyclerView = findViewById(R.id.recyclerWorkoutTodos)
+            tvWarning = findViewById(R.id.tvWarning)
+            btnPlusReps = findViewById(R.id.btnPlusReps)
+            btnMinusReps = findViewById(R.id.btnMinusReps)
+            btnPlusMinutes = findViewById(R.id.btnPlusMinutes)
+            btnMinusMinutes = findViewById(R.id.btnMinusMinutes)
+            btnPlusSeconds = findViewById(R.id.btnPlusSeconds)
+            btnMinusSeconds = findViewById(R.id.btnMinusSeconds)
+            btnPlusSets = findViewById(R.id.btnPlusSets)
+            btnMinusSets = findViewById(R.id.btnMinusSets)
+            etWorkoutSearch = findViewById(R.id.etWorkoutSearch)
+            // Safe initialization for progressBar and cardLoading
+            try { progressBar = findViewById(R.id.progressBar) } catch (_: Exception) {}
+            try { cardLoading = findViewById(R.id.cardLoading) } catch (_: Exception) {}
+            btnAddWorkout.isEnabled = false
+            workoutSpinner.isEnabled = false
+            val calendar = Calendar.getInstance()
+            val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+            selectedDate = dateFormat.format(calendar.time)
+            updateDateButtonText()
+        } catch (e: Exception) {
+            Log.e("WorkoutTodo", "Error initializing views", e)
+            handleError("Failed to initialize interface", e)
+        }
+    }
+    
+    private fun updateDateButtonText() {
+        try {
+            btnSelectDate.text = selectedDate
+        } catch (e: Exception) {
+            Log.e("WorkoutTodo", "Error updating date button text", e)
+        }
+    }
+    
+    private fun setupRecyclerView() {
+        adapter = WorkoutTodoAdapter(todoList) { todo ->
+            toggleTodoCompletion(todo)
+        }
+        recyclerView.layoutManager = LinearLayoutManager(this)
+        recyclerView.adapter = adapter
+    }
+    
+    private fun setupClickListeners() {
+        try {
+            // Back button
+            findViewById<ImageButton>(R.id.btnBack)?.setOnClickListener {
+                finish()
+            }
+            
+            // Sets +/- buttons
+            findViewById<ImageButton>(R.id.btnPlusSets)?.setOnClickListener {
+                try {
+                    val currentValue = findViewById<EditText>(R.id.etSets)?.text?.toString()?.toIntOrNull() ?: 0
+                    findViewById<EditText>(R.id.etSets)?.setText((currentValue + 1).toString())
+                } catch (e: Exception) {
+                    Log.e("WorkoutTodo", "Error incrementing sets", e)
+                }
+            }
+            
+            findViewById<ImageButton>(R.id.btnMinusSets)?.setOnClickListener {
+                try {
+                    val currentValue = findViewById<EditText>(R.id.etSets)?.text?.toString()?.toIntOrNull() ?: 0
+                    if (currentValue > 0) {
+                        findViewById<EditText>(R.id.etSets)?.setText((currentValue - 1).toString())
+                    }
+                } catch (e: Exception) {
+                    Log.e("WorkoutTodo", "Error decrementing sets", e)
+                }
+            }
+            
+            // Reps +/- buttons
+            btnPlusReps?.setOnClickListener {
+                try {
+                    val currentValue = etReps?.text?.toString()?.toIntOrNull() ?: 0
+                    etReps?.setText((currentValue + 1).toString())
+                } catch (e: Exception) {
+                    Log.e("WorkoutTodo", "Error incrementing reps", e)
+                }
+            }
+            
+            btnMinusReps?.setOnClickListener {
+                try {
+                    val currentValue = etReps?.text?.toString()?.toIntOrNull() ?: 0
+                    if (currentValue > 0) {
+                        etReps?.setText((currentValue - 1).toString())
+                    }
+                } catch (e: Exception) {
+                    Log.e("WorkoutTodo", "Error decrementing reps", e)
+                }
+            }
+            
+            // Minutes +/- buttons
+            btnPlusMinutes?.setOnClickListener {
+                try {
+                    val currentValue = etMinutes?.text?.toString()?.toIntOrNull() ?: 0
+                    etMinutes?.setText((currentValue + 1).toString())
+                } catch (e: Exception) {
+                    Log.e("WorkoutTodo", "Error incrementing minutes", e)
+                }
+            }
+            
+            btnMinusMinutes?.setOnClickListener {
+                try {
+                    val currentValue = etMinutes?.text?.toString()?.toIntOrNull() ?: 0
+                    if (currentValue > 0) {
+                        etMinutes?.setText((currentValue - 1).toString())
+                    }
+                } catch (e: Exception) {
+                    Log.e("WorkoutTodo", "Error decrementing minutes", e)
+                }
+            }
+            
+            // Seconds +/- buttons
+            btnPlusSeconds?.setOnClickListener {
+                try {
+                    val currentValue = etSeconds?.text?.toString()?.toIntOrNull() ?: 0
+                    etSeconds?.setText((currentValue + 1).toString())
+                } catch (e: Exception) {
+                    Log.e("WorkoutTodo", "Error incrementing seconds", e)
+                }
+            }
+            
+            btnMinusSeconds?.setOnClickListener {
+                try {
+                    val currentValue = etSeconds?.text?.toString()?.toIntOrNull() ?: 0
+                    if (currentValue > 0) {
+                        etSeconds?.setText((currentValue - 1).toString())
+                    }
+                } catch (e: Exception) {
+                    Log.e("WorkoutTodo", "Error decrementing seconds", e)
+                }
+            }
+            
+            // Date selection
+            btnSelectDate?.setOnClickListener {
+                showDatePicker()
+            }
+            
+            // Add workout button
+            btnAddWorkout?.setOnClickListener {
+                addWorkoutTodo()
+            }
+            
+        } catch (e: Exception) {
+            Log.e("WorkoutTodo", "Error setting up click listeners", e)
+            handleError("Failed to setup interactions", e)
+        }
+    }
+    
+    private fun loadDataAsync() {
+        showLoading(true)
+        
+        // Load data in sequence to prevent overwhelming Firebase
+        loadUserMedicalInfoAsync {
+            loadWorkoutDataAsync {
+                loadTodoListAsync {
+                    onAllDataLoaded()
+                }
+            }
+        }
+    }
+    
+    private fun loadUserMedicalInfoAsync(onComplete: () -> Unit) {
+        backgroundExecutor.execute {
+            try {
+                firestore.collection("userMedicalInfo")
+                    .document(userId)
+                    .get()
+                    .addOnSuccessListener { document ->
+                        try {
+                            if (document.exists()) {
+                                userMedicalInfo = document.toObject(UserMedicalInfo::class.java)
+                            }
+                            incrementLoadedComponents()
+                            onComplete()
+                        } catch (e: Exception) {
+                            handleError("Error parsing medical info", e)
+                            onComplete()
+                        }
+                    }
+                    .addOnFailureListener { e ->
+                        handleError("Failed to load medical info", e)
+                        onComplete()
+                    }
+            } catch (e: Exception) {
+                handleError("Medical info loading error", e)
+                onComplete()
+            }
+        }
+    }
+    
+    private fun loadWorkoutDataAsync(onComplete: () -> Unit) {
+        backgroundExecutor.execute {
+            try {
+        firestore.collection("workouts")
+                    .limit(50) // Limit to prevent large data loads
+            .get()
+            .addOnSuccessListener { documents ->
+                        try {
+                            mainHandler.post {
+                workoutList.clear()
+                for (document in documents) {
+                    val workout = document.toObject(WorkoutItem::class.java).copy(id = document.id)
+                    workoutList.add(workout)
+                }
+                
+                                // Add sample workouts if none exist
+                                if (workoutList.isEmpty()) {
+                                    addSampleWorkouts()
+                                } else {
+                                    setupWorkoutSpinner()
+                                }
+                                
+                                incrementLoadedComponents()
+                                onComplete()
+                            }
+                        } catch (e: Exception) {
+                            handleError("Error processing workouts", e)
+                            onComplete()
+                        }
+                    }
+                    .addOnFailureListener { e ->
+                        handleError("Failed to load workouts", e)
+                        // Add sample workouts as fallback
+                        mainHandler.post {
+                            addSampleWorkouts()
+                            incrementLoadedComponents()
+                            onComplete()
+                        }
+                    }
+            } catch (e: Exception) {
+                handleError("Workout data loading error", e)
+                mainHandler.post {
+                    addSampleWorkouts()
+                    incrementLoadedComponents()
+                    onComplete()
+                }
+            }
+        }
+    }
+    
+    private fun addSampleWorkouts() {
+        workoutList.addAll(listOf(
+            WorkoutItem(
+                id = "1",
+                name = "Push-ups",
+                gif_url = "",
+                muscle_groups = listOf("Chest", "Arms", "Core"),
+                safety_warning = "Keep your body in a straight line",
+                calories_per_minute = 8
+            ),
+            WorkoutItem(
+                id = "2", 
+                name = "Squats",
+                gif_url = "",
+                muscle_groups = listOf("Legs", "Glutes", "Core"),
+                safety_warning = "Keep knees behind toes",
+                calories_per_minute = 6
+            ),
+            WorkoutItem(
+                id = "3",
+                name = "Burpees", 
+                gif_url = "",
+                muscle_groups = listOf("Full Body", "Core", "Cardio"),
+                safety_warning = "Land softly on jumps",
+                calories_per_minute = 12
+            ),
+            WorkoutItem(
+                id = "4",
+                name = "Plank",
+                gif_url = "",
+                muscle_groups = listOf("Core", "Arms", "Back"),
+                safety_warning = "Keep back straight, no sagging",
+                calories_per_minute = 4
+            ),
+            WorkoutItem(
+                id = "5",
+                name = "Jumping Jacks",
+                gif_url = "",
+                muscle_groups = listOf("Full Body", "Cardio"),
+                safety_warning = "Land on balls of feet",
+                calories_per_minute = 10
+            ),
+            WorkoutItem(
+                id = "6",
+                name = "Lunges",
+                gif_url = "",
+                muscle_groups = listOf("Legs", "Glutes", "Core"),
+                safety_warning = "Keep front knee at 90 degrees",
+                calories_per_minute = 7
+            ),
+            WorkoutItem(
+                id = "7",
+                name = "Mountain Climbers",
+                gif_url = "",
+                muscle_groups = listOf("Core", "Arms", "Cardio"),
+                safety_warning = "Keep hips level",
+                calories_per_minute = 11
+            ),
+            WorkoutItem(
+                id = "8",
+                name = "Sit-ups",
+                gif_url = "",
+                muscle_groups = listOf("Core", "Abs"),
+                safety_warning = "Don't pull on neck",
+                calories_per_minute = 5
+            )
+        ))
+        setupWorkoutSpinner()
+    }
+    
+    private fun setupWorkoutSpinner() {
+        try {
+            if (workoutList.isEmpty()) {
+                showError("No workouts available")
+                // Add fallback sample data
+                addSampleWorkouts()
+            }
+            val workoutOptions = mutableListOf("Select Exercise")
+            workoutOptions.addAll(workoutList.map { it.name })
+            val spinnerAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, workoutOptions).apply {
+                setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+            }
+            mainHandler.post {
+                workoutSpinner.adapter = spinnerAdapter
+                workoutSpinner.isEnabled = true
+            }
+            // Filtration logic
+            etWorkoutSearch.addTextChangedListener(object : android.text.TextWatcher {
+                override fun afterTextChanged(s: android.text.Editable?) {
+                    val filtered = workoutList.filter { it.name.contains(s.toString(), ignoreCase = true) }
+                    val filteredOptions = mutableListOf("Select Exercise")
+                    filteredOptions.addAll(filtered.map { it.name })
+                    val filterAdapter = ArrayAdapter(this@WorkoutTodoActivity, android.R.layout.simple_spinner_item, filteredOptions)
+                    filterAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+                    mainHandler.post {
+                        workoutSpinner.adapter = filterAdapter
+                    }
+                }
+                override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+                override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+            })
+        } catch (e: Exception) {
+            handleError("Error setting up workout spinner", e)
+        }
+    }
+    
+    private fun loadTodoListAsync(onComplete: () -> Unit) {
+        try {
+            todoListener?.remove()
+            todoListener = firestore.collection("userTodoList")
+                .document(userId)
+                .collection("workoutPlan")
+                .whereEqualTo("scheduledDate", selectedDate)
+                .addSnapshotListener { snapshots, e ->
+                    if (e != null) {
+                        handleError("Todo list listener error", e)
+                        onComplete()
+                        return@addSnapshotListener
+                    }
+                    try {
+                        mainHandler.post {
+                            todoList.clear()
+                            snapshots?.let {
+                                for (doc in it) {
+                                    val todo = doc.toObject(WorkoutTodo::class.java).copy(id = doc.id)
+                                    todoList.add(todo)
+                                }
+                            }
+                            adapter.notifyDataSetChanged()
+                            updateProgressCards()
+                            if (loadedComponents < totalComponents) {
+                                incrementLoadedComponents()
+                                onComplete()
+                            }
+                        }
+                    } catch (e: Exception) {
+                        handleError("Error updating todo list", e)
+                        onComplete()
+                    }
+                }
+        } catch (e: Exception) {
+            handleError("Todo list setup error", e)
+            onComplete()
+        }
+    }
+    
+    private fun incrementLoadedComponents() {
+        loadedComponents++
+        updateLoadingProgress()
+    }
+    
+    private fun updateLoadingProgress() {
+        val progress = (loadedComponents * 100) / totalComponents
+        val loadingMessage = when (loadedComponents) {
+            0 -> "Loading workout data..."
+            1 -> "Loading medical information..."
+            2 -> "Loading your workout plans..."
+            else -> "Almost ready..."
+        }
+        
+        mainHandler.post {
+            progressBar.progress = progress
+            try {
+                tvLoadingText.text = loadingMessage
+            } catch (e: Exception) {
+                // Fallback if loading text view doesn't exist
+            }
+        }
+    }
+    
+    private fun onAllDataLoaded() {
+        isDataLoaded = true
+        mainHandler.post {
+            showLoading(false)
+            btnAddWorkout.isEnabled = true
+            Toast.makeText(this, "Ready to plan your workouts!", Toast.LENGTH_SHORT).show()
+        }
+    }
+    
+    private fun showLoading(show: Boolean) {
+        try {
+            if (::cardLoading.isInitialized) {
+                cardLoading.visibility = if (show) android.view.View.VISIBLE else android.view.View.GONE
+            }
+            if (::progressBar.isInitialized) {
+                progressBar.visibility = if (show) android.view.View.VISIBLE else android.view.View.GONE
+            }
+        } catch (e: Exception) {
+            // Fallback: do nothing
+        }
+    }
+    
+    private fun handleError(message: String, exception: Exception) {
+        android.util.Log.e("WorkoutTodoActivity", "$message: ${exception.message}", exception)
+        mainHandler.post {
+            showLoading(false)
+            showError("$message. Please try again.")
+            btnAddWorkout.isEnabled = false
+        }
+    }
+    
+    private fun showError(message: String) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+    }
+    
+    private fun checkMedicalWarnings(workout: WorkoutItem) {
+        try {
+        var warningMessage = ""
+        
+        // Check safety warnings
+        if (workout.safety_warning.isNotEmpty()) {
+            warningMessage += "⚠️ Safety Warning: ${workout.safety_warning}\n"
+        }
+        
+        // Check user medical conditions
+        userMedicalInfo?.let { medicalInfo ->
+            // Check for fractures/injuries
+            val relevantInjuries = medicalInfo.injuries.filter { injury ->
+                workout.muscle_groups.any { muscle ->
+                    injury.contains(muscle, ignoreCase = true) || 
+                    muscle.contains(injury, ignoreCase = true)
+                }
+            }
+            
+            if (relevantInjuries.isNotEmpty()) {
+                warningMessage += "🚨 Medical Alert: You have reported injuries in: ${relevantInjuries.joinToString(", ")}. " +
+                        "This workout targets: ${workout.muscle_groups.joinToString(", ")}. Please consult your doctor.\n"
+            }
+            
+            // Check fitness level
+            if (medicalInfo.fitnessLevel == "Beginner" && workout.muscle_groups.contains("Core")) {
+                warningMessage += "💡 Beginner Tip: Start with lower intensity and gradually increase.\n"
+            }
+        }
+        
+            mainHandler.post {
+        if (warningMessage.isNotEmpty()) {
+            tvWarning.text = warningMessage
+            tvWarning.visibility = android.view.View.VISIBLE
+        } else {
+            tvWarning.visibility = android.view.View.GONE
+                }
+            }
+        } catch (e: Exception) {
+            handleError("Error checking medical warnings", e)
+        }
+    }
+    
+    private fun showDatePicker() {
+        try {
+            val calendar = Calendar.getInstance()
+            val dateParts = selectedDate.split("/")
+            if (dateParts.size == 3) {
+                calendar.set(Calendar.DAY_OF_MONTH, dateParts[0].toInt())
+                calendar.set(Calendar.MONTH, dateParts[1].toInt() - 1)
+                calendar.set(Calendar.YEAR, dateParts[2].toInt())
+            }
+            val datePickerDialog = DatePickerDialog(
+                this,
+                { _, year, month, dayOfMonth ->
+                    val cal = Calendar.getInstance()
+                    cal.set(year, month, dayOfMonth)
+                    val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+                    selectedDate = dateFormat.format(cal.time)
+                    updateDateButtonText()
+                    if (isDataLoaded) {
+                        loadTodoListAsync {}
+                    }
+                },
+                calendar.get(Calendar.YEAR),
+                calendar.get(Calendar.MONTH),
+                calendar.get(Calendar.DAY_OF_MONTH)
+            )
+            datePickerDialog.show()
+        } catch (e: Exception) {
+            handleError("Error showing date picker", e)
+        }
+    }
+    
+    private fun addWorkoutTodo() {
+        try {
+            if (!isDataLoaded || workoutList.isEmpty()) {
+                showError("Please wait for workouts to load")
+                return
+            }
+            val selectedPosition = workoutSpinner.selectedItemPosition
+            if (selectedPosition <= 0) {
+                showError("Please select an exercise from the dropdown")
+                return
+            }
+            val workoutIndex = selectedPosition - 1
+            if (workoutIndex < 0 || workoutIndex >= workoutList.size) {
+                showError("Please select a valid workout")
+                return
+            }
+            val selectedWorkout = workoutList[workoutIndex]
+            val sets = etSets.text.toString().toIntOrNull() ?: 0
+            val reps = etReps.text.toString().toIntOrNull() ?: 0
+            val minutes = etMinutes.text.toString().toIntOrNull() ?: 0
+            val seconds = etSeconds.text.toString().toIntOrNull() ?: 0
+            if ((sets <= 0 || reps <= 0) && (minutes <= 0 && seconds <= 0)) {
+                showError("Please enter valid sets & reps or time")
+                return
+            }
+            createWorkoutTodoAsync(selectedWorkout, sets, reps, minutes, seconds)
+        } catch (e: Exception) {
+            handleError("Error adding workout", e)
+        }
+    }
+    
+    private fun createWorkoutTodoAsync(workout: WorkoutItem, sets: Int, reps: Int, minutes: Int, seconds: Int) {
+        backgroundExecutor.execute {
+            try {
+                val totalMinutes = minutes + (seconds / 60.0)
+                val estimatedCalories = (workout.calories_per_minute * totalMinutes).toInt()
+                val workoutTodo = WorkoutTodo(
+                    id = "",
+                    workoutName = workout.name,
+                    sets = sets,
+                    reps = reps,
+                    minutes = minutes,
+                    seconds = seconds,
+                    scheduledDate = selectedDate,
+                    userId = userId,
+                    muscleGroups = workout.muscle_groups,
+                    estimatedCalories = estimatedCalories,
+                    isCompleted = false,
+                    durationMinutes = if (minutes > 0 || seconds > 0) minutes + (seconds / 60) else 0
+                )
+                firestore.collection("userTodoList")
+                    .document(userId)
+                    .collection("workoutPlan")
+                    .add(workoutTodo)
+                    .addOnSuccessListener {
+                        mainHandler.post {
+                            Toast.makeText(this@WorkoutTodoActivity, "✅ Workout added to your plan!", Toast.LENGTH_SHORT).show()
+                            clearInputs()
+                            updateProgressCards()
+                        }
+                    }
+                    .addOnFailureListener { e ->
+                        handleError("Failed to add workout", e)
+                    }
+            } catch (e: Exception) {
+                handleError("Error creating workout todo", e)
+            }
+        }
+    }
+    
+    private fun toggleTodoCompletion(todo: WorkoutTodo) {
+        backgroundExecutor.execute {
+            try {
+                val updatedTodo = todo.copy(isCompleted = !todo.isCompleted)
+                
+                firestore.collection("userTodoList")
+                    .document(userId)
+                    .collection("workoutPlan")
+                    .document(todo.id)
+                    .set(updatedTodo)
+                    .addOnSuccessListener {
+                        // Update calories burned if completed
+                        if (updatedTodo.isCompleted) {
+                            updateCaloriesBurnedAsync(todo.estimatedCalories)
+                            addToRecentActivities(todo)
+                        }
+                        // Update progress cards immediately
+                        mainHandler.post {
+                            updateProgressCards()
+                            Toast.makeText(
+                                this@WorkoutTodoActivity, 
+                                if (updatedTodo.isCompleted) "✅ ${todo.workoutName} completed!" else "⏳ ${todo.workoutName} marked as pending",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+                    }
+                    .addOnFailureListener { e ->
+                        handleError("Failed to update workout", e)
+                    }
+            } catch (e: Exception) {
+                handleError("Error toggling completion", e)
+            }
+        }
+    }
+    
+    private fun updateCaloriesBurnedAsync(calories: Int) {
+        try {
+            val today = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(Date())
+            
+            firestore.collection("userStats")
+                .document(userId)
+                .collection("dailyStats")
+                .document(today)
+                .get()
+                .addOnSuccessListener { document ->
+                    val currentCalories = document.getLong("caloriesBurned")?.toInt() ?: 0
+                    val updatedCalories = currentCalories + calories
+                    
+                    firestore.collection("userStats")
+                        .document(userId)
+                        .collection("dailyStats")
+                        .document(today)
+                        .set(mapOf(
+                            "caloriesBurned" to updatedCalories,
+                            "lastUpdated" to System.currentTimeMillis(),
+                            "date" to today
+                        ), com.google.firebase.firestore.SetOptions.merge())
+                        .addOnSuccessListener {
+                            Log.d("WorkoutTodo", "Calories burned updated: $updatedCalories")
+                        }
+                        .addOnFailureListener { e ->
+                            Log.e("WorkoutTodo", "Error updating calories burned", e)
+                        }
+                }
+                .addOnFailureListener { e ->
+                    Log.e("WorkoutTodo", "Error getting current calories", e)
+                }
+        } catch (e: Exception) {
+            Log.e("WorkoutTodo", "Error updating calories burned", e)
+        }
+    }
+    
+    private fun addToRecentActivities(todo: WorkoutTodo) {
+        try {
+            val activity = mapOf(
+                "title" to todo.workoutName,
+                "subtitle" to "${todo.sets} sets × ${todo.reps} reps - ${todo.estimatedCalories} cal burned",
+                "timestamp" to System.currentTimeMillis(),
+                "type" to "workout",
+                "caloriesBurned" to todo.estimatedCalories
+            )
+            
+            firestore.collection("userActivities")
+                .document(userId)
+                .collection("recentActivities")
+                .add(activity)
+                .addOnSuccessListener {
+                    Log.d("WorkoutTodo", "Activity added to recent activities")
+                }
+                .addOnFailureListener { e ->
+                    Log.e("WorkoutTodo", "Error adding to recent activities", e)
+                }
+        } catch (e: Exception) {
+            Log.e("WorkoutTodo", "Error adding to recent activities", e)
+        }
+    }
+    
+    private fun updateProgressCards() {
+        try {
+            val completedCount = todoList.count { it.isCompleted }
+            val pendingCount = todoList.count { !it.isCompleted }
+            val totalMinutes = todoList.sumOf { 
+                if (it.isCompleted) it.minutes + (it.seconds / 60.0) else 0.0
+            }.toInt()
+            
+            // Update progress card views
+            findViewById<TextView>(R.id.tvCompletedCount)?.text = completedCount.toString()
+            findViewById<TextView>(R.id.tvPendingCount)?.text = pendingCount.toString()
+            findViewById<TextView>(R.id.tvTotalTime)?.text = "${totalMinutes}m"
+            
+        } catch (e: Exception) {
+            android.util.Log.e("WorkoutTodo", "Error updating progress cards", e)
+        }
+    }
+    
+    private fun clearInputs() {
+        try {
+            workoutSpinner?.setSelection(0)
+            findViewById<EditText>(R.id.etSets)?.setText("")
+            etReps?.setText("")
+            etMinutes?.setText("")
+            etSeconds?.setText("")
+        } catch (e: Exception) {
+            android.util.Log.e("WorkoutTodo", "Error clearing inputs", e)
+        }
+    }
+    
+    override fun onDestroy() {
+        super.onDestroy()
+        try {
+            // Clean up resources to prevent memory leaks
+            todoListener?.remove()
+            backgroundExecutor.shutdown()
+        } catch (e: Exception) {
+            android.util.Log.e("WorkoutTodoActivity", "Error during cleanup", e)
+        }
+    }
+    
+    override fun onPause() {
+        super.onPause()
+        try {
+            // Remove expensive listeners when not visible
+            todoListener?.remove()
+        } catch (e: Exception) {
+            android.util.Log.e("WorkoutTodoActivity", "Error pausing", e)
+        }
+    }
+    
+    override fun onResume() {
+        super.onResume()
+        try {
+            if (isDataLoaded && todoListener == null) {
+                // Restart listener when activity resumes
+                loadTodoListAsync {}
+            }
+        } catch (e: Exception) {
+            android.util.Log.e("WorkoutTodoActivity", "Error resuming", e)
+        }
+    }
+}
+
+// Adapter for WorkoutTodo RecyclerView
+class WorkoutTodoAdapter(
+    private val todoList: List<WorkoutTodo>,
+    private val onToggleCompletion: (WorkoutTodo) -> Unit
+) : RecyclerView.Adapter<WorkoutTodoAdapter.ViewHolder>() {
+    
+    class ViewHolder(view: android.view.View) : RecyclerView.ViewHolder(view) {
+        val checkBox: CheckBox = view.findViewById(R.id.cbCompleted)
+        val tvWorkoutName: TextView = view.findViewById(R.id.tvWorkoutName)
+        val tvDetails: TextView = view.findViewById(R.id.tvDetails)
+        val tvCalories: TextView = view.findViewById(R.id.tvCalories)
+        val tvMuscles: TextView = view.findViewById(R.id.tvMuscles)
+        val tvStatus: TextView = view.findViewById(R.id.tvStatus)
+        val ivCompletionOverlay: ImageView = view.findViewById(R.id.ivCompletionOverlay)
+        val ivStatusIcon: ImageView = view.findViewById(R.id.ivStatusIcon)
+        val cardTodo: androidx.cardview.widget.CardView = view.findViewById(R.id.cardTodo)
+    }
+    
+    override fun onCreateViewHolder(parent: android.view.ViewGroup, viewType: Int): ViewHolder {
+        val view = android.view.LayoutInflater.from(parent.context)
+            .inflate(R.layout.item_workout_todo, parent, false)
+        return ViewHolder(view)
+    }
+    
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+        try {
+            val todo = todoList[position]
+            
+            // Set checkbox state
+            holder.checkBox.setOnCheckedChangeListener(null)
+            holder.checkBox.isChecked = todo.isCompleted
+            holder.checkBox.setOnCheckedChangeListener { _, isChecked ->
+                onToggleCompletion(todo.copy(isCompleted = isChecked))
+            }
+            
+            // Set workout details
+            holder.tvWorkoutName.text = todo.workoutName
+            val details = if (todo.reps > 0) {
+                "${todo.sets} sets × ${todo.reps} reps"
+            } else {
+                "${todo.minutes}:${String.format("%02d", todo.seconds)}"
+            }
+            holder.tvDetails.text = details
+            holder.tvCalories.text = "${todo.estimatedCalories} cal"
+            holder.tvMuscles.text = "Targets: ${todo.muscleGroups.joinToString(", ")}"
+            
+            // Update completion status styling
+            if (todo.isCompleted) {
+                // Completed styling
+                holder.tvStatus.text = "✅ Completed"
+                holder.tvStatus.setTextColor(ContextCompat.getColor(holder.itemView.context, R.color.status_completed))
+                holder.ivStatusIcon.setImageResource(R.drawable.ic_check_circle)
+                holder.ivStatusIcon.setColorFilter(ContextCompat.getColor(holder.itemView.context, R.color.status_completed))
+                holder.ivCompletionOverlay.visibility = android.view.View.VISIBLE
+                
+                // Apply completed card styling
+                holder.cardTodo.setCardBackgroundColor(ContextCompat.getColor(holder.itemView.context, R.color.success_light))
+                holder.cardTodo.alpha = 0.95f
+                
+                // Strike through workout name
+                holder.tvWorkoutName.paintFlags = holder.tvWorkoutName.paintFlags or android.graphics.Paint.STRIKE_THRU_TEXT_FLAG
+                holder.tvWorkoutName.alpha = 0.7f
+                
+            } else {
+                // Pending styling
+                holder.tvStatus.text = "⏳ Pending"
+                holder.tvStatus.setTextColor(ContextCompat.getColor(holder.itemView.context, R.color.status_pending))
+                holder.ivStatusIcon.setImageResource(R.drawable.ic_timer)
+                holder.ivStatusIcon.setColorFilter(ContextCompat.getColor(holder.itemView.context, R.color.status_pending))
+                holder.ivCompletionOverlay.visibility = android.view.View.GONE
+                
+                // Apply pending card styling
+                holder.cardTodo.setCardBackgroundColor(ContextCompat.getColor(holder.itemView.context, R.color.surface_light))
+                holder.cardTodo.alpha = 1.0f
+                
+                // Remove strike through
+                holder.tvWorkoutName.paintFlags = holder.tvWorkoutName.paintFlags and android.graphics.Paint.STRIKE_THRU_TEXT_FLAG.inv()
+                holder.tvWorkoutName.alpha = 1.0f
+            }
+            
+        } catch (e: Exception) {
+            Log.e("WorkoutTodoAdapter", "Error binding view holder", e)
+        }
+    }
+    
+    override fun getItemCount() = todoList.size
+} 

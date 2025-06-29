@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="@dimen/spacing_md"
+    app:cardCornerRadius="@dimen/card_corner_radius_medium"
+    app:cardElevation="@dimen/card_elevation_low"
+    app:cardBackgroundColor="@color/surface_light"
+    app:strokeColor="@color/theme_neutral_light"
+    app:strokeWidth="1dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:padding="@dimen/spacing_lg">
+
+        <!-- Meal Image -->
+        <androidx.cardview.widget.CardView
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:layout_marginEnd="@dimen/spacing_md"
+            app:cardCornerRadius="8dp"
+            app:cardElevation="2dp">
+
+            <ImageView
+                android:id="@+id/ivMealImage"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:src="@drawable/meal_placeholder"
+                android:scaleType="centerCrop"
+                android:contentDescription="Meal image" />
+        </androidx.cardview.widget.CardView>
+
+        <!-- Meal Details -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <!-- Meal Name and Type -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginBottom="@dimen/spacing_xs">
+
+                <TextView
+                    android:id="@+id/tvMealName"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Grilled Chicken Salad"
+                    android:textSize="@dimen/text_body_large"
+                    android:textStyle="bold"
+                    android:textColor="@color/text_primary_light" />
+
+                <TextView
+                    android:id="@+id/tvMealType"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Lunch"
+                    android:textSize="@dimen/text_body_small"
+                    android:textStyle="bold"
+                    android:textColor="@color/theme_secondary"
+                    android:background="@drawable/chip_background_selector"
+                    android:paddingHorizontal="@dimen/spacing_sm"
+                    android:paddingVertical="@dimen/spacing_xs" />
+            </LinearLayout>
+
+            <!-- Time and Prep Time -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="@dimen/spacing_xs">
+
+                <TextView
+                    android:id="@+id/tvTime"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="12:30"
+                    android:textSize="@dimen/text_body_medium"
+                    android:textColor="@color/text_secondary_light"
+                    android:drawableStart="@drawable/timer"
+                    android:drawablePadding="@dimen/spacing_xs"
+                    android:gravity="center_vertical" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text=" • "
+                    android:textSize="@dimen/text_body_medium"
+                    android:textColor="@color/text_secondary_light" />
+
+                <TextView
+                    android:id="@+id/tvPrepTime"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Prep: 15 min"
+                    android:textSize="@dimen/text_body_medium"
+                    android:textColor="@color/text_secondary_light" />
+            </LinearLayout>
+
+            <!-- Allergies Warning -->
+            <TextView
+                android:id="@+id/tvAllergies"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Contains: Dairy, Nuts"
+                android:textSize="@dimen/text_body_small"
+                android:textColor="@color/warning"
+                android:textStyle="italic"
+                android:visibility="gone"
+                android:drawableStart="@drawable/ic_warning"
+                android:drawablePadding="@dimen/spacing_xs"
+                android:gravity="center_vertical"
+                tools:visibility="visible" />
+        </LinearLayout>
+
+        <!-- Status and Calories -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="end"
+            android:layout_marginStart="@dimen/spacing_md">
+
+            <!-- Calories -->
+            <TextView
+                android:id="@+id/tvCalories"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="320 cal"
+                android:textSize="@dimen/text_body_medium"
+                android:textStyle="bold"
+                android:textColor="@color/theme_accent"
+                android:layout_marginBottom="@dimen/spacing_sm" />
+
+            <!-- Completion Checkbox -->
+            <CheckBox
+                android:id="@+id/cbCompleted"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:buttonTint="@color/theme_secondary" />
+        </LinearLayout>
+    </LinearLayout>
+</androidx.cardview.widget.CardView> 
