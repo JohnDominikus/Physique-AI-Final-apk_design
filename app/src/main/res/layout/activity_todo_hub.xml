@@ -15,7 +15,7 @@
         android:background="@drawable/fitness_dashboard_background"
         android:gravity="center_vertical"
         android:paddingHorizontal="20dp">
-
+        
         <ImageButton
             android:id="@+id/backButton"
             android:layout_width="40dp"
@@ -25,7 +25,7 @@
             android:contentDescription="Back"
             app:tint="@color/absolute_white"
             android:layout_marginEnd="16dp" />
-
+        
         <TextView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -34,7 +34,7 @@
             android:textColor="@color/absolute_white"
             android:textSize="24sp"
             android:fontFamily="@font/poppins_bold" />
-
+            
         <ImageView
             android:layout_width="40dp"
             android:layout_height="40dp"
@@ -65,7 +65,7 @@
                 android:textSize="22sp"
                 android:fontFamily="@font/poppins_semibold"
                 android:layout_marginBottom="8dp" />
-
+                
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -121,7 +121,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Workout"
+                            android:text="Workout Todo"
                             android:textSize="18sp"
                             android:textStyle="bold"
                             android:textColor="@color/text_primary_light"
@@ -192,7 +192,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Dietary"
+                            android:text="Dietary Todo"
                             android:textSize="18sp"
                             android:textStyle="bold"
                             android:textColor="@color/text_primary_light"
@@ -218,6 +218,75 @@
             </androidx.cardview.widget.CardView>
 
             <!-- Outdoor Activity Card -->
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cardOutdoorActivity"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="20dp"
+                app:cardCornerRadius="20dp"
+                app:cardElevation="8dp"
+                app:cardBackgroundColor="@color/surface_light"
+                android:foreground="?android:attr/selectableItemBackground"
+                android:clickable="true">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:padding="24dp">
+
+                    <!-- Icon Container -->
+                    <androidx.cardview.widget.CardView
+                        android:layout_width="60dp"
+                        android:layout_height="60dp"
+                        android:layout_marginEnd="20dp"
+                        app:cardCornerRadius="30dp"
+                        app:cardElevation="4dp"
+                        app:cardBackgroundColor="@color/theme_accent">
+
+                        <ImageView
+                            android:layout_width="32dp"
+                            android:layout_height="32dp"
+                            android:layout_gravity="center"
+                            android:src="@drawable/ic_training"
+                            app:tint="@color/absolute_white" />
+                    </androidx.cardview.widget.CardView>
+
+                    <!-- Content -->
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Outdoor Activity"
+                            android:textSize="18sp"
+                            android:textStyle="bold"
+                            android:textColor="@color/text_primary_light"
+                            android:fontFamily="@font/poppins_semibold"
+                            android:layout_marginBottom="4dp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Plan outdoor activities and adventures"
+                            android:textSize="14sp"
+                            android:textColor="@color/theme_secondary"
+                            android:fontFamily="@font/poppins_medium" />
+                    </LinearLayout>
+
+                    <!-- Arrow -->
+                    <ImageView
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:src="@drawable/ic_arrow_forward"
+                        app:tint="@color/theme_accent" />
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
 
             <!-- Additional Info -->
             <LinearLayout
@@ -267,4 +336,4 @@
         android:background="@color/surface_light"
         app:menu="@menu/bottom_navigation_menu" />
 
-</LinearLayout>
+</LinearLayout> 

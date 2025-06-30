@@ -22,7 +22,6 @@ import java.util.concurrent.TimeUnit
 import androidx.activity.OnBackPressedCallback
 import com.example.physiqueaiapkfinal.MealTodo
 import com.example.physiqueaiapkfinal.UserMedicalInfo
-import kotlin.math.roundToInt
 
 // Data Models for Dietary
 data class MealItem(
@@ -167,19 +166,6 @@ class DietaryTodoActivity : AppCompatActivity() {
             nutritionFacts = mapOf("Protein" to "16g", "Carbs" to "65g", "Fat" to "8g")
         )
     )
-    
-    /* ╔═══════ HELPER FUNCTIONS ═══════╗ */
-    private fun Any?.toIntSafe(): Int = when (this) {
-        is Number -> this.toDouble().roundToInt()
-        is String -> this.toDoubleOrNull()?.roundToInt() ?: 0
-        else      -> 0
-    }
-    private fun Any?.toStringList(): List<String> = when (this) {
-        is List<*> -> this.filterIsInstance<String>()
-        is String  -> this.split(",").map { it.trim() }.filter { it.isNotEmpty() }
-        else       -> listOf()
-    }
-    /* ╚═══════════════════════════════╝ */
     
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -442,42 +428,19 @@ class DietaryTodoActivity : AppCompatActivity() {
     
     private fun loadMealDataAsync(onComplete: () -> Unit) {
         backgroundExecutor.execute {
-            firestore.collection("dietarylist")
-                .limit(50)
-                .get()
-                .addOnSuccessListener { docs ->
-                    mainHandler.post {
-                        mealList.clear()
-                        docs.forEach { d ->
-                            // Gumamit ng *safe* casting para kahit maling type ay hindi magka-crash
-                            mealList.add(
-                                MealItem(
-                                    id        = d.id,
-                                    mealName  = d.getString("mealName") ?: "",
-                                    mealType  = d.getString("mealType") ?: "",
-                                    prepTime  = d.get("prepTime").toIntSafe(),          // ← dito tayo nagka-crash
-                                    imageUrl  = d.getString("imageUrl") ?: "",
-                                    allergies = d.get("allergies").toStringList(),
-                                    calories  = d.get("calories").toIntSafe(),
-                                    ingredients = d.get("ingredients").toStringList(),
-                                    dietaryRestrictions = d.get("dietaryRestrictions").toStringList(),
-                                    nutritionFacts = d.get("nutritionFacts") as? Map<String, String> ?: mapOf()
-                                )
-                            )
-                        }
-                        setupMealSpinner()
-                        incrementLoadedComponents()
-                        onComplete()
-                    }
+            try {
+                // Use sample data instead of Firebase for now
+                mainHandler.post {
+                    mealList.clear()
+                    mealList.addAll(sampleMeals)
+                    setupMealSpinner()
+                    incrementLoadedComponents()
+                    onComplete()
                 }
-                .addOnFailureListener { e ->
-                    handleError("Failed to load meals", e)
-                    mainHandler.post {
-                        setupMealSpinner()
-                        incrementLoadedComponents()
-                        onComplete()
-                    }
-                }
+            } catch (e: Exception) {
+                handleError("Meal data loading error", e)
+                onComplete()
+            }
         }
     }
     
