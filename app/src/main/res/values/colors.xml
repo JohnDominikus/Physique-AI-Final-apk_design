@@ -4,11 +4,74 @@
     <!-- PROFESSIONAL PREMIUM GYM COLOR SYSTEM -->
     <!-- ============================================ -->
     
-    <!-- Primary Brand Colors (Premium Red Palette) -->
-    <color name="primary">#D32F2F</color>
-    <color name="primary_variant">#B71C1C</color>
-    <color name="secondary">#D32F2F</color>
-    <color name="accent">#FF5252</color>
+    <!-- Primary Theme Colors -->
+    <color name="primary">#FF6B35</color>
+    <color name="primary_dark">#E55A2B</color>
+    <color name="primary_light">#FF8A65</color>
+    <color name="primary_variant">#E55A2B</color>
+    <color name="secondary">#4ECDC4</color>
+    <color name="accent">#4ECDC4</color>
+    <color name="accent_dark">#26A69A</color>
+    
+    <!-- Modern Fitness Colors -->
+    <color name="fitness_primary">#FF6B35</color>
+    <color name="fitness_secondary">#4ECDC4</color>
+    <color name="fitness_accent">#FFE66D</color>
+    <color name="fitness_success">#2ECC71</color>
+    <color name="fitness_warning">#F39C12</color>
+    <color name="fitness_error">#E74C3C</color>
+    
+    <!-- Background Colors -->
+    <color name="background_primary">#FAFAFA</color>
+    <color name="background_secondary">#F5F5F5</color>
+    <color name="surface_light">#FFFFFF</color>
+    <color name="surface_dark">#121212</color>
+    
+    <!-- Text Colors -->
+    <color name="text_primary_light">#212121</color>
+    <color name="text_secondary_light">#757575</color>
+    <color name="text_hint_light">#BDBDBD</color>
+    <color name="text_primary_dark">#FFFFFF</color>
+    <color name="text_secondary_dark">#B3FFFFFF</color>
+    
+    <!-- Status Colors -->
+    <color name="success">#4CAF50</color>
+    <color name="warning">#FF9800</color>
+    <color name="error">#F44336</color>
+    <color name="info">#2196F3</color>
+    
+    <!-- Theme Colors -->
+    <color name="theme_primary">#FF6B35</color>
+    <color name="theme_secondary">#4ECDC4</color>
+    <color name="theme_accent">#FFE66D</color>
+    <color name="theme_neutral">#718096</color>
+    <color name="theme_neutral_light">#E0E0E0</color>
+    <color name="theme_neutral_dark">#424242</color>
+    <color name="theme_error">#E74C3C</color>
+    
+    <!-- Divider Colors -->
+    <color name="divider_light">#E0E0E0</color>
+    <color name="divider_dark">#424242</color>
+    
+    <!-- Card Colors -->
+    <color name="card_background">#FFFFFF</color>
+    <color name="card_elevation">#000000</color>
+    
+    <!-- Progress Colors -->
+    <color name="progress_background">#E0E0E0</color>
+    <color name="progress_fill">#4ECDC4</color>
+    <color name="progress_secondary">#FF6B35</color>
+    
+    <!-- BMI Category Colors -->
+    <color name="bmi_underweight">#FF6B6B</color>
+    <color name="bmi_normal">#4ECDC4</color>
+    <color name="bmi_overweight">#FFA726</color>
+    <color name="bmi_obese">#EF5350</color>
+    
+    <!-- Legacy Colors (for compatibility) -->
+    <color name="black">#000000</color>
+    <color name="white">#FFFFFF</color>
+    <color name="transparent">#00000000</color>
     
     <!-- Professional Red Shades -->
     <color name="fitness_crimson_red">#D32F2F</color>
@@ -19,32 +82,27 @@
     <color name="fitness_coral_red">#FF8A80</color>
     
     <!-- Modern Surface Colors (Light Theme) -->
-    <color name="surface_light">#FFFFFF</color>
     <color name="background_light">#FFFFFF</color>
-    <color name="background_secondary">#FFFFFF</color>
     <color name="card_light">#FFFFFF</color>
     <color name="card_elevated">#FFFFFF</color>
     <color name="card_secondary">#FFFFFF</color>
     
     <!-- Professional Text Colors (High Contrast) -->
-    <color name="text_primary_light">#000000</color>
-    <color name="text_secondary_light">#D32F2F</color>
+    <!-- <color name="text_primary_light">#000000</color> -->
+    <!-- <color name="text_secondary_light">#D32F2F</color> -->
     <color name="text_tertiary_light">#757575</color>
-    <color name="text_hint_light">#BDBDBD</color>
     <color name="text_on_primary_light">#FFFFFF</color>
     
     <!-- Dark Theme Colors -->
-    <color name="surface_dark">#FFFFFF</color>
+    <!-- <color name="surface_dark">#FFFFFF</color> -->
     <color name="background_dark">#FFFFFF</color>
     <color name="card_dark">#FFFFFF</color>
-    <color name="text_primary_dark">#000000</color>
-    <color name="text_secondary_dark">#D32F2F</color>
+    <!-- <color name="text_primary_dark">#000000</color> -->
     <color name="text_tertiary_dark">#757575</color>
     <color name="text_on_primary_dark">#FFFFFF</color>
     
     <!-- Professional Component Colors -->
-    <color name="divider_light">#E0E0E0</color>
-    <color name="divider_dark">#BDBDBD</color>
+    <!-- <color name="divider_light">#E0E0E0</color> -->
     <color name="border_light">#E0E0E0</color>
     <color name="border_focus">#D32F2F</color>
     
@@ -59,13 +117,9 @@
     <color name="button_surface_dark">#FFFFFF</color>
     
     <!-- Status Colors (Professional) -->
-    <color name="success">#388E3C</color>
     <color name="success_light">#E8F5E9</color>
-    <color name="warning">#FFA000</color>
     <color name="warning_light">#FFF8E1</color>
-    <color name="error">#D32F2F</color>
     <color name="error_light">#FFCDD2</color>
-    <color name="info">#1976D2</color>
     <color name="info_light">#E3F2FD</color>
     
     <!-- Workout Category Colors (Professional) -->
@@ -89,7 +143,6 @@
     <!-- Utility Colors -->
     <color name="absolute_white">#FFFFFF</color>
     <color name="absolute_black">#000000</color>
-    <color name="transparent">#00000000</color>
     <color name="overlay_light">#0A000000</color>
     <color name="overlay_medium">#1A000000</color>
     <color name="overlay_dark">#4D000000</color>
@@ -135,8 +188,6 @@
     <!-- Material Design Legacy -->
     <color name="teal_200">#80CBC4</color>
     <color name="teal_700">#00796B</color>
-    <color name="black">#000000</color>
-    <color name="white">#FFFFFF</color>
     <color name="purple_200">#FFBB86FC</color>
     <color name="purple_500">#FF6200EE</color>
     <color name="purple_700">#FF3700B3</color>
@@ -157,23 +208,15 @@
     <color name="cardBg">#FFFFFF</color>
     
     <!-- Theme Specific Professional Colors -->
-    <color name="theme_primary">#FF9800</color>
     <color name="theme_primary_light">#FED7D7</color>
     <color name="theme_primary_dark">#FF9800</color>
-    <color name="theme_secondary">#3F51B5</color>
     <color name="theme_secondary_light">#FFE5E5</color>
     <color name="theme_secondary_dark">#3F51B5</color>
-    <color name="theme_accent">#FF8A80</color>
     <color name="theme_accent_light">#FFEBEE</color>
-    <color name="theme_neutral">#718096</color>
-    <color name="theme_neutral_light">#F7FAFC</color>
-    <color name="theme_neutral_dark">#2D3748</color>
-    <color name="theme_surface">#FFFFFF</color>
     <color name="theme_surface_variant">#F8FAFC</color>
     <color name="theme_success">#38A169</color>
     <color name="theme_warning">#D69E2E</color>
     <color name="warning_dark">#B7791F</color>
-    <color name="theme_error">#E53E3E</color>
     <color name="theme_info">#3182CE</color>
     
     <!-- Meal Category Colors -->
@@ -191,4 +234,99 @@
     <!-- Professional Aliases -->
     <color name="chip_stroke_color">#E2E8F0</color>
     <color name="chip_background_color">#F7FAFC</color>
+    
+    <!-- Dark Mode Colors -->
+    <color name="dark_primary">#FF6B35</color>
+    <color name="dark_primary_dark">#E55A2B</color>
+    <color name="dark_primary_light">#FF8A65</color>
+    <color name="dark_secondary">#4ECDC4</color>
+    <color name="dark_accent">#FFE66D</color>
+    
+    <!-- Dark Theme Background Colors -->
+    <color name="dark_background_primary">#121212</color>
+    <color name="dark_background_secondary">#1E1E1E</color>
+    <color name="dark_surface_light">#2D2D2D</color>
+    <color name="dark_surface_dark">#1A1A1A</color>
+    <color name="dark_card_background">#2D2D2D</color>
+    <color name="dark_card_elevation">#000000</color>
+    
+    <!-- Dark Theme Text Colors -->
+    <color name="dark_text_primary">#FFFFFF</color>
+    <color name="dark_text_secondary">#B3FFFFFF</color>
+    <color name="dark_text_hint">#80FFFFFF</color>
+    <color name="dark_text_disabled">#66FFFFFF</color>
+    
+    <!-- Dark Theme Status Colors -->
+    <color name="dark_success">#4CAF50</color>
+    <color name="dark_warning">#FF9800</color>
+    <color name="dark_error">#F44336</color>
+    <color name="dark_info">#2196F3</color>
+    
+    <!-- Dark Theme Divider Colors -->
+    <color name="dark_divider_light">#424242</color>
+    <color name="dark_divider_dark">#2D2D2D</color>
+    
+    <!-- Dark Theme Progress Colors -->
+    <color name="dark_progress_background">#424242</color>
+    <color name="dark_progress_fill">#4ECDC4</color>
+    <color name="dark_progress_secondary">#FF6B35</color>
+    
+    <!-- Dark Theme Button Colors -->
+    <color name="dark_button_primary">#FF6B35</color>
+    <color name="dark_button_secondary">#2D2D2D</color>
+    <color name="dark_button_outline">#FF6B35</color>
+    
+    <!-- Dark Theme Input Colors -->
+    <color name="dark_input_background">#2D2D2D</color>
+    <color name="dark_input_border">#424242</color>
+    <color name="dark_input_border_focus">#FF6B35</color>
+    
+    <!-- Dark Theme Navigation Colors -->
+    <color name="dark_nav_background">#1E1E1E</color>
+    <color name="dark_nav_selected">#FF6B35</color>
+    <color name="dark_nav_unselected">#B3FFFFFF</color>
+    
+    <!-- Dark Theme Chip Colors -->
+    <color name="dark_chip_background">#2D2D2D</color>
+    <color name="dark_chip_background_selected">#FF6B35</color>
+    <color name="dark_chip_border">#424242</color>
+    <color name="dark_chip_text">#FFFFFF</color>
+    <color name="dark_chip_text_selected">#FFFFFF</color>
+    
+    <!-- Dark Theme Overlay Colors -->
+    <color name="dark_overlay_light">#1A000000</color>
+    <color name="dark_overlay_medium">#33000000</color>
+    <color name="dark_overlay_dark">#66000000</color>
+    
+    <!-- Dark Theme BMI Colors -->
+    <color name="dark_bmi_underweight">#FF6B6B</color>
+    <color name="dark_bmi_normal">#4ECDC4</color>
+    <color name="dark_bmi_overweight">#FFA726</color>
+    <color name="dark_bmi_obese">#EF5350</color>
+    
+    <!-- Dark Theme Fitness Colors -->
+    <color name="dark_fitness_primary">#FF6B35</color>
+    <color name="dark_fitness_secondary">#4ECDC4</color>
+    <color name="dark_fitness_accent">#FFE66D</color>
+    <color name="dark_fitness_success">#2ECC71</color>
+    <color name="dark_fitness_warning">#F39C12</color>
+    <color name="dark_fitness_error">#E74C3C</color>
+    
+    <!-- Dark Theme Workout Colors -->
+    <color name="dark_workout_strength">#FF6B35</color>
+    <color name="dark_workout_cardio">#4ECDC4</color>
+    <color name="dark_workout_flexibility">#FFE66D</color>
+    <color name="dark_workout_endurance">#FF8A65</color>
+    
+    <!-- Dark Theme Meal Colors -->
+    <color name="dark_meal_breakfast">#FFE66D</color>
+    <color name="dark_meal_lunch">#4ECDC4</color>
+    <color name="dark_meal_dinner">#FF6B35</color>
+    <color name="dark_meal_snack">#FF8A65</color>
+    
+    <!-- Dark Theme Status Colors -->
+    <color name="dark_status_completed">#4ECDC4</color>
+    <color name="dark_status_in_progress">#FFE66D</color>
+    <color name="dark_status_pending">#B3FFFFFF</color>
+    <color name="dark_status_missed">#FF6B35</color>
 </resources>

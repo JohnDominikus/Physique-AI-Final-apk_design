@@ -3,6 +3,7 @@ package com.example.physiqueaiapkfinal
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
+import android.graphics.Color
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -12,6 +13,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.CheckBox
+import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.ProgressBar
@@ -24,11 +26,18 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
+import com.google.firebase.firestore.Query
 import java.text.SimpleDateFormat
 import java.util.*
+import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
+import java.util.concurrent.TimeUnit
+import com.example.physiqueaiapkfinal.WorkoutTodo
+import com.example.physiqueaiapkfinal.MealTodo
+import com.example.physiqueaiapkfinal.UserMedicalInfo
 
 // Data classes for dashboard
 data class DashboardStats(
@@ -40,10 +49,16 @@ data class DashboardStats(
 )
 
 data class RecentActivity(
+    val id: String = "",
     val title: String = "",
     val subtitle: String = "",
-    val timestamp: Long = 0L
+    val timestamp: Long = 0L,
+    val type: String = ""
 )
+
+// Import the shared data classes
+// import com.example.physiqueaiapkfinal.MealTodo
+// import com.example.physiqueaiapkfinal.WorkoutTodo
 
 // Recent Activities Adapter
 class RecentActivitiesAdapter(private var activities: List<RecentActivity>) : 
@@ -90,11 +105,13 @@ class RecentActivitiesAdapter(private var activities: List<RecentActivity>) :
 
 class DashboardActivity : AppCompatActivity() {
 
-    private lateinit var auth: FirebaseAuth
+    // Firebase instances
     private lateinit var firestore: FirebaseFirestore
-    private lateinit var userId: String
+    private lateinit var auth: FirebaseAuth
+    private var currentUser: FirebaseUser? = null
+    private var userId: String? = null
     
-    // UI Components - Make them nullable to prevent crashes
+    // UI Components
     private var tvWelcome: TextView? = null
     private var tvFullName: TextView? = null
     private var tvEmail: TextView? = null
@@ -109,664 +126,697 @@ class DashboardActivity : AppCompatActivity() {
     private var progressCalories: ProgressBar? = null
     private var progressWorkouts: ProgressBar? = null
     private var rvRecentActivities: RecyclerView? = null
-    private var layoutEmptyState: LinearLayout? = null
+    private var layoutEmptyState: View? = null
     
-    // Cards - Make them nullable to prevent crashes
+    // Cards
     private var cardBMI: CardView? = null
     private var cardWorkouts: CardView? = null
     private var cardCalories: CardView? = null
     private var cardStartWorkout: CardView? = null
     private var cardBMICalc: CardView? = null
     private var cardPoseAI: CardView? = null
-
-    // Dropdown menu components
-    private var btnProfileMenu: ImageView? = null
-    private var dropdownMenu: androidx.cardview.widget.CardView? = null
-    private var isDropdownVisible = false
-
-    private lateinit var mainHandler: Handler
+    
+    // Profile menu
+    private var btnProfileMenu: ImageButton? = null
+    
+    // Todo section
     private var btnViewTodo: Button? = null
-    private var tvNoTasks: TextView? = null
-
-    // Real-time listeners
+    
+    // Firebase Listeners
     private var userInfoListener: ListenerRegistration? = null
+    private var statsListener: ListenerRegistration? = null
+    private var todosListener: ListenerRegistration? = null
+    private var mealTodosListener: ListenerRegistration? = null
+    private var activitiesListener: ListenerRegistration? = null
+    
+    // Legacy listener references (for cleanup)
     private var workoutTodoListener: ListenerRegistration? = null
     private var mealTodoListener: ListenerRegistration? = null
+    private var userStatsListener: ListenerRegistration? = null
     
     // Background executor for heavy operations
-    private val backgroundExecutor = Executors.newSingleThreadExecutor()
+    private val backgroundExecutor: ExecutorService = Executors.newFixedThreadPool(2)
+    
+    // Main handler for UI updates
+    private var mainHandler: android.os.Handler? = null
+    
+    // Data storage for unified updates
+    private var allWorkoutTodos: List<WorkoutTodo> = emptyList()
+    private var allMealTodos: List<MealTodo> = emptyList()
+    private var todayWorkoutTodos: List<WorkoutTodo> = emptyList()
+    private var todayMealTodos: List<MealTodo> = emptyList()
+
+    // New RecyclerView instances
+    private var rvMealActivities: RecyclerView? = null
+    private var rvWorkoutActivities: RecyclerView? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        
         try {
+            super.onCreate(savedInstanceState)
             setContentView(R.layout.activity_dashboard)
-
-            // Initialize Firebase with error handling
-            initializeFirebase()
             
-            // Check authentication with error handling
-            if (!checkAuthentication()) {
-                return
-            }
+            // Initialize UI components first (fast operations)
+            initializeUIComponents()
             
-            // Initialize UI components with error handling
-            initializeViews()
-            setupClickListeners()
-            setupBottomNavigation()
-            
-            // Load dashboard data with error handling
-            loadDashboardData()
-            
-            mainHandler = Handler(Looper.getMainLooper())
-            
-            // Setup real-time listeners
-            setupRealtimeListeners()
-            
-            // Initialize btnViewTodo safely
-            btnViewTodo = safelyFindView(R.id.btnViewTodo)
-            btnViewTodo?.setOnClickListener {
+            // Initialize Firebase in background
+            backgroundExecutor.execute {
                 try {
-                    // Navigate to Todo screen
-                    startActivity(Intent(this, TodoHubActivity::class.java))
+                    initializeFirebase()
+                    
+                    // Setup listeners in background
+                    setupRealTimeListeners()
+                    
+                    // Setup UI interactions on main thread
+                    mainHandler?.post {
+                        try {
+                            setupClickListeners()
+                            setupBottomNavigation()
+                        } catch (e: Exception) {
+                            Log.e("DashboardActivity", "Error setting up UI interactions", e)
+                        }
+                    }
+                    
                 } catch (e: Exception) {
-                    Log.e("DashboardActivity", "Error navigating to TodoHub", e)
-                    showError("Failed to open Todo Hub")
+                    Log.e("DashboardActivity", "Error in background initialization", e)
+                    mainHandler?.post {
+                        ErrorHandler.handleError(this, "Failed to initialize app data", e)
+                    }
                 }
             }
             
+            // Initialize main handler
+            mainHandler = android.os.Handler(android.os.Looper.getMainLooper())
+            
         } catch (e: Exception) {
-            Log.e("DashboardActivity", "Error in onCreate", e)
-            handleCriticalError("Failed to initialize dashboard", e)
+            Log.e("DashboardActivity", "Critical error in onCreate", e)
+            ErrorHandler.handleCrash(this, e, "DashboardActivity onCreate failed")
         }
     }
-
+    
     private fun initializeFirebase() {
         try {
-            auth = FirebaseAuth.getInstance()
             firestore = FirebaseFirestore.getInstance()
+            auth = FirebaseAuth.getInstance()
+            currentUser = auth.currentUser
+            
+            if (currentUser == null) {
+                Log.w("DashboardActivity", "No authenticated user found")
+                // Redirect to login if no user
+                mainHandler?.post {
+                    startActivity(Intent(this, LoginActivity::class.java))
+                    finish()
+                }
+                return
+            }
+            
+            userId = currentUser?.uid
+            Log.d("DashboardActivity", "Firebase initialized for user: $userId")
+            
         } catch (e: Exception) {
             Log.e("DashboardActivity", "Firebase initialization failed", e)
-            throw RuntimeException("Firebase initialization failed", e)
-        }
-    }
-        
-    private fun checkAuthentication(): Boolean {
-        return try {
-            val currentUser = auth.currentUser
-            if (currentUser == null) {
-                Log.w("DashboardActivity", "User not authenticated, redirecting to login")
-                startActivity(Intent(this, LoginActivity::class.java))
-                finish()
-                false
-            } else {
-                userId = currentUser.uid
-                Log.d("DashboardActivity", "User authenticated: $userId")
-                true
+            ErrorHandler.handleError(this, "Failed to initialize app data", e)
+            // Show user-friendly error and redirect to login
+            mainHandler?.post {
             }
-        } catch (e: Exception) {
-            Log.e("DashboardActivity", "Authentication check failed", e)
-            handleCriticalError("Authentication failed", e)
-            false
         }
     }
-
-    private fun initializeViews() {
+    
+    private fun initializeUIComponents() {
         try {
-            // Use safe findViewById with null checks
-            tvWelcome = safelyFindView(R.id.tvWelcome)
-            tvFullName = safelyFindView(R.id.tvFullName)
-            tvEmail = safelyFindView(R.id.tvEmail)
-            tvMotivation = safelyFindView(R.id.tvMotivation)
-            ivProfileImage = safelyFindView(R.id.ivProfileImage)
-            tvBMIValue = safelyFindView(R.id.tvBMIValue)
-            tvWorkoutCount = safelyFindView(R.id.tvWorkoutCount)
-            tvCaloriesBurned = safelyFindView(R.id.tvCaloriesBurned)
-            tvTodoCount = safelyFindView(R.id.tvTodoCount)
-            tvCaloriesProgress = safelyFindView(R.id.tvCaloriesProgress)
-            tvWorkoutsProgress = safelyFindView(R.id.tvWorkoutsProgress)
-            progressCalories = safelyFindView(R.id.progressCalories)
-            progressWorkouts = safelyFindView(R.id.progressWorkouts)
-            rvRecentActivities = safelyFindView(R.id.rvRecentActivities)
-            layoutEmptyState = safelyFindView(R.id.layoutEmptyState)
+            // Initialize all UI components with null safety
+            tvWelcome = findViewById(R.id.tvWelcome)
+            tvFullName = findViewById(R.id.tvFullName)
+            tvEmail = findViewById(R.id.tvEmail)
+            tvMotivation = findViewById(R.id.tvMotivation)
+            ivProfileImage = findViewById(R.id.ivProfileImage)
+            tvBMIValue = findViewById(R.id.tvBMIValue)
+            tvWorkoutCount = findViewById(R.id.tvWorkoutCount)
+            tvCaloriesBurned = findViewById(R.id.tvCaloriesBurned)
+            tvTodoCount = findViewById(R.id.tvTodoCount)
+            tvCaloriesProgress = findViewById(R.id.tvCaloriesProgress)
+            tvWorkoutsProgress = findViewById(R.id.tvWorkoutsProgress)
+            progressCalories = findViewById(R.id.progressCalories)
+            progressWorkouts = findViewById(R.id.progressWorkouts)
+            rvRecentActivities = findViewById(R.id.rvRecentActivities)
+            layoutEmptyState = findViewById(R.id.layoutEmptyState)
             
-            // Cards with error handling
-            cardBMI = safelyFindView(R.id.cardBMI)
-            cardWorkouts = safelyFindView(R.id.cardWorkouts)
-            cardCalories = safelyFindView(R.id.cardCalories)
-            cardStartWorkout = safelyFindView(R.id.cardStartWorkout)
-            cardBMICalc = safelyFindView(R.id.cardBMICalc)
-            cardPoseAI = safelyFindView(R.id.cardPoseAI)
+            // Initialize cards
+            cardBMI = findViewById(R.id.cardBMI)
+            cardWorkouts = findViewById(R.id.cardWorkouts)
+            cardCalories = findViewById(R.id.cardCalories)
+            cardStartWorkout = findViewById(R.id.cardStartWorkout)
+            cardBMICalc = findViewById(R.id.cardBMICalc)
+            cardPoseAI = findViewById(R.id.cardPoseAI)
             
-            // Dropdown menu components
-            btnProfileMenu = safelyFindView(R.id.btnProfileMenu)
-            dropdownMenu = safelyFindView(R.id.dropdownMenu)
+            // Initialize profile menu
+            btnProfileMenu = findViewById(R.id.btnProfileMenu)
             
-            // Setup RecyclerView with error handling
-            rvRecentActivities?.let { rv ->
-                rv.layoutManager = LinearLayoutManager(this)
-            }
+            // Initialize todo section
+            btnViewTodo = findViewById(R.id.btnViewTodo)
             
-            Log.d("DashboardActivity", "Views initialized successfully")
+            // Initialize new RecyclerView instances
+            rvMealActivities = findViewById(R.id.rvMealActivities)
+            rvWorkoutActivities = findViewById(R.id.rvWorkoutActivities)
+            
+            Log.d("DashboardActivity", "UI components initialized successfully")
+            
         } catch (e: Exception) {
-            Log.e("DashboardActivity", "Error initializing views", e)
-            handleCriticalError("Failed to initialize interface", e)
+            Log.e("DashboardActivity", "Error initializing UI components", e)
+            ErrorHandler.handleError(this, "Failed to load interface", e)
         }
     }
-
+    
     private fun setupClickListeners() {
         try {
-            // Profile menu button
+            // Settings icon (btnProfileMenu) click listener
             btnProfileMenu?.setOnClickListener {
-                toggleDropdownMenu()
+                try {
+                    val intent = Intent(this, ProfileActivity::class.java)
+                    startActivity(intent)
+                } catch (e: Exception) {
+                    Log.e("DashboardActivity", "Error navigating to settings", e)
+                }
             }
             
-            // Dropdown menu items
-            safelyFindView<LinearLayout>(R.id.menuAbout)?.setOnClickListener {
-                showAboutDialog()
-                hideDropdownMenu()
-            }
-            
-            safelyFindView<LinearLayout>(R.id.menuSettings)?.setOnClickListener {
-                navigateToSettings()
-                hideDropdownMenu()
-            }
-            
-            safelyFindView<LinearLayout>(R.id.menuLogout)?.setOnClickListener {
-                logoutUser()
-                hideDropdownMenu()
-            }
-            
-            // Card click listeners
+            // Card click listeners with null safety
             cardStartWorkout?.setOnClickListener {
-                startActivity(Intent(this, WorkoutListActivity::class.java))
+                try {
+                    startActivity(Intent(this, WorkoutListActivity::class.java))
+                } catch (e: Exception) {
+                    Log.e("DashboardActivity", "Error navigating to workouts", e)
+                }
             }
             
             cardBMICalc?.setOnClickListener {
-                startActivity(Intent(this, BmiCalculatorActivity::class.java))
+                try {
+                    startActivity(Intent(this, BmiCalculatorActivity::class.java))
+                } catch (e: Exception) {
+                    Log.e("DashboardActivity", "Error navigating to BMI calculator", e)
+                }
             }
             
             cardPoseAI?.setOnClickListener {
-                startActivity(Intent(this, PoseActivity::class.java))
+                try {
+                    startActivity(Intent(this, PoseActivity::class.java))
+                } catch (e: Exception) {
+                    Log.e("DashboardActivity", "Error navigating to Pose AI", e)
+                }
             }
             
-            // Click outside to close dropdown
-            findViewById<View>(android.R.id.content).setOnClickListener {
-                hideDropdownMenu()
+            cardWorkouts?.setOnClickListener {
+                try {
+                    startActivity(Intent(this, WorkoutListActivity::class.java))
+                } catch (e: Exception) {
+                    Log.e("DashboardActivity", "Error navigating to workout list", e)
+                }
+            }
+            
+            cardCalories?.setOnClickListener {
+                try {
+                    startActivity(Intent(this, TodoHubActivity::class.java))
+                } catch (e: Exception) {
+                    Log.e("DashboardActivity", "Error navigating to todo hub", e)
+                }
+            }
+            
+            btnViewTodo?.setOnClickListener {
+                try {
+                    startActivity(Intent(this, TodoHubActivity::class.java))
+                } catch (e: Exception) {
+                    Log.e("DashboardActivity", "Error navigating to todo hub", e)
+                }
             }
             
         } catch (e: Exception) {
             Log.e("DashboardActivity", "Error setting up click listeners", e)
+            ErrorHandler.handleError(this, "Failed to setup interactions", e)
         }
     }
-
-    private fun setupRealtimeListeners() {
+    
+    private fun setupRealTimeListeners() {
         try {
-            // Setup user info listener
+            if (userId.isNullOrEmpty()) {
+                Log.w("DashboardActivity", "Cannot setup listeners: userId is null")
+                return
+            }
+            
+            // Setup listeners in background to prevent ANR
+            backgroundExecutor.execute {
+                try {
+                    // Setup listeners with timeout protection
+                    val timeoutHandler = Handler(Looper.getMainLooper())
+                    val timeoutRunnable = Runnable {
+                        Log.w("DashboardActivity", "Listener setup timeout, continuing...")
+                    }
+                    
+                    // Set 2-second timeout (reduced from 3 seconds)
+                    timeoutHandler.postDelayed(timeoutRunnable, 2000)
+                    
+                    // Setup user info listener
+                    setupUserInfoListener()
+                    
+                    // Setup stats listener
+                    setupStatsListener()
+                    
+                    // Setup todos listener
+                    setupTodosListener()
+                    
+                    // Setup recent activities listener
+                    setupRecentActivitiesListener()
+                    
+                    // Remove timeout
+                    timeoutHandler.removeCallbacks(timeoutRunnable)
+                    
+                    Log.d("DashboardActivity", "Real-time listeners setup completed")
+                    
+                } catch (e: Exception) {
+                    Log.e("DashboardActivity", "Error setting up real-time listeners", e)
+                    mainHandler?.post {
+                        ErrorHandler.handleError(this@DashboardActivity, "Failed to setup data sync", e)
+                    }
+                }
+            }
+            
+        } catch (e: Exception) {
+            Log.e("DashboardActivity", "Error setting up real-time listeners", e)
+            ErrorHandler.handleError(this, "Failed to setup data sync", e)
+        }
+    }
+    
+    private fun setupUserInfoListener() {
+        try {
             userInfoListener = firestore.collection("users")
-                .document(userId)
+                .document(userId!!)
                 .addSnapshotListener { snapshot, error ->
-                    try {
-                        if (error != null) {
-                            Log.e("DashboardActivity", "Error listening to user info", error)
-                            return@addSnapshotListener
-                        }
-                        
-                        if (snapshot != null && snapshot.exists()) {
-                            val personalInfo = snapshot.get("personalInfo") as? Map<String, Any>
-                            val bmiInfo = snapshot.get("bmiInfo") as? Map<String, Any>
+                    backgroundExecutor.execute {
+                        try {
+                            if (error != null) {
+                                Log.e("DashboardActivity", "User info listener error", error)
+                                return@execute
+                            }
                             
-                            mainHandler.post {
-                                try {
-                                    // Update UI on main thread
-                                    updateUserInfo(personalInfo, bmiInfo)
-                                } catch (e: Exception) {
-                                    Log.e("DashboardActivity", "Error updating user info UI", e)
+                            if (snapshot != null && snapshot.exists()) {
+                                val userData = snapshot.data
+                                val personalInfo = userData?.get("personalInfo") as? Map<String, Any>
+                                val bmiInfo = userData?.get("bmiInfo") as? Map<String, Any>
+                                
+                                // Update UI on main thread
+                                mainHandler?.post {
+                                    try {
+                                        updateUserInfo(personalInfo, bmiInfo)
+                                    } catch (e: Exception) {
+                                        Log.e("DashboardActivity", "Error updating user info", e)
+                                    }
+                                }
+                            } else {
+                                Log.w("DashboardActivity", "User document not found")
+                                mainHandler?.post {
+                                    try {
+                                        showEmptyUserState()
+                                    } catch (e: Exception) {
+                                        Log.e("DashboardActivity", "Error showing empty user state", e)
+                                    }
                                 }
                             }
+                        } catch (e: Exception) {
+                            Log.e("DashboardActivity", "Error processing user info", e)
                         }
-                    } catch (e: Exception) {
-                        Log.e("DashboardActivity", "Error in user info listener", e)
                     }
                 }
-            
-            // Setup separate listeners for workout and meal todos
-            val today = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(Date())
-            
-            // Workout todos listener
-            workoutTodoListener = firestore.collection("userTodoList")
-                .document(userId)
+        } catch (e: Exception) {
+            Log.e("DashboardActivity", "Error setting up user info listener", e)
+        }
+    }
+    
+    private fun setupStatsListener() {
+        try {
+            statsListener = firestore.collection("userStats")
+                .document(userId!!)
+                .addSnapshotListener { snapshot, error ->
+                    backgroundExecutor.execute {
+                        try {
+                            if (error != null) {
+                                Log.e("DashboardActivity", "Stats listener error", error)
+                                return@execute
+                            }
+                            
+                            if (snapshot != null && snapshot.exists()) {
+                                val stats = snapshot.data
+                                
+                                // Update UI on main thread
+                                mainHandler?.post {
+                                    try {
+                                        updateDashboardStats(stats)
+                                    } catch (e: Exception) {
+                                        Log.e("DashboardActivity", "Error updating dashboard stats", e)
+                                    }
+                                }
+                            } else {
+                                Log.w("DashboardActivity", "Stats document not found")
+                                mainHandler?.post {
+                                    try {
+                                        showEmptyStatsState()
+                                    } catch (e: Exception) {
+                                        Log.e("DashboardActivity", "Error showing empty stats state", e)
+                                    }
+                                }
+                            }
+                        } catch (e: Exception) {
+                            Log.e("DashboardActivity", "Error processing stats", e)
+                        }
+                    }
+                }
+        } catch (e: Exception) {
+            Log.e("DashboardActivity", "Error setting up stats listener", e)
+        }
+    }
+    
+    private fun setupTodosListener() {
+        try {
+            // Setup workout todos listener with limit and background processing
+            todosListener = firestore.collection("userTodoList")
+                .document(userId!!)
                 .collection("workoutPlan")
-                .whereEqualTo("scheduledDate", today)
+                .limit(5) // Reduced from 10 to 5 for better performance
                 .addSnapshotListener { snapshot, error ->
-                    try {
-                        if (error != null) {
-                            Log.e("DashboardActivity", "Error listening to workout todos", error)
-                            return@addSnapshotListener
-                        }
-                        
-                        val workoutTodos = snapshot?.documents?.mapNotNull { doc ->
-                            try {
-                                // Use Map to avoid data class conflicts
-                                val data = doc.data
-                                if (data != null) {
-                                    WorkoutTodo(
-                                        id = doc.id,
-                                        workoutName = data["workoutName"] as? String ?: "",
-                                        sets = (data["sets"] as? Number)?.toInt() ?: 0,
-                                        reps = (data["reps"] as? Number)?.toInt() ?: 0,
-                                        estimatedCalories = (data["estimatedCalories"] as? Number)?.toInt() ?: 0,
-                                        scheduledDate = data["scheduledDate"] as? String ?: "",
-                                        isCompleted = data["isCompleted"] as? Boolean ?: false,
-                                        createdAt = (data["createdAt"] as? Number)?.toLong() ?: System.currentTimeMillis()
-                                    )
-                                } else null
-                            } catch (e: Exception) {
-                                Log.w("DashboardActivity", "Error parsing workout todo: ${doc.id}", e)
-                                null
+                    backgroundExecutor.execute {
+                        try {
+                            if (error != null) {
+                                Log.e("DashboardActivity", "Workout todos listener error", error)
+                                return@execute
                             }
-                        } ?: emptyList()
-                        
-                        // Update dashboard with workout data
-                        updateDashboardWithWorkoutData(workoutTodos)
-                        
-                    } catch (e: Exception) {
-                        Log.e("DashboardActivity", "Error in workout todo listener", e)
+                            
+                            val workoutTodos = snapshot?.documents?.mapNotNull { doc ->
+                                try {
+                                    doc.toObject(WorkoutTodo::class.java)?.copy(id = doc.id)
+                                } catch (e: Exception) {
+                                    Log.e("DashboardActivity", "Error parsing workout todo", e)
+                                    null
+                                }
+                            } ?: emptyList()
+                            
+                            allWorkoutTodos = workoutTodos
+                            todayWorkoutTodos = workoutTodos.filter { todo ->
+                                todo.scheduledDate == getCurrentDate()
+                            }
+                            
+                            // Update UI on main thread
+                            mainHandler?.post {
+                                try {
+                                    updateTodosDisplay(allWorkoutTodos, allMealTodos)
+                                } catch (e: Exception) {
+                                    Log.e("DashboardActivity", "Error updating todos display", e)
+                                }
+                            }
+                            
+                        } catch (e: Exception) {
+                            Log.e("DashboardActivity", "Error processing workout todos", e)
+                        }
                     }
                 }
             
-            // Meal todos listener
-            mealTodoListener = firestore.collection("userTodoList")
-                .document(userId)
+            // Setup meal todos listener with limit and background processing
+            mealTodosListener = firestore.collection("userTodoList")
+                .document(userId!!)
                 .collection("mealPlan")
-                .whereEqualTo("scheduledDate", today)
+                .limit(5) // Reduced from 10 to 5 for better performance
                 .addSnapshotListener { snapshot, error ->
-                    try {
-                        if (error != null) {
-                            Log.e("DashboardActivity", "Error listening to meal todos", error)
-                            return@addSnapshotListener
-                        }
-                        
-                        val mealTodos = snapshot?.documents?.mapNotNull { doc ->
-                            try {
-                                // Use Map to avoid data class conflicts
-                                val data = doc.data
-                                if (data != null) {
-                                    MealTodo(
-                                        id = doc.id,
-                                        mealName = data["mealName"] as? String ?: "",
-                                        mealType = data["mealType"] as? String ?: "",
-                                        calories = (data["calories"] as? Number)?.toInt() ?: 0,
-                                        scheduledDate = data["scheduledDate"] as? String ?: "",
-                                        isCompleted = data["isCompleted"] as? Boolean ?: false,
-                                        createdAt = (data["createdAt"] as? Number)?.toLong() ?: System.currentTimeMillis()
-                                    )
-                                } else null
-                            } catch (e: Exception) {
-                                Log.w("DashboardActivity", "Error parsing meal todo: ${doc.id}", e)
-                                null
+                    backgroundExecutor.execute {
+                        try {
+                            if (error != null) {
+                                Log.e("DashboardActivity", "Meal todos listener error", error)
+                                return@execute
                             }
-                        } ?: emptyList()
-                        
-                        // Update dashboard with meal data
-                        updateDashboardWithMealData(mealTodos)
-                        
-                    } catch (e: Exception) {
-                        Log.e("DashboardActivity", "Error in meal todo listener", e)
+                            
+                            val mealTodos = snapshot?.documents?.mapNotNull { doc ->
+                                try {
+                                    doc.toObject(MealTodo::class.java)?.copy(id = doc.id)
+                                } catch (e: Exception) {
+                                    Log.e("DashboardActivity", "Error parsing meal todo", e)
+                                    null
+                                }
+                            } ?: emptyList()
+                            
+                            allMealTodos = mealTodos
+                            todayMealTodos = mealTodos.filter { todo ->
+                                todo.scheduledDate == getCurrentDate()
+                            }
+                            
+                            // Update UI on main thread
+                            mainHandler?.post {
+                                try {
+                                    updateTodosDisplay(allWorkoutTodos, allMealTodos)
+                                } catch (e: Exception) {
+                                    Log.e("DashboardActivity", "Error updating todos display", e)
+                                }
+                            }
+                            
+                        } catch (e: Exception) {
+                            Log.e("DashboardActivity", "Error processing meal todos", e)
+                        }
                     }
                 }
                 
         } catch (e: Exception) {
-            Log.e("DashboardActivity", "Error setting up real-time listeners", e)
+            Log.e("DashboardActivity", "Error setting up todos listeners", e)
         }
     }
     
-    // Separate methods for updating dashboard data
-    private fun updateDashboardWithWorkoutData(workoutTodos: List<WorkoutTodo>) {
+    private fun getCurrentDate(): String {
+        return SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
+    }
+    
+    private fun setupRecentActivitiesListener() {
         try {
-            val completedWorkouts = workoutTodos.count { it.isCompleted }
-            val totalCaloriesBurned = workoutTodos.filter { it.isCompleted }.sumOf { it.estimatedCalories }
-            
-            mainHandler.post {
-                try {
-                    tvWorkoutCount?.text = completedWorkouts.toString()
-                    tvCaloriesBurned?.text = "$totalCaloriesBurned cal"
-                    
-                    // Update progress bars
-                    val caloriesProgress = if (totalCaloriesBurned > 0) {
-                        (totalCaloriesBurned * 100) / 2000
-                    } else {
-                        0
+            activitiesListener = firestore.collection("userActivities")
+                .document(userId!!)
+                .collection("recentActivities")
+                .orderBy("timestamp", Query.Direction.DESCENDING)
+                .limit(20) // Taasan ang limit para makita lahat
+                .addSnapshotListener { snapshot, error ->
+                    backgroundExecutor.execute {
+                        try {
+                            if (error != null) {
+                                Log.e("DashboardActivity", "Recent activities listener error", error)
+                                return@execute
+                            }
+                            
+                            val activities = snapshot?.documents?.mapNotNull { doc ->
+                                try {
+                                    doc.toObject(RecentActivity::class.java)?.copy(id = doc.id)
+                                } catch (e: Exception) {
+                                    Log.e("DashboardActivity", "Error parsing recent activity", e)
+                                    null
+                                }
+                            } ?: emptyList()
+                            
+                            // Update UI on main thread
+                            mainHandler?.post {
+                                try {
+                                    updateRecentActivities(activities)
+                                } catch (e: Exception) {
+                                    Log.e("DashboardActivity", "Error updating recent activities", e)
+                                }
+                            }
+                        } catch (e: Exception) {
+                            Log.e("DashboardActivity", "Error processing recent activities", e)
+                        }
                     }
-                    progressCalories?.progress = caloriesProgress.coerceAtMost(100)
-                    tvCaloriesProgress?.text = "$totalCaloriesBurned cal"
-                    
-                    // Update recent activities
-                    updateRecentActivities(workoutTodos, emptyList())
-                    
-                } catch (e: Exception) {
-                    Log.e("DashboardActivity", "Error updating workout data UI", e)
                 }
-            }
         } catch (e: Exception) {
-            Log.e("DashboardActivity", "Error updating workout data", e)
+            Log.e("DashboardActivity", "Error setting up recent activities listener", e)
         }
     }
     
-    private fun updateDashboardWithMealData(mealTodos: List<MealTodo>) {
-        try {
-            val completedMeals = mealTodos.count { it.isCompleted }
-            val totalCaloriesConsumed = mealTodos.filter { it.isCompleted }.sumOf { it.calories }
-            
-            mainHandler.post {
-                try {
-                    // Update recent activities with meal data
-                    updateRecentActivities(emptyList(), mealTodos)
-                    
-                } catch (e: Exception) {
-                    Log.e("DashboardActivity", "Error updating meal data UI", e)
-                }
-            }
-        } catch (e: Exception) {
-            Log.e("DashboardActivity", "Error updating meal data", e)
-        }
-    }
-
-    private fun updateDashboardStats(
-        totalTodos: Int,
-        completedTodos: Int,
-        caloriesBurned: Int,
-        caloriesConsumed: Int,
-        workoutTodos: List<WorkoutTodo>,
-        mealTodos: List<MealTodo>
-    ) {
-        try {
-            // Update todo count
-            tvTodoCount?.text = "$completedTodos/$totalTodos"
-            
-            // Update calories burned
-            tvCaloriesBurned?.text = "$caloriesBurned cal"
-            
-            // Update workout count (completed workouts only)
-            val completedWorkouts = workoutTodos.count { it.isCompleted }
-            tvWorkoutCount?.text = completedWorkouts.toString()
-            
-            // Update progress bars
-            val completionProgress = if (totalTodos > 0) {
-                (completedTodos * 100) / totalTodos
-            } else {
-                0
-            }
-            
-            progressWorkouts?.progress = completionProgress.coerceAtMost(100)
-            tvWorkoutsProgress?.text = "$completedTodos/$totalTodos"
-            
-            // Update calories progress (assuming 2000 cal daily goal)
-            val caloriesProgress = if (caloriesBurned > 0) {
-                (caloriesBurned * 100) / 2000
-            } else {
-                0
-            }
-            progressCalories?.progress = caloriesProgress.coerceAtMost(100)
-            tvCaloriesProgress?.text = "$caloriesBurned cal"
-            
-            // Update motivation text based on progress
-            updateMotivationText(completedTodos, totalTodos, caloriesBurned)
-            
-            // Update recent activities
-            updateRecentActivities(workoutTodos, mealTodos)
-            
-            Log.d("DashboardActivity", "Dashboard updated: $completedTodos/$totalTodos completed, $caloriesBurned cal burned")
-            
-        } catch (e: Exception) {
-            Log.e("DashboardActivity", "Error updating dashboard stats", e)
-        }
-    }
-
-    private fun updateMotivationText(completedTodos: Int, totalTodos: Int, caloriesBurned: Int) {
-        try {
-            val motivationText = when {
-                totalTodos == 0 -> "Ready to crush your goals today? 💪"
-                completedTodos == totalTodos -> "Amazing! You've completed all your tasks! 🎉"
-                completedTodos > totalTodos / 2 -> "You're doing great! Keep it up! 🔥"
-                completedTodos > 0 -> "Good start! You've got this! 💪"
-                else -> "Time to get started! Your future self will thank you! ⚡"
-            }
-            
-            tvMotivation?.text = motivationText
-            
-        } catch (e: Exception) {
-            Log.e("DashboardActivity", "Error updating motivation text", e)
-        }
-    }
-
-    private fun updateRecentActivities(workoutTodos: List<WorkoutTodo>, mealTodos: List<MealTodo>) {
-        try {
-            val recentActivities = mutableListOf<RecentActivity>()
-            
-            // Add completed workout activities
-            workoutTodos.filter { it.isCompleted }
-                .sortedByDescending { it.createdAt }
-                .take(5)
-                .forEach { todo ->
-                    recentActivities.add(
-                        RecentActivity(
-                            title = todo.workoutName,
-                            subtitle = "${todo.sets} sets × ${todo.reps} reps - ${todo.estimatedCalories} cal burned",
-                            timestamp = todo.createdAt
-                        )
-                    )
-                }
-            
-            // Add completed meal activities
-            mealTodos.filter { it.isCompleted }
-                .sortedByDescending { it.createdAt }
-                .take(5)
-                .forEach { todo ->
-                    recentActivities.add(
-                        RecentActivity(
-                            title = todo.mealName,
-                            subtitle = "${todo.mealType} - ${todo.calories} cal consumed",
-                            timestamp = todo.createdAt
-                        )
-                    )
-                }
-            
-            // Sort by timestamp and take top 10
-            val sortedActivities = recentActivities.sortedByDescending { it.timestamp }.take(10)
-            
-            // Update RecyclerView if it exists
-            rvRecentActivities?.let { rv ->
-                if (sortedActivities.isNotEmpty()) {
-                    layoutEmptyState?.visibility = View.GONE
-                    rv.visibility = View.VISIBLE
-                    
-                    // Create adapter if not exists
-                    if (rv.adapter == null) {
-                        val adapter = RecentActivitiesAdapter(sortedActivities)
-                        rv.adapter = adapter
-                    } else {
-                        (rv.adapter as? RecentActivitiesAdapter)?.updateActivities(sortedActivities)
-                    }
-                } else {
-                    layoutEmptyState?.visibility = View.VISIBLE
-                    rv.visibility = View.GONE
-                }
-            }
-            
-        } catch (e: Exception) {
-            Log.e("DashboardActivity", "Error updating recent activities", e)
-        }
-    }
-
     private fun updateUserInfo(personalInfo: Map<String, Any>?, bmiInfo: Map<String, Any>?) {
         try {
-            // Update welcome message and name
-            val firstName = personalInfo?.get("firstName") as? String ?: ""
-            val lastName = personalInfo?.get("lastName") as? String ?: ""
-            val fullName = "$firstName $lastName".trim()
-            
-            tvWelcome?.text = "Welcome back!"
-            tvFullName?.text = if (fullName.isNotEmpty()) fullName else "User"
-            
-            // Update BMI
-            val currentBMI = bmiInfo?.get("currentBMI") as? Double ?: 0.0
-            tvBMIValue?.text = String.format("%.1f", currentBMI)
-            
-        } catch (e: Exception) {
-            Log.e("DashboardActivity", "Error updating user info", e)
-        }
-    }
-
-    // 🎯 TOGGLE DROPDOWN MENU
-    private fun toggleDropdownMenu() {
-        try {
-            dropdownMenu?.let { menu ->
-                if (menu.visibility == View.VISIBLE) {
-                    // Hide with animation
-                    menu.animate()
-                        .alpha(0f)
-                        .translationY(-20f)
-                        .setDuration(200)
-                        .withEndAction {
-                            menu.visibility = View.GONE
-                            menu.alpha = 1f
-                            menu.translationY = 0f
+            runOnUiThread {
+                try {
+                    // Update personal info
+                    personalInfo?.let { info ->
+                        val firstName = info["firstName"] as? String ?: ""
+                        val lastName = info["lastName"] as? String ?: ""
+                        val email = info["email"] as? String ?: ""
+                        
+                        tvWelcome?.text = "Welcome back, $firstName!"
+                        tvFullName?.text = "$firstName $lastName"
+                        tvEmail?.text = email
+                        
+                        // Set motivation based on time
+                        val currentHour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY)
+                        val motivation = when {
+                            currentHour < 12 -> "Good morning! Ready to crush your goals?"
+                            currentHour < 17 -> "Good afternoon! Keep pushing forward!"
+                            else -> "Good evening! Great work today!"
                         }
-                        .start()
-                } else {
-                    // Show with animation
-                    menu.alpha = 0f
-                    menu.translationY = -20f
-                    menu.visibility = View.VISIBLE
-                    menu.animate()
-                        .alpha(1f)
-                        .translationY(0f)
-                        .setDuration(200)
-                        .start()
+                        tvMotivation?.text = motivation
+                    }
+                    
+                    // Update BMI info
+                    bmiInfo?.let { bmi ->
+                        val bmiValue = bmi["bmi"] as? Double ?: 0.0
+                        val bmiCategory = bmi["category"] as? String ?: "Unknown"
+                        
+                        tvBMIValue?.text = String.format("%.1f", bmiValue)
+                        
+                        // Set BMI card color based on category
+                        cardBMI?.setCardBackgroundColor(getBMIColor(bmiCategory))
+                    }
+                    
+                } catch (e: Exception) {
+                    Log.e("DashboardActivity", "Error updating UI with user info", e)
                 }
             }
         } catch (e: Exception) {
-            Log.e("DashboardActivity", "Error toggling dropdown menu", e)
+            Log.e("DashboardActivity", "Error in updateUserInfo", e)
         }
     }
-
-    // 🎯 HIDE DROPDOWN MENU
-    private fun hideDropdownMenu() {
+    
+    private fun updateDashboardStats(stats: Map<String, Any>?) {
         try {
-            dropdownMenu?.let { menu ->
-                if (menu.visibility == View.VISIBLE) {
-                    menu.animate()
-                        .alpha(0f)
-                        .translationY(-20f)
-                        .setDuration(200)
-                        .withEndAction {
-                            menu.visibility = View.GONE
-                            menu.alpha = 1f
-                            menu.translationY = 0f
-                        }
-                        .start()
+            runOnUiThread {
+                try {
+                    stats?.let { data ->
+                        val totalWorkouts = (data["totalWorkouts"] as? Long)?.toInt() ?: 0
+                        val totalCaloriesBurned = (data["totalCaloriesBurned"] as? Long)?.toInt() ?: 0
+                        val todayWorkouts = (data["todayWorkouts"] as? Long)?.toInt() ?: 0
+                        val todayCaloriesBurned = (data["todayCaloriesBurned"] as? Long)?.toInt() ?: 0
+                        
+                        // Update total stats
+                        tvWorkoutCount?.text = totalWorkouts.toString()
+                        tvCaloriesBurned?.text = totalCaloriesBurned.toString()
+                        
+                        // Update today progress
+                        tvWorkoutsProgress?.text = "$todayWorkouts today"
+                        tvCaloriesProgress?.text = "$todayCaloriesBurned today"
+                        
+                        // Update progress bars
+                        progressWorkouts?.progress = todayWorkouts
+                        progressCalories?.progress = todayCaloriesBurned
+                        
+                    } ?: run {
+                        // No stats available
+                        showEmptyStatsState()
+                    }
+                    
+                } catch (e: Exception) {
+                    Log.e("DashboardActivity", "Error updating UI with stats", e)
                 }
             }
         } catch (e: Exception) {
-            Log.e("DashboardActivity", "Error hiding dropdown menu", e)
+            Log.e("DashboardActivity", "Error in updateDashboardStats", e)
         }
     }
-
-    // ℹ️ SHOW ABOUT DIALOG
-    private fun showAboutDialog() {
+    
+    private fun updateTodosDisplay(workoutTodos: List<WorkoutTodo>, mealTodos: List<MealTodo>) {
         try {
-            // Navigate to AboutActivity instead of showing dialog
-            val intent = Intent(this, AboutActivity::class.java)
-            startActivity(intent)
-        } catch (e: Exception) {
-            Log.e("DashboardActivity", "Error navigating to AboutActivity", e)
-            // Fallback to dialog if navigation fails
-            AlertDialog.Builder(this)
-                .setTitle("About Physique AI")
-                .setMessage("""
-                    Physique AI v1.0
+            runOnUiThread {
+                try {
+                    val totalTodos = workoutTodos.size + mealTodos.size
+                    val completedTodos = workoutTodos.count { it.isCompleted } + mealTodos.count { it.isCompleted }
                     
-                    Created by BSCS 4-3
+                    tvTodoCount?.text = "$completedTodos/$totalTodos"
                     
-                    Your personal fitness companion powered by AI.
+                    if (totalTodos == 0) {
+                        btnViewTodo?.text = "Add Your First Task"
+                    } else {
+                        btnViewTodo?.text = "View All Tasks"
+                    }
                     
-                    Features:
-                    • AI-powered workout recommendations
-                    • Real-time pose detection
-                    • Personalized meal planning
-                    • Progress tracking
-                    • BMI calculator
-                    
-                    Built with ❤️ for your fitness journey.
-                """.trimIndent())
-                .setPositiveButton("OK", null)
-                .show()
-        }
-    }
-
-    // ⚙️ NAVIGATE TO SETTINGS
-    private fun navigateToSettings() {
-        try {
-            // Navigate to ProfileActivity for settings
-            val intent = Intent(this, ProfileActivity::class.java)
-            startActivity(intent)
-        } catch (e: Exception) {
-            Log.e("DashboardActivity", "Error navigating to ProfileActivity", e)
-            // Fallback to dialog if navigation fails
-            AlertDialog.Builder(this)
-                .setTitle("Settings")
-                .setMessage("Settings feature coming soon!")
-                .setPositiveButton("OK", null)
-                .show()
-        }
-    }
-
-    // 🚪 LOGOUT USER
-    private fun logoutUser() {
-        try {
-            AlertDialog.Builder(this)
-                .setTitle("Logout")
-                .setMessage("Are you sure you want to logout?")
-                .setPositiveButton("Yes") { _, _ ->
-                    performLogout()
+                } catch (e: Exception) {
+                    Log.e("DashboardActivity", "Error updating todos display", e)
                 }
-                .setNegativeButton("No", null)
-                .show()
+            }
         } catch (e: Exception) {
-            Log.e("DashboardActivity", "Error showing logout dialog", e)
+            Log.e("DashboardActivity", "Error in updateTodosDisplay", e)
         }
     }
-
-    // 🚪 PERFORM LOGOUT
-    private fun performLogout() {
+    
+    private fun updateRecentActivities(activities: List<RecentActivity>) {
         try {
-            // Sign out from Firebase
-            FirebaseAuth.getInstance().signOut()
-            
-            // Clear any stored user data
-            val sharedPrefs = getSharedPreferences("PhysiqueAI", Context.MODE_PRIVATE)
-            sharedPrefs.edit().clear().apply()
-            
-            // Navigate to login screen and clear activity stack
-            val intent = Intent(this, LoginActivity::class.java)
-            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-            startActivity(intent)
-            finish()
-            
+            val mealActivities = activities.filter { it.type == "meal" }
+            val workoutActivities = activities.filter { it.type == "workout" }
+            runOnUiThread {
+                try {
+                    // Meal Activities
+                    if (mealActivities.isEmpty()) {
+                        rvMealActivities?.visibility = View.GONE
+                    } else {
+                        rvMealActivities?.visibility = View.VISIBLE
+                        if (rvMealActivities?.adapter == null) {
+                            rvMealActivities?.layoutManager = LinearLayoutManager(this)
+                            rvMealActivities?.adapter = RecentActivitiesAdapter(mealActivities)
+                        } else {
+                            (rvMealActivities?.adapter as? RecentActivitiesAdapter)?.updateActivities(mealActivities)
+                        }
+                    }
+                    // Workout Activities
+                    if (workoutActivities.isEmpty()) {
+                        rvWorkoutActivities?.visibility = View.GONE
+                    } else {
+                        rvWorkoutActivities?.visibility = View.VISIBLE
+                        if (rvWorkoutActivities?.adapter == null) {
+                            rvWorkoutActivities?.layoutManager = LinearLayoutManager(this)
+                            rvWorkoutActivities?.adapter = RecentActivitiesAdapter(workoutActivities)
+                        } else {
+                            (rvWorkoutActivities?.adapter as? RecentActivitiesAdapter)?.updateActivities(workoutActivities)
+                        }
+                    }
+                } catch (e: Exception) {
+                    Log.e("DashboardActivity", "Error updating separated recent activities", e)
+                }
+            }
         } catch (e: Exception) {
-            Log.e("DashboardActivity", "Error performing logout", e)
-            // Fallback: just navigate to login
-            val intent = Intent(this, LoginActivity::class.java)
-            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-            startActivity(intent)
-            finish()
+            Log.e("DashboardActivity", "Error in updateRecentActivities", e)
+        }
+    }
+    
+    private fun showEmptyUserState() {
+        try {
+            runOnUiThread {
+                tvWelcome?.text = "Welcome!"
+                tvFullName?.text = "User"
+                tvEmail?.text = "No email available"
+                tvMotivation?.text = "Complete your profile to get started!"
+            }
+        } catch (e: Exception) {
+            Log.e("DashboardActivity", "Error showing empty user state", e)
+        }
+    }
+    
+    private fun showEmptyStatsState() {
+        try {
+            runOnUiThread {
+                tvWorkoutCount?.text = "0"
+                tvCaloriesBurned?.text = "0"
+                tvWorkoutsProgress?.text = "0 today"
+                tvCaloriesProgress?.text = "0 today"
+                progressWorkouts?.progress = 0
+                progressCalories?.progress = 0
+            }
+        } catch (e: Exception) {
+            Log.e("DashboardActivity", "Error showing empty stats state", e)
+        }
+    }
+    
+    private fun getBMIColor(category: String): Int {
+        return try {
+            when (category.lowercase()) {
+                "underweight" -> Color.parseColor("#FF6B6B")
+                "normal" -> Color.parseColor("#4ECDC4")
+                "overweight" -> Color.parseColor("#FFA726")
+                "obese" -> Color.parseColor("#EF5350")
+                else -> Color.parseColor("#9E9E9E")
+            }
+        } catch (e: Exception) {
+            Log.e("DashboardActivity", "Error parsing BMI color", e)
+            Color.parseColor("#9E9E9E")
         }
     }
 
     private fun setupBottomNavigation() {
         try {
-            val bottomNavigation = safelyFindView<BottomNavigationView>(R.id.bottom_navigation)
+            val bottomNavigation = findViewById<BottomNavigationView>(R.id.bottom_navigation)
             bottomNavigation?.let { nav ->
                 nav.selectedItemId = R.id.nav_home
                 
@@ -800,7 +850,6 @@ class DashboardActivity : AppCompatActivity() {
                         }
                     } catch (e: Exception) {
                         Log.e("DashboardActivity", "Error in navigation", e)
-                        showError("Navigation failed")
                         false
                     }
                 }
@@ -816,7 +865,7 @@ class DashboardActivity : AppCompatActivity() {
             startActivity(intent)
         } catch (e: Exception) {
             Log.e("DashboardActivity", "Failed to navigate to ${activityClass.simpleName}", e)
-            showError("Failed to open ${activityClass.simpleName}")
+            ErrorHandler.handleError(this, "Failed to open ${activityClass.simpleName}", e)
         }
     }
 
@@ -839,56 +888,24 @@ class DashboardActivity : AppCompatActivity() {
         }
     }
 
-    private fun showError(message: String) {
-        try {
-            runOnUiThread {
-                Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
-            }
-        } catch (e: Exception) {
-            Log.e("DashboardActivity", "Error showing toast", e)
-        }
-    }
-
-    private fun handleCriticalError(message: String, error: Exception) {
-        try {
-            Log.e("DashboardActivity", "Critical error: $message", error)
-            
-            // Show user-friendly error message
-            runOnUiThread {
-                try {
-                    AlertDialog.Builder(this)
-                        .setTitle("Error")
-                        .setMessage("$message\n\nPlease try again or restart the app.")
-                        .setPositiveButton("OK") { _, _ ->
-                            finish()
-                        }
-                        .setCancelable(false)
-                        .show()
-                } catch (e: Exception) {
-                    Log.e("DashboardActivity", "Error showing error dialog", e)
-                    finish()
-                }
-            }
-        } catch (e: Exception) {
-            Log.e("DashboardActivity", "Error handling critical error", e)
-            finish()
-        }
-    }
-
-    // 🧹 CLEANUP LISTENERS ON DESTROY
     override fun onDestroy() {
         try {
             // Clean up listeners to prevent memory leaks
-            userInfoListener?.remove()
-            workoutTodoListener?.remove()
-            mealTodoListener?.remove()
-            
+            // (cleanupListeners removed)
             // Remove callbacks to prevent memory leaks
-            mainHandler.removeCallbacksAndMessages(null)
-            
-            // Shutdown background executor
-            backgroundExecutor.shutdown()
-            
+            mainHandler?.removeCallbacksAndMessages(null)
+            // Shutdown background executor properly
+            if (!backgroundExecutor.isShutdown) {
+                backgroundExecutor.shutdown()
+                try {
+                    if (!backgroundExecutor.awaitTermination(5, TimeUnit.SECONDS)) {
+                        backgroundExecutor.shutdownNow()
+                    }
+                } catch (e: InterruptedException) {
+                    backgroundExecutor.shutdownNow()
+                    Thread.currentThread().interrupt()
+                }
+            }
             super.onDestroy()
         } catch (e: Exception) {
             Log.e("DashboardActivity", "Error in onDestroy", e)
@@ -898,12 +915,26 @@ class DashboardActivity : AppCompatActivity() {
 
     override fun onPause() {
         try {
-            // Hide dropdown menu when activity is paused
-            hideDropdownMenu()
+            // Don't cleanup listeners immediately to prevent unnecessary re-initialization
+            // Only cleanup in onDestroy to prevent memory leaks
             super.onPause()
         } catch (e: Exception) {
             Log.e("DashboardActivity", "Error in onPause", e)
             super.onPause()
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        try {
+            // Listeners are already active, no need to restart
+            // Only restart if they were actually cleaned up
+            if (userInfoListener == null && !userId.isNullOrEmpty() && !isFinishing) {
+                Log.d("DashboardActivity", "Restarting listeners in onResume")
+                setupRealTimeListeners()
+            }
+        } catch (e: Exception) {
+            Log.e("DashboardActivity", "Error in onResume", e)
         }
     }
 } 

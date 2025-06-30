@@ -110,7 +110,7 @@
                     app:srcCompat="@drawable/ic_check_circle"
                     app:layout_constraintTop_toBottomOf="@id/weightRangeText"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:tint="@color/green" />
+                    android:tint="@color/green" />
 
                 <TextView
                     android:id="@+id/bmiStatusText"

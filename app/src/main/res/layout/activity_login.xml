@@ -24,7 +24,7 @@
             android:contentDescription="Back"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:tint="?attr/textColorPrimary" />
+            android:tint="?attr/textColorPrimary" />
 
         <!-- Main Content Card -->
         <androidx.cardview.widget.CardView

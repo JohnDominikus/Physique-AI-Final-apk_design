@@ -17,12 +17,15 @@
 
         <ImageButton
             android:id="@+id/btnBack"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
+            android:layout_width="@dimen/button_icon_size"
+            android:layout_height="@dimen/button_icon_size"
+            android:layout_margin="@dimen/spacing_sm"
+            android:background="?attr/selectableItemBackgroundBorderless"
             android:src="@drawable/back"
-            android:background="?android:attr/selectableItemBackgroundBorderless"
             android:contentDescription="Back"
-            app:tint="@color/absolute_white" />
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:tint="@color/absolute_white" />
 
         <TextView
             android:layout_width="0dp"

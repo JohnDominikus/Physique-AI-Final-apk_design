@@ -21,6 +21,9 @@ import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
+import java.util.concurrent.TimeUnit
+import com.example.physiqueaiapkfinal.WorkoutTodo
+import com.example.physiqueaiapkfinal.UserMedicalInfo
 
 // Import UserMedicalInfo from DietaryTodoActivity
 
@@ -33,26 +36,6 @@ data class WorkoutItem(
     val safety_warning: String = "",
     val calories_per_minute: Int = 0
 )
-
-data class WorkoutTodo(
-    val id: String = UUID.randomUUID().toString(),
-    val workoutId: String = "",
-    val workoutName: String = "",
-    val sets: Int = 0,
-    val reps: Int = 0,
-    val minutes: Int = 0,
-    val seconds: Int = 0,
-    val scheduledDate: String = "",
-    val isCompleted: Boolean = false,
-    val userId: String = "",
-    val createdAt: Long = System.currentTimeMillis(),
-    val muscleGroups: List<String> = listOf(),
-    val safetyWarning: String = "",
-    val estimatedCalories: Int = 0,
-    val durationMinutes: Int = 0
-)
-
-
 
 class WorkoutTodoActivity : AppCompatActivity() {
     
@@ -156,9 +139,11 @@ class WorkoutTodoActivity : AppCompatActivity() {
     }
     
     private fun setupRecyclerView() {
-        adapter = WorkoutTodoAdapter(todoList) { todo ->
-            toggleTodoCompletion(todo)
-        }
+        adapter = WorkoutTodoAdapter(
+            todoList,
+            onToggleCompletion = { todo -> toggleTodoCompletion(todo) },
+            onDelete = { todo -> deleteTodo(todo) }
+        )
         recyclerView.layoutManager = LinearLayoutManager(this)
         recyclerView.adapter = adapter
     }
@@ -696,6 +681,20 @@ class WorkoutTodoActivity : AppCompatActivity() {
                     .collection("workoutPlan")
                     .add(workoutTodo)
                     .addOnSuccessListener {
+                        // Magdagdag ng activity log sa recentActivities
+                        val activity = mapOf(
+                            "title" to workout.name,
+                            "subtitle" to "$sets sets × $reps reps - $estimatedCalories cal scheduled",
+                            "timestamp" to System.currentTimeMillis(),
+                            "type" to "workout",
+                            "caloriesBurned" to estimatedCalories,
+                            "date" to selectedDate,
+                            "userId" to userId
+                        )
+                        firestore.collection("userActivities")
+                            .document(userId)
+                            .collection("recentActivities")
+                            .add(activity)
                         mainHandler.post {
                             Toast.makeText(this@WorkoutTodoActivity, "✅ Workout added to your plan!", Toast.LENGTH_SHORT).show()
                             clearInputs()
@@ -750,6 +749,7 @@ class WorkoutTodoActivity : AppCompatActivity() {
         try {
             val today = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(Date())
             
+            // Update userStats collection for dashboard integration
             firestore.collection("userStats")
                 .document(userId)
                 .collection("dailyStats")
@@ -757,19 +757,53 @@ class WorkoutTodoActivity : AppCompatActivity() {
                 .get()
                 .addOnSuccessListener { document ->
                     val currentCalories = document.getLong("caloriesBurned")?.toInt() ?: 0
+                    val currentWorkouts = document.getLong("workoutsCompleted")?.toInt() ?: 0
                     val updatedCalories = currentCalories + calories
+                    val updatedWorkouts = currentWorkouts + 1
+                    
+                    val statsData = mapOf(
+                        "caloriesBurned" to updatedCalories,
+                        "workoutsCompleted" to updatedWorkouts,
+                        "lastUpdated" to System.currentTimeMillis(),
+                        "date" to today,
+                        "userId" to userId
+                    )
                     
                     firestore.collection("userStats")
                         .document(userId)
                         .collection("dailyStats")
                         .document(today)
-                        .set(mapOf(
-                            "caloriesBurned" to updatedCalories,
-                            "lastUpdated" to System.currentTimeMillis(),
-                            "date" to today
-                        ), com.google.firebase.firestore.SetOptions.merge())
+                        .set(statsData, com.google.firebase.firestore.SetOptions.merge())
                         .addOnSuccessListener {
-                            Log.d("WorkoutTodo", "Calories burned updated: $updatedCalories")
+                            Log.d("WorkoutTodo", "Dashboard stats updated: Calories=$updatedCalories, Workouts=$updatedWorkouts")
+                            
+                            // Also update the main userStats document for quick access
+                            firestore.collection("userStats")
+                                .document(userId)
+                                .get()
+                                .addOnSuccessListener { mainDoc ->
+                                    val totalCaloriesBurned = mainDoc.getLong("totalCaloriesBurned")?.toInt() ?: 0
+                                    val totalWorkoutsCompleted = mainDoc.getLong("totalWorkoutsCompleted")?.toInt() ?: 0
+                                    
+                                    firestore.collection("userStats")
+                                        .document(userId)
+                                        .set(mapOf(
+                                            "totalCaloriesBurned" to (totalCaloriesBurned + calories),
+                                            "totalWorkoutsCompleted" to (totalWorkoutsCompleted + 1),
+                                            "todayCaloriesBurned" to updatedCalories,
+                                            "todayWorkoutsCompleted" to updatedWorkouts,
+                                            "lastUpdated" to System.currentTimeMillis()
+                                        ), com.google.firebase.firestore.SetOptions.merge())
+                                        .addOnSuccessListener {
+                                            Log.d("WorkoutTodo", "Main userStats updated with today's progress")
+                                        }
+                                        .addOnFailureListener { e ->
+                                            Log.e("WorkoutTodo", "Error updating main userStats", e)
+                                        }
+                                }
+                                .addOnFailureListener { e ->
+                                    Log.e("WorkoutTodo", "Error getting main userStats", e)
+                                }
                         }
                         .addOnFailureListener { e ->
                             Log.e("WorkoutTodo", "Error updating calories burned", e)
@@ -790,15 +824,26 @@ class WorkoutTodoActivity : AppCompatActivity() {
                 "subtitle" to "${todo.sets} sets × ${todo.reps} reps - ${todo.estimatedCalories} cal burned",
                 "timestamp" to System.currentTimeMillis(),
                 "type" to "workout",
-                "caloriesBurned" to todo.estimatedCalories
+                "caloriesBurned" to todo.estimatedCalories,
+                "date" to todo.scheduledDate,
+                "userId" to userId
             )
             
+            // Add to recent activities for dashboard
             firestore.collection("userActivities")
                 .document(userId)
                 .collection("recentActivities")
                 .add(activity)
                 .addOnSuccessListener {
                     Log.d("WorkoutTodo", "Activity added to recent activities")
+                    
+                    // Also update the main activities document for quick access
+                    firestore.collection("userActivities")
+                        .document(userId)
+                        .set(mapOf(
+                            "lastActivity" to activity,
+                            "lastUpdated" to System.currentTimeMillis()
+                        ), com.google.firebase.firestore.SetOptions.merge())
                 }
                 .addOnFailureListener { e ->
                     Log.e("WorkoutTodo", "Error adding to recent activities", e)
@@ -838,12 +883,47 @@ class WorkoutTodoActivity : AppCompatActivity() {
         }
     }
     
+    private fun deleteTodo(todo: WorkoutTodo) {
+        backgroundExecutor.execute {
+            try {
+                firestore.collection("userTodoList")
+                    .document(userId)
+                    .collection("workoutPlan")
+                    .document(todo.id)
+                    .delete()
+                    .addOnSuccessListener {
+                        mainHandler.post {
+                            Toast.makeText(this@WorkoutTodoActivity, "✅ Workout deleted from your plan!", Toast.LENGTH_SHORT).show()
+                            updateProgressCards()
+                        }
+                    }
+                    .addOnFailureListener { e ->
+                        handleError("Failed to delete workout", e)
+                    }
+            } catch (e: Exception) {
+                handleError("Error deleting workout", e)
+            }
+        }
+    }
+    
     override fun onDestroy() {
         super.onDestroy()
         try {
             // Clean up resources to prevent memory leaks
             todoListener?.remove()
-            backgroundExecutor.shutdown()
+            
+            // Shutdown background executor properly
+            if (!backgroundExecutor.isShutdown) {
+                backgroundExecutor.shutdown()
+                try {
+                    if (!backgroundExecutor.awaitTermination(5, TimeUnit.SECONDS)) {
+                        backgroundExecutor.shutdownNow()
+                    }
+                } catch (e: InterruptedException) {
+                    backgroundExecutor.shutdownNow()
+                    Thread.currentThread().interrupt()
+                }
+            }
         } catch (e: Exception) {
             android.util.Log.e("WorkoutTodoActivity", "Error during cleanup", e)
         }
@@ -875,7 +955,8 @@ class WorkoutTodoActivity : AppCompatActivity() {
 // Adapter for WorkoutTodo RecyclerView
 class WorkoutTodoAdapter(
     private val todoList: List<WorkoutTodo>,
-    private val onToggleCompletion: (WorkoutTodo) -> Unit
+    private val onToggleCompletion: (WorkoutTodo) -> Unit,
+    private val onDelete: (WorkoutTodo) -> Unit
 ) : RecyclerView.Adapter<WorkoutTodoAdapter.ViewHolder>() {
     
     class ViewHolder(view: android.view.View) : RecyclerView.ViewHolder(view) {
@@ -888,6 +969,7 @@ class WorkoutTodoAdapter(
         val ivCompletionOverlay: ImageView = view.findViewById(R.id.ivCompletionOverlay)
         val ivStatusIcon: ImageView = view.findViewById(R.id.ivStatusIcon)
         val cardTodo: androidx.cardview.widget.CardView = view.findViewById(R.id.cardTodo)
+        val btnDelete: ImageButton = view.findViewById(R.id.btnDelete)
     }
     
     override fun onCreateViewHolder(parent: android.view.ViewGroup, viewType: Int): ViewHolder {
@@ -950,6 +1032,10 @@ class WorkoutTodoAdapter(
                 // Remove strike through
                 holder.tvWorkoutName.paintFlags = holder.tvWorkoutName.paintFlags and android.graphics.Paint.STRIKE_THRU_TEXT_FLAG.inv()
                 holder.tvWorkoutName.alpha = 1.0f
+            }
+            
+            holder.btnDelete.setOnClickListener {
+                onDelete(todo)
             }
             
         } catch (e: Exception) {

@@ -19,13 +19,70 @@
     
     <!-- Button color attributes -->
     <attr name="buttonPrimaryColor" format="color" />
+    <attr name="buttonSecondaryColor" format="color" />
+    <attr name="buttonOutlineColor" format="color" />
     <attr name="buttonSurfaceColor" format="color" />
     
     <!-- Input field color attributes -->
     <attr name="inputBackgroundColor" format="color" />
     <attr name="inputBorderColor" format="color" />
+    <attr name="inputBorderFocusColor" format="color" />
     
     <!-- Navigation color attributes -->
+    <attr name="navBackgroundColor" format="color" />
     <attr name="navSelectedColor" format="color" />
     <attr name="navUnselectedColor" format="color" />
+    
+    <!-- Card color attributes -->
+    <attr name="cardBackgroundColor" format="color" />
+    <attr name="cardElevationColor" format="color" />
+    
+    <!-- Progress color attributes -->
+    <attr name="progressBackgroundColor" format="color" />
+    <attr name="progressFillColor" format="color" />
+    <attr name="progressSecondaryColor" format="color" />
+    
+    <!-- Fitness color attributes -->
+    <attr name="fitnessPrimary" format="color" />
+    <attr name="fitnessSecondary" format="color" />
+    <attr name="fitnessAccent" format="color" />
+    <attr name="fitnessSuccess" format="color" />
+    <attr name="fitnessWarning" format="color" />
+    <attr name="fitnessError" format="color" />
+    
+    <!-- BMI color attributes -->
+    <attr name="bmiUnderweightColor" format="color" />
+    <attr name="bmiNormalColor" format="color" />
+    <attr name="bmiOverweightColor" format="color" />
+    <attr name="bmiObeseColor" format="color" />
+    
+    <!-- Workout color attributes -->
+    <attr name="workoutStrengthColor" format="color" />
+    <attr name="workoutCardioColor" format="color" />
+    <attr name="workoutFlexibilityColor" format="color" />
+    <attr name="workoutEnduranceColor" format="color" />
+    
+    <!-- Meal color attributes -->
+    <attr name="mealBreakfastColor" format="color" />
+    <attr name="mealLunchColor" format="color" />
+    <attr name="mealDinnerColor" format="color" />
+    <attr name="mealSnackColor" format="color" />
+    
+    <!-- Status color attributes -->
+    <attr name="statusCompletedColor" format="color" />
+    <attr name="statusInProgressColor" format="color" />
+    <attr name="statusPendingColor" format="color" />
+    <attr name="statusMissedColor" format="color" />
+    
+    <!-- Chip color attributes -->
+    <attr name="chipBackgroundColor" format="color" />
+    <attr name="chipBackgroundSelectedColor" format="color" />
+    <attr name="chipBorderColor" format="color" />
+    <attr name="chipTextColor" format="color" />
+    <attr name="chipTextSelectedColor" format="color" />
+    
+    <!-- Overlay color attributes -->
+    <attr name="overlayLightColor" format="color" />
+    <attr name="overlayMediumColor" format="color" />
+    <attr name="overlayDarkColor" format="color" />
 </resources> 

@@ -28,18 +28,21 @@ class LandingActivity : AppCompatActivity() {
         // 🔒 Auto-login if user is already authenticated
         if (isUserLoggedIn()) {
             Log.d("LandingActivity", "User already logged in: ${auth.currentUser?.email}")
-            navigateThroughSplash(DashboardActivity::class.java)
+            startActivity(Intent(this, DashboardActivity::class.java))
+            finish()
             return
         }
 
         // Handle Sign In button click
         binding.btnSignIn.setOnClickListener {
-            navigateThroughSplash(LoginActivity::class.java)
+            startActivity(Intent(this, LoginActivity::class.java))
+            finish()
         }
 
         // Handle Sign Up button click
         binding.txtSignUp.setOnClickListener {
-            navigateThroughSplash(RegisterActivity::class.java)
+            startActivity(Intent(this, RegisterActivity::class.java))
+            finish()
         }
     }
 
@@ -50,25 +53,5 @@ class LandingActivity : AppCompatActivity() {
         val sharedPreferences: SharedPreferences = getSharedPreferences("USER_DATA", MODE_PRIVATE)
         val storedUserId = sharedPreferences.getString("USER_ID", null)
         return auth.currentUser != null && auth.currentUser?.uid == storedUserId
-    }
-
-    /**
-     * Navigates to the splash screen and passes the target activity to load after splash
-     */
-    private fun navigateThroughSplash(targetActivity: Class<*>) {
-        // Create intent for SplashActivity
-        val splashIntent = Intent(this, SplashActivity::class.java)
-
-        // Pass the target activity name as extra
-        splashIntent.putExtra("TARGET_ACTIVITY", targetActivity.name)
-
-        // Add fade-in and fade-out animations
-        val options = ActivityOptions.makeCustomAnimation(this, android.R.anim.fade_in, android.R.anim.fade_out)
-
-        // Start SplashActivity with animation
-        startActivity(splashIntent, options.toBundle())
-
-        // Optionally, remove LandingActivity from the backstack
-        finish()
     }
 }

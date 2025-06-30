@@ -10,6 +10,8 @@ import android.net.Uri
 import android.os.Build
 import android.provider.MediaStore
 import android.util.Log
+import android.content.Context
+import android.graphics.BitmapFactory
 
 import com.example.physiqueaiapkfinal.visionutils.FrameMetadata
 import java.io.IOException
@@ -122,6 +124,18 @@ object BitmapUtils {
         yuvImage.compressToJpeg(android.graphics.Rect(0, 0, metadata.width, metadata.height), 100, out)
         val imageBytes = out.toByteArray()
         return android.graphics.BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
+    }
+
+    fun getBitmapFromUri(context: Context, uri: Uri): Bitmap? {
+        return try {
+            val inputStream = context.contentResolver.openInputStream(uri)
+            inputStream?.use { stream ->
+                BitmapFactory.decodeStream(stream)
+            }
+        } catch (e: Exception) {
+            Log.e("BitmapUtils", "Error getting bitmap from URI", e)
+            null
+        }
     }
 }
 

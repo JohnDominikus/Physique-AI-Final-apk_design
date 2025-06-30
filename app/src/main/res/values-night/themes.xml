@@ -1,71 +1,118 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- ============================================ -->
-    <!-- PROFESSIONAL DARK THEME -->
+    <!-- DARK THEME -->
     <!-- ============================================ -->
-    <style name="Base.Theme.Physiqueaiapkfinal" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- ========== PRIMARY BRAND COLORS ========== -->
-        <item name="colorPrimary">@color/primary</item>
-        <item name="colorPrimaryVariant">@color/primary_variant</item>
-        <item name="colorSecondary">@color/secondary</item>
-        <item name="colorAccent">@color/accent</item>
+    <style name="Theme.PhysiqueAI" parent="Theme.Material3.DayNight.NoActionBar">
+        <!-- Primary brand colors -->
+        <item name="colorPrimary">@color/dark_primary</item>
+        <item name="colorPrimaryVariant">@color/dark_primary_dark</item>
+        <item name="colorOnPrimary">@color/dark_text_primary</item>
         
-        <!-- ========== SURFACE COLORS ========== -->
-        <item name="android:colorBackground">@color/background_dark</item>
-        <item name="colorSurface">@color/surface_dark</item>
-        <item name="colorSurfaceVariant">@color/card_dark</item>
-        <item name="colorOnSurface">@color/text_primary_dark</item>
-        <item name="colorOnBackground">@color/text_primary_dark</item>
+        <!-- Secondary brand colors -->
+        <item name="colorSecondary">@color/dark_secondary</item>
+        <item name="colorSecondaryVariant">@color/dark_secondary</item>
+        <item name="colorOnSecondary">@color/dark_text_primary</item>
         
-        <!-- ========== TEXT COLORS ========== -->
-        <item name="colorOnPrimary">@color/text_on_primary_dark</item>
-        <item name="colorOnSecondary">@color/text_on_primary_dark</item>
-        <item name="android:textColorPrimary">@color/text_primary_dark</item>
-        <item name="android:textColorSecondary">@color/text_secondary_dark</item>
-        <item name="android:textColorTertiary">@color/text_tertiary_dark</item>
-        <item name="android:textColorHint">@color/text_tertiary_dark</item>
-        
-        <!-- ========== COMPONENT STYLING ========== -->
-        <item name="colorControlNormal">@color/input_border_dark</item>
-        <item name="colorControlActivated">@color/border_focus</item>
-        <item name="colorControlHighlight">@color/accent</item>
-        
-        <!-- ========== STATUS BAR & NAVIGATION ========== -->
-        <item name="android:statusBarColor">@color/surface_dark</item>
-        <item name="android:navigationBarColor">@color/surface_dark</item>
+        <!-- Status bar color -->
+        <item name="android:statusBarColor">@color/dark_background_primary</item>
+        <item name="android:navigationBarColor">@color/dark_background_primary</item>
         <item name="android:windowLightStatusBar">false</item>
         <item name="android:windowLightNavigationBar">false</item>
         
-        <!-- ========== WINDOW STYLING ========== -->
-        <item name="android:windowBackground">@color/background_dark</item>
-        <item name="android:windowActionBar">false</item>
-        <item name="android:windowNoTitle">true</item>
-        <item name="android:windowContentTransitions">true</item>
-        <item name="android:windowAllowEnterTransitionOverlap">true</item>
-        <item name="android:windowAllowReturnTransitionOverlap">true</item>
+        <!-- Background colors -->
+        <item name="android:colorBackground">@color/dark_background_primary</item>
+        <item name="colorSurface">@color/dark_surface_light</item>
+        <item name="colorSurfaceVariant">@color/dark_surface_dark</item>
+        <item name="colorOnSurface">@color/dark_text_primary</item>
+        <item name="colorOnSurfaceVariant">@color/dark_text_secondary</item>
         
-        <!-- ========== MATERIAL DESIGN 3 COMPONENTS ========== -->
-        <item name="materialButtonStyle">@style/Widget.App.Button</item>
-        <item name="materialCardViewStyle">@style/Widget.App.CardView</item>
-        <item name="textInputStyle">@style/Widget.App.TextInputLayout</item>
-        <item name="chipStyle">@style/Widget.App.Chip</item>
-        <item name="bottomNavigationStyle">@style/Widget.App.BottomNavigation</item>
+        <!-- Text colors -->
+        <item name="android:textColorPrimary">@color/dark_text_primary</item>
+        <item name="android:textColorSecondary">@color/dark_text_secondary</item>
+        <item name="android:textColorHint">@color/dark_text_hint</item>
+        <item name="android:textColor">@color/dark_text_primary</item>
         
-        <!-- ========== RIPPLE EFFECTS ========== -->
-        <item name="android:colorControlHighlight">@color/overlay_dark</item>
-        <item name="rippleColor">@color/overlay_medium</item>
+        <!-- Error colors -->
+        <item name="colorError">@color/dark_error</item>
+        <item name="colorOnError">@color/dark_text_primary</item>
         
-        <!-- ========== PREVENT FORCED DARK MODE ========== -->
-        <item name="android:forceDarkAllowed" tools:targetApi="29">false</item>
+        <!-- Outline colors -->
+        <item name="colorOutline">@color/dark_divider_light</item>
+        <item name="colorOutlineVariant">@color/dark_divider_dark</item>
+        
+        <!-- Custom color attributes -->
+        <item name="fitnessPrimary">@color/dark_fitness_primary</item>
+        <item name="fitnessSecondary">@color/dark_fitness_secondary</item>
+        <item name="fitnessAccent">@color/dark_fitness_accent</item>
+        <item name="fitnessSuccess">@color/dark_fitness_success</item>
+        <item name="fitnessWarning">@color/dark_fitness_warning</item>
+        <item name="fitnessError">@color/dark_fitness_error</item>
+        
+        <!-- Card colors -->
+        <item name="cardBackgroundColor">@color/dark_card_background</item>
+        <item name="cardElevationColor">@color/dark_card_elevation</item>
+        
+        <!-- Button colors -->
+        <item name="buttonPrimaryColor">@color/dark_button_primary</item>
+        <item name="buttonSecondaryColor">@color/dark_button_secondary</item>
+        <item name="buttonOutlineColor">@color/dark_button_outline</item>
+        
+        <!-- Input colors -->
+        <item name="inputBackgroundColor">@color/dark_input_background</item>
+        <item name="inputBorderColor">@color/dark_input_border</item>
+        <item name="inputBorderFocusColor">@color/dark_input_border_focus</item>
+        
+        <!-- Navigation colors -->
+        <item name="navBackgroundColor">@color/dark_nav_background</item>
+        <item name="navSelectedColor">@color/dark_nav_selected</item>
+        <item name="navUnselectedColor">@color/dark_nav_unselected</item>
+        
+        <!-- Progress colors -->
+        <item name="progressBackgroundColor">@color/dark_progress_background</item>
+        <item name="progressFillColor">@color/dark_progress_fill</item>
+        <item name="progressSecondaryColor">@color/dark_progress_secondary</item>
+        
+        <!-- BMI colors -->
+        <item name="bmiUnderweightColor">@color/dark_bmi_underweight</item>
+        <item name="bmiNormalColor">@color/dark_bmi_normal</item>
+        <item name="bmiOverweightColor">@color/dark_bmi_overweight</item>
+        <item name="bmiObeseColor">@color/dark_bmi_obese</item>
+        
+        <!-- Workout colors -->
+        <item name="workoutStrengthColor">@color/dark_workout_strength</item>
+        <item name="workoutCardioColor">@color/dark_workout_cardio</item>
+        <item name="workoutFlexibilityColor">@color/dark_workout_flexibility</item>
+        <item name="workoutEnduranceColor">@color/dark_workout_endurance</item>
+        
+        <!-- Meal colors -->
+        <item name="mealBreakfastColor">@color/dark_meal_breakfast</item>
+        <item name="mealLunchColor">@color/dark_meal_lunch</item>
+        <item name="mealDinnerColor">@color/dark_meal_dinner</item>
+        <item name="mealSnackColor">@color/dark_meal_snack</item>
+        
+        <!-- Status colors -->
+        <item name="statusCompletedColor">@color/dark_status_completed</item>
+        <item name="statusInProgressColor">@color/dark_status_in_progress</item>
+        <item name="statusPendingColor">@color/dark_status_pending</item>
+        <item name="statusMissedColor">@color/dark_status_missed</item>
+        
+        <!-- Chip colors -->
+        <item name="chipBackgroundColor">@color/dark_chip_background</item>
+        <item name="chipBackgroundSelectedColor">@color/dark_chip_background_selected</item>
+        <item name="chipBorderColor">@color/dark_chip_border</item>
+        <item name="chipTextColor">@color/dark_chip_text</item>
+        <item name="chipTextSelectedColor">@color/dark_chip_text_selected</item>
+        
+        <!-- Overlay colors -->
+        <item name="overlayLightColor">@color/dark_overlay_light</item>
+        <item name="overlayMediumColor">@color/dark_overlay_medium</item>
+        <item name="overlayDarkColor">@color/dark_overlay_dark</item>
     </style>
 
-    <!-- ============================================ -->
-    <!-- LEGACY LIGHT THEME (Compatibility) -->
-    <!-- ============================================ -->
-    <style name="AppTheme.Light.NoNight" parent="Theme.Material3.DayNight.NoActionBar">
-        <item name="android:colorBackground">@color/background_light</item>
-        <item name="colorSurface">@color/surface_light</item>
+    <!-- Legacy light theme (kept for compatibility) -->
+    <style name="AppTheme.Light.NoNight" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <item name="backgroundTint">@color/white</item>
         <item name="android:forceDarkAllowed" tools:targetApi="29">false</item>
     </style>
-    
 </resources>

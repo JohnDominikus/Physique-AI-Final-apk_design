@@ -5,40 +5,29 @@
         android:id="@+id/nav_workout"
         android:icon="@drawable/excercise"
         android:title="Workout"
-        app:showAsAction="ifRoom"
-
-    android:titleTextColor="@color/nav_item_text_color"
-    android:iconTint="@color/nav_item_icon_color" /> <!-- Set icon color for inactive state -->
+        app:showAsAction="ifRoom" />
 
     <item
         android:id="@+id/nav_posture"
         android:icon="@drawable/pose"
-    android:title="Posture"
-    app:showAsAction="ifRoom"
-    android:titleTextColor="@color/nav_item_text_color"
-    android:iconTint="@color/nav_item_icon_color" />
+        android:title="Posture"
+        app:showAsAction="ifRoom" />
 
     <item
         android:id="@+id/nav_home"
         android:icon="@drawable/home"
-    android:title="Home"
-    app:showAsAction="ifRoom"
-    android:titleTextColor="@color/nav_item_text_color"
-    android:iconTint="@color/nav_item_icon_color" />
+        android:title="Home"
+        app:showAsAction="ifRoom" />
 
     <item
         android:id="@+id/nav_dietary"
         android:icon="@drawable/dietary"
-    android:title="Dietary"
-    app:showAsAction="ifRoom"
-    android:titleTextColor="@color/nav_item_text_color"
-    android:iconTint="@color/nav_item_icon_color" />
+        android:title="Dietary"
+        app:showAsAction="ifRoom" />
 
     <item
         android:id="@+id/nav_task"
         android:icon="@drawable/task"
-    android:title="Task"
-    app:showAsAction="ifRoom"
-    android:titleTextColor="@color/nav_item_text_color"
-    android:iconTint="@color/nav_item_icon_color" />
+        android:title="Task"
+        app:showAsAction="ifRoom" />
 </menu>

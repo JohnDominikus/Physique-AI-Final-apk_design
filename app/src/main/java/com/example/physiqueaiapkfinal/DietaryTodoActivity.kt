@@ -18,6 +18,10 @@ import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
+import java.util.concurrent.TimeUnit
+import androidx.activity.OnBackPressedCallback
+import com.example.physiqueaiapkfinal.MealTodo
+import com.example.physiqueaiapkfinal.UserMedicalInfo
 
 // Data Models for Dietary
 data class MealItem(
@@ -33,29 +37,8 @@ data class MealItem(
     val dietaryRestrictions: List<String> = listOf() // Vegan, Vegetarian, Gluten-free, etc.
 )
 
-data class MealTodo(
-    val id: String = UUID.randomUUID().toString(),
-    val mealId: String = "",
-    val mealName: String = "",
-    val mealType: String = "",
-    val scheduledDate: String = "",
-    val scheduledTime: String = "", // e.g., "08:00"
-    val isCompleted: Boolean = false,
-    val userId: String = "",
-    val createdAt: Long = System.currentTimeMillis(),
-    val calories: Int = 0,
-    val allergies: List<String> = listOf(),
-    val prepTime: Int = 0,
-    val imageUrl: String = ""
-)
-
-data class UserMedicalInfo(
-    val userId: String = "",
-    val injuries: List<String> = listOf(),
-    val allergies: List<String> = listOf(),
-    val medicalConditions: List<String> = listOf(),
-    val fitnessLevel: String = ""
-)
+// import com.example.physiqueaiapkfinal.MealTodo
+// import com.example.physiqueaiapkfinal.UserMedicalInfo
 
 class DietaryTodoActivity : AppCompatActivity() {
     
@@ -188,6 +171,13 @@ class DietaryTodoActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_dietary_todo)
         
+        // Setup modern back press handling
+        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                finish()
+            }
+        })
+        
         try {
             // Setup action bar with back button
             supportActionBar?.setDisplayHomeAsUpEnabled(true)
@@ -263,9 +253,11 @@ class DietaryTodoActivity : AppCompatActivity() {
     }
     
     private fun setupRecyclerView() {
-        adapter = MealTodoAdapter(todoList) { todo ->
-            toggleTodoCompletion(todo)
-        }
+        adapter = MealTodoAdapter(
+            todoList,
+            onToggleCompletion = { todo -> toggleTodoCompletion(todo) },
+            onDelete = { todo -> deleteTodo(todo) }
+        )
         recyclerView.layoutManager = LinearLayoutManager(this)
         recyclerView.adapter = adapter
     }
@@ -778,6 +770,20 @@ class DietaryTodoActivity : AppCompatActivity() {
                     .collection("mealPlan")
                     .add(mealTodo)
                     .addOnSuccessListener {
+                        // Magdagdag ng activity log sa recentActivities
+                        val activity = mapOf(
+                            "title" to meal.mealName,
+                            "subtitle" to "$mealType - ${meal.calories} cal scheduled",
+                            "timestamp" to System.currentTimeMillis(),
+                            "type" to "meal",
+                            "caloriesConsumed" to meal.calories,
+                            "date" to selectedDate,
+                            "userId" to userId
+                        )
+                        firestore.collection("userActivities")
+                            .document(userId)
+                            .collection("recentActivities")
+                            .add(activity)
                         mainHandler.post {
                             Toast.makeText(this@DietaryTodoActivity, "✅ ${meal.mealName} added to your plan!", Toast.LENGTH_SHORT).show()
                             resetFormAfterAdd()
@@ -870,6 +876,7 @@ class DietaryTodoActivity : AppCompatActivity() {
         try {
             val today = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(Date())
             
+            // Update userStats collection for dashboard integration
             firestore.collection("userStats")
                 .document(userId)
                 .collection("dailyStats")
@@ -877,22 +884,56 @@ class DietaryTodoActivity : AppCompatActivity() {
                 .get()
                 .addOnSuccessListener { document ->
                     val currentCalories = document.getLong("caloriesConsumed")?.toInt() ?: 0
+                    val currentMeals = document.getLong("mealsCompleted")?.toInt() ?: 0
                     val updatedCalories = currentCalories + calories
+                    val updatedMeals = currentMeals + 1
+                    
+                    val statsData = mapOf(
+                        "caloriesConsumed" to updatedCalories,
+                        "mealsCompleted" to updatedMeals,
+                        "lastUpdated" to System.currentTimeMillis(),
+                        "date" to today,
+                        "userId" to userId
+                    )
                     
                     firestore.collection("userStats")
                         .document(userId)
                         .collection("dailyStats")
                         .document(today)
-                        .set(mapOf(
-                            "caloriesConsumed" to updatedCalories,
-                            "lastUpdated" to System.currentTimeMillis(),
-                            "date" to today
-                        ), com.google.firebase.firestore.SetOptions.merge())
+                        .set(statsData, com.google.firebase.firestore.SetOptions.merge())
                         .addOnSuccessListener {
-                            Log.d("DietaryTodo", "Calories consumed updated: $updatedCalories")
+                            Log.d("DietaryTodo", "Dashboard stats updated: Calories=$updatedCalories, Meals=$updatedMeals")
+                            
+                            // Also update the main userStats document for quick access
+                            firestore.collection("userStats")
+                                .document(userId)
+                                .get()
+                                .addOnSuccessListener { mainDoc ->
+                                    val totalCaloriesConsumed = mainDoc.getLong("totalCaloriesConsumed")?.toInt() ?: 0
+                                    val totalMealsCompleted = mainDoc.getLong("totalMealsCompleted")?.toInt() ?: 0
+                                    
+                                    firestore.collection("userStats")
+                                        .document(userId)
+                                        .set(mapOf(
+                                            "totalCaloriesConsumed" to (totalCaloriesConsumed + calories),
+                                            "totalMealsCompleted" to (totalMealsCompleted + 1),
+                                            "todayCaloriesConsumed" to updatedCalories,
+                                            "todayMealsCompleted" to updatedMeals,
+                                            "lastUpdated" to System.currentTimeMillis()
+                                        ), com.google.firebase.firestore.SetOptions.merge())
+                                        .addOnSuccessListener {
+                                            Log.d("DietaryTodo", "Main userStats updated with today's progress")
+                                        }
+                                        .addOnFailureListener { e ->
+                                            Log.e("DietaryTodo", "Error updating main userStats", e)
+                                        }
+                                }
+                                .addOnFailureListener { e ->
+                                    Log.e("DietaryTodo", "Error getting main userStats", e)
+                                }
                         }
                         .addOnFailureListener { e ->
-                            Log.e("DietaryTodo", "Error updating calories consumed", e)
+                            Log.e("DietaryTodo", "Error getting current calories", e)
                         }
                 }
                 .addOnFailureListener { e ->
@@ -910,15 +951,26 @@ class DietaryTodoActivity : AppCompatActivity() {
                 "subtitle" to "${todo.mealType} - ${todo.calories} cal consumed",
                 "timestamp" to System.currentTimeMillis(),
                 "type" to "meal",
-                "caloriesConsumed" to todo.calories
+                "caloriesConsumed" to todo.calories,
+                "date" to todo.scheduledDate,
+                "userId" to userId
             )
             
+            // Add to recent activities for dashboard
             firestore.collection("userActivities")
                 .document(userId)
                 .collection("recentActivities")
                 .add(activity)
                 .addOnSuccessListener {
                     Log.d("DietaryTodo", "Activity added to recent activities")
+                    
+                    // Also update the main activities document for quick access
+                    firestore.collection("userActivities")
+                        .document(userId)
+                        .set(mapOf(
+                            "lastActivity" to activity,
+                            "lastUpdated" to System.currentTimeMillis()
+                        ), com.google.firebase.firestore.SetOptions.merge())
                 }
                 .addOnFailureListener { e ->
                     Log.e("DietaryTodo", "Error adding to recent activities", e)
@@ -928,12 +980,47 @@ class DietaryTodoActivity : AppCompatActivity() {
         }
     }
     
+    private fun deleteTodo(todo: MealTodo) {
+        backgroundExecutor.execute {
+            try {
+                firestore.collection("userTodoList")
+                    .document(userId)
+                    .collection("mealPlan")
+                    .document(todo.id)
+                    .delete()
+                    .addOnSuccessListener {
+                        mainHandler.post {
+                            Toast.makeText(this@DietaryTodoActivity, "✅ ${todo.mealName} removed from your plan!", Toast.LENGTH_SHORT).show()
+                            loadTodoListAsync {}
+                        }
+                    }
+                    .addOnFailureListener { e ->
+                        handleError("Failed to delete meal", e)
+                    }
+            } catch (e: Exception) {
+                handleError("Error deleting meal", e)
+            }
+        }
+    }
+    
     override fun onDestroy() {
         super.onDestroy()
         try {
             // Clean up resources to prevent memory leaks
             todoListener?.remove()
-            backgroundExecutor.shutdown()
+            
+            // Shutdown background executor properly
+            if (!backgroundExecutor.isShutdown) {
+                backgroundExecutor.shutdown()
+                try {
+                    if (!backgroundExecutor.awaitTermination(5, TimeUnit.SECONDS)) {
+                        backgroundExecutor.shutdownNow()
+                    }
+                } catch (e: InterruptedException) {
+                    backgroundExecutor.shutdownNow()
+                    Thread.currentThread().interrupt()
+                }
+            }
         } catch (e: Exception) {
             android.util.Log.e("DietaryTodoActivity", "Error during cleanup", e)
         }
@@ -1001,7 +1088,8 @@ class DietaryTodoActivity : AppCompatActivity() {
 // Adapter for MealTodo RecyclerView
 class MealTodoAdapter(
     private val todoList: List<MealTodo>,
-    private val onToggleCompletion: (MealTodo) -> Unit
+    private val onToggleCompletion: (MealTodo) -> Unit,
+    private val onDelete: (MealTodo) -> Unit
 ) : RecyclerView.Adapter<MealTodoAdapter.ViewHolder>() {
     
     class ViewHolder(view: android.view.View) : RecyclerView.ViewHolder(view) {
@@ -1013,6 +1101,7 @@ class MealTodoAdapter(
         val tvPrepTime: TextView = view.findViewById(R.id.tvPrepTime)
         val tvAllergies: TextView = view.findViewById(R.id.tvAllergies)
         val ivMealImage: ImageView = view.findViewById(R.id.ivMealImage)
+        val btnDelete: ImageButton = view.findViewById(R.id.btnDelete)
     }
     
     override fun onCreateViewHolder(parent: android.view.ViewGroup, viewType: Int): ViewHolder {
@@ -1046,6 +1135,9 @@ class MealTodoAdapter(
         
         holder.checkBox.setOnCheckedChangeListener { _, _ ->
             onToggleCompletion(todo)
+        }
+        holder.btnDelete.setOnClickListener {
+            onDelete(todo)
         }
     }
     

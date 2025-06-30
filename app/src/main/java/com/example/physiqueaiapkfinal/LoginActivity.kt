@@ -128,14 +128,7 @@ class LoginActivity : AppCompatActivity() {
 
     // Navigate to the dashboard (or main activity)
     private fun navigateToDashboard() {
-        val user = auth.currentUser
-        val userId = user?.uid ?: "Unknown ID"
-        val userEmail = user?.email ?: "Unknown Email"
-
-        val intent = Intent(this, SplashActivity::class.java).apply {
-            putExtra("USER_ID", userId)
-            putExtra("USER_EMAIL", userEmail)
-        }
+        val intent = Intent(this, SplashActivity::class.java)
         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         startActivity(intent)
         finish()

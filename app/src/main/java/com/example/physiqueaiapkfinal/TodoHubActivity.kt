@@ -14,6 +14,7 @@ import androidx.cardview.widget.CardView
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
+import androidx.core.app.ActivityOptionsCompat
 
 class TodoHubActivity : AppCompatActivity() {
 
@@ -106,14 +107,14 @@ class TodoHubActivity : AppCompatActivity() {
             // Workout Todo Card with async navigation
             cardWorkoutTodo.setOnClickListener {
                 if (isInitialized) {
-                    navigateToActivityAsync(WorkoutTodoActivity::class.java, "Workout Todo")
+                    navigateToWorkoutTodo()
                 }
             }
 
             // Dietary Todo Card with async navigation
             cardDietaryTodo.setOnClickListener {
                 if (isInitialized) {
-                    navigateToActivityAsync(DietaryTodoActivity::class.java, "Dietary Todo")
+                    navigateToDietaryTodo()
                 }
             }
 
@@ -203,6 +204,44 @@ class TodoHubActivity : AppCompatActivity() {
                     setCardsEnabled(true)
                 }
             }
+        }
+    }
+
+    private fun navigateToWorkoutTodo() {
+        try {
+            val intent = Intent(this, WorkoutTodoActivity::class.java)
+            
+            // Use modern activity transition
+            val options = ActivityOptionsCompat.makeCustomAnimation(
+                this,
+                R.anim.slide_in_right,
+                R.anim.slide_out_left
+            )
+            
+            startActivity(intent, options.toBundle())
+        } catch (e: Exception) {
+            Log.e("TodoHub", "Error navigating to workout todo", e)
+            // Fallback to simple navigation
+            startActivity(Intent(this, WorkoutTodoActivity::class.java))
+        }
+    }
+    
+    private fun navigateToDietaryTodo() {
+        try {
+            val intent = Intent(this, DietaryTodoActivity::class.java)
+            
+            // Use modern activity transition
+            val options = ActivityOptionsCompat.makeCustomAnimation(
+                this,
+                R.anim.slide_in_right,
+                R.anim.slide_out_left
+            )
+            
+            startActivity(intent, options.toBundle())
+        } catch (e: Exception) {
+            Log.e("TodoHub", "Error navigating to dietary todo", e)
+            // Fallback to simple navigation
+            startActivity(Intent(this, DietaryTodoActivity::class.java))
         }
     }
 

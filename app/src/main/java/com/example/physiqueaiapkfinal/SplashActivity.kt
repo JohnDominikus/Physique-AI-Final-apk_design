@@ -6,6 +6,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import android.view.animation.DecelerateInterpolator
 import android.widget.ImageView
 import android.widget.ProgressBar
@@ -13,6 +14,7 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.cardview.widget.CardView
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.app.ActivityOptionsCompat
 import com.google.firebase.auth.FirebaseAuth
 import kotlin.random.Random
 
@@ -39,22 +41,55 @@ class SplashActivity : AppCompatActivity() {
     )
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_splash)
-        
-        initializeViews()
-        setupInitialState()
-        startSplashSequence()
+        try {
+            super.onCreate(savedInstanceState)
+            setContentView(R.layout.activity_splash)
+            
+            initializeViews()
+            setupInitialState()
+            startSplashSequence()
+            
+            // Safety timeout - if something goes wrong, navigate after 6 seconds
+            handler.postDelayed({
+                try {
+                    if (!isFinishing) {
+                        Log.w("SplashActivity", "Safety timeout reached, navigating...")
+                        navigateToNextScreen()
+                    }
+                } catch (e: Exception) {
+                    Log.e("SplashActivity", "Error in safety timeout", e)
+                    finish()
+                }
+            }, 6000) // 6 second safety timeout
+            
+        } catch (e: Exception) {
+            Log.e("SplashActivity", "Critical error in onCreate", e)
+            // Emergency fallback
+            try {
+                startActivity(Intent(this, LandingActivity::class.java))
+                finish()
+            } catch (e2: Exception) {
+                Log.e("SplashActivity", "Emergency fallback failed", e2)
+                finish()
+            }
+        }
     }
 
     private fun initializeViews() {
-        progressBar = findViewById(R.id.progressBar)
-        loadingText = findViewById(R.id.loadingText)
-        progressText = findViewById(R.id.progressText)
-        appTitle = findViewById(R.id.appTitle)
-        logoCard = findViewById(R.id.logoCard)
-        logoImage = findViewById(R.id.logoImage)
-        contentContainer = findViewById(R.id.contentContainer)
+        try {
+            progressBar = findViewById(R.id.progressBar)
+            loadingText = findViewById(R.id.loadingText)
+            progressText = findViewById(R.id.progressText)
+            appTitle = findViewById(R.id.appTitle)
+            logoCard = findViewById(R.id.logoCard)
+            logoImage = findViewById(R.id.logoImage)
+            contentContainer = findViewById(R.id.contentContainer)
+        } catch (e: Exception) {
+            Log.e("SplashActivity", "Error initializing views", e)
+            // Emergency fallback
+            startActivity(Intent(this, LandingActivity::class.java))
+            finish()
+        }
     }
 
     private fun setupInitialState() {
@@ -91,27 +126,35 @@ class SplashActivity : AppCompatActivity() {
 
     private fun startSmartLoadingAnimation() {
         handler.postDelayed({
-            smartLoadingAlgorithm()
-        }, 1500)
+            try {
+                smartLoadingAlgorithm()
+            } catch (e: Exception) {
+                Log.e("SplashActivity", "Error in smart loading", e)
+                // Fallback: navigate immediately
+                navigateToNextScreen()
+            }
+        }, 800) // Reduced from 1500ms to 800ms for faster start
     }
 
     private fun smartLoadingAlgorithm() {
         handler.postDelayed(object : Runnable {
             override fun run() {
                 if (progress < 100) {
-                    val progressIncrement = Random.nextInt(1, 4)
+                    // Faster progress for 4-second total duration
+                    val progressIncrement = Random.nextInt(3, 8) // Increased increment
                     progress = (progress + progressIncrement).coerceAtMost(100)
                     
                     updateProgressBar(progress)
                     updateLoadingPhase()
                     
-                    val nextDelay = Random.nextLong(60, 150)
+                    // Faster delays for quicker loading
+                    val nextDelay = Random.nextLong(30, 80) // Reduced delay
                     handler.postDelayed(this, nextDelay)
                 } else {
                     finishLoading()
                 }
             }
-        }, 50)
+        }, 30) // Reduced initial delay
     }
 
     private fun updateProgressBar(targetProgress: Int) {
@@ -131,26 +174,56 @@ class SplashActivity : AppCompatActivity() {
     }
 
     private fun finishLoading() {
-        loadingText.text = "Welcome back, fitness champion! "
-        
-        handler.postDelayed({
-            navigateToNextScreen()
-        }, 800)
+        try {
+            loadingText.text = "Welcome back, fitness champion! "
+            
+            handler.postDelayed({
+                try {
+                    navigateToNextScreen()
+                } catch (e: Exception) {
+                    Log.e("SplashActivity", "Error navigating after loading", e)
+                    // Emergency fallback
+                    startActivity(Intent(this, LandingActivity::class.java))
+                    finish()
+                }
+            }, 400) // Reduced from 800ms to 400ms
+        } catch (e: Exception) {
+            Log.e("SplashActivity", "Error in finishLoading", e)
+            // Emergency fallback
+            startActivity(Intent(this, LandingActivity::class.java))
+            finish()
+        }
     }
 
     private fun navigateToNextScreen() {
-        val targetActivity = if (FirebaseAuth.getInstance().currentUser != null) {
-            DashboardActivity::class.java
-        } else {
-            LandingActivity::class.java
+        try {
+            // Check if user is authenticated
+            val auth = FirebaseAuth.getInstance()
+            val currentUser = auth.currentUser
+            
+            val nextIntent = if (currentUser != null) {
+                // User is logged in, go to Dashboard
+                Intent(this, DashboardActivity::class.java)
+            } else {
+                // No user logged in, go to Landing
+                Intent(this, LandingActivity::class.java)
+            }
+
+            // Use modern activity transition
+            val options = ActivityOptionsCompat.makeCustomAnimation(
+                this,
+                R.anim.slide_in_right,
+                R.anim.slide_out_left
+            )
+
+            startActivity(nextIntent, options.toBundle())
+            finish()
+        } catch (e: Exception) {
+            Log.e("SplashActivity", "Error navigating to next screen", e)
+            // Fallback to simple navigation
+            startActivity(Intent(this, LandingActivity::class.java))
+            finish()
         }
-        
-        val intent = Intent(this, targetActivity)
-        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-        
-        startActivity(intent)
-        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
-        finish()
     }
 
     @Deprecated("Deprecated in Java")

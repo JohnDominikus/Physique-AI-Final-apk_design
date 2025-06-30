@@ -50,19 +50,28 @@ class ForgotPasswordNewPasswordActivity : AppCompatActivity() {
     }
 
     private fun resetPassword(email: String, newPassword: String) {
-        auth.fetchSignInMethodsForEmail(email)
-            .addOnCompleteListener { task ->
-                if (task.isSuccessful) {
-                    val existingMethods = task.result?.signInMethods
-                    if (existingMethods?.contains("password") == true) {
-                        sendPasswordResetEmail(email, newPassword)
+        try {
+            // Use modern Firebase Auth approach
+            val auth = FirebaseAuth.getInstance()
+            
+            // Check if user exists and has password sign-in method
+            auth.fetchSignInMethodsForEmail(email)
+                .addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+                        val signInMethods = task.result?.signInMethods ?: emptyList()
+                        if (signInMethods.contains("password")) {
+                            // User exists with password, proceed with reset
+                            sendPasswordResetEmail(email, newPassword)
+                        } else {
+                            showToast("No password account found for this email")
+                        }
                     } else {
-                        showToast("No user found with this email")
+                        showToast("Error checking email: ${task.exception?.message}")
                     }
-                } else {
-                    showToast("Error checking email: ${task.exception?.message}")
                 }
-            }
+        } catch (e: Exception) {
+            showToast("Error: ${e.message}")
+        }
     }
 
     private fun sendPasswordResetEmail(email: String, newPassword: String) {

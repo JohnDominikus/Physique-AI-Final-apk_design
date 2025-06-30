@@ -49,6 +49,75 @@
         <item name="android:windowSharedElementEnterTransition">@android:transition/move</item>
         <item name="android:windowSharedElementExitTransition">@android:transition/move</item>
         
+        <!-- ========== CUSTOM COLOR ATTRIBUTES ========== -->
+        <!-- Fitness colors -->
+        <item name="fitnessPrimary">@color/fitness_primary</item>
+        <item name="fitnessSecondary">@color/fitness_secondary</item>
+        <item name="fitnessAccent">@color/fitness_accent</item>
+        <item name="fitnessSuccess">@color/fitness_success</item>
+        <item name="fitnessWarning">@color/fitness_warning</item>
+        <item name="fitnessError">@color/fitness_error</item>
+        
+        <!-- Card colors -->
+        <item name="cardBackgroundColor">@color/card_background</item>
+        <item name="cardElevationColor">@color/card_elevation</item>
+        
+        <!-- Button colors -->
+        <item name="buttonPrimaryColor">@color/button_primary</item>
+        <item name="buttonSecondaryColor">@color/button_secondary</item>
+        <item name="buttonOutlineColor">@color/button_outline</item>
+        
+        <!-- Input colors -->
+        <item name="inputBackgroundColor">@color/input_background_light</item>
+        <item name="inputBorderColor">@color/input_border_light</item>
+        <item name="inputBorderFocusColor">@color/input_border_focus</item>
+        
+        <!-- Navigation colors -->
+        <item name="navBackgroundColor">@color/nav_background</item>
+        <item name="navSelectedColor">@color/nav_selected</item>
+        <item name="navUnselectedColor">@color/nav_unselected</item>
+        
+        <!-- Progress colors -->
+        <item name="progressBackgroundColor">@color/progress_background</item>
+        <item name="progressFillColor">@color/progress_fill</item>
+        <item name="progressSecondaryColor">@color/progress_secondary</item>
+        
+        <!-- BMI colors -->
+        <item name="bmiUnderweightColor">@color/bmi_underweight</item>
+        <item name="bmiNormalColor">@color/bmi_normal</item>
+        <item name="bmiOverweightColor">@color/bmi_overweight</item>
+        <item name="bmiObeseColor">@color/bmi_obese</item>
+        
+        <!-- Workout colors -->
+        <item name="workoutStrengthColor">@color/workout_strength</item>
+        <item name="workoutCardioColor">@color/workout_cardio</item>
+        <item name="workoutFlexibilityColor">@color/workout_flexibility</item>
+        <item name="workoutEnduranceColor">@color/workout_endurance</item>
+        
+        <!-- Meal colors -->
+        <item name="mealBreakfastColor">@color/meal_breakfast</item>
+        <item name="mealLunchColor">@color/meal_lunch</item>
+        <item name="mealDinnerColor">@color/meal_dinner</item>
+        <item name="mealSnackColor">@color/meal_snack</item>
+        
+        <!-- Status colors -->
+        <item name="statusCompletedColor">@color/status_completed</item>
+        <item name="statusInProgressColor">@color/status_in_progress</item>
+        <item name="statusPendingColor">@color/status_pending</item>
+        <item name="statusMissedColor">@color/status_missed</item>
+        
+        <!-- Chip colors -->
+        <item name="chipBackgroundColor">@color/chip_background_light</item>
+        <item name="chipBackgroundSelectedColor">@color/chip_background_selected</item>
+        <item name="chipBorderColor">@color/chip_border_light</item>
+        <item name="chipTextColor">@color/chip_text_light</item>
+        <item name="chipTextSelectedColor">@color/chip_text_selected</item>
+        
+        <!-- Overlay colors -->
+        <item name="overlayLightColor">@color/overlay_light</item>
+        <item name="overlayMediumColor">@color/overlay_medium</item>
+        <item name="overlayDarkColor">@color/overlay_dark</item>
+        
         <!-- ========== MATERIAL DESIGN 3 COMPONENTS ========== -->
         <item name="materialButtonStyle">@style/Widget.App.Button</item>
         <item name="materialCardViewStyle">@style/Widget.App.CardView</item>

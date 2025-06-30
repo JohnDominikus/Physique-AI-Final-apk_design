@@ -15,6 +15,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FieldPath
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
+import androidx.activity.OnBackPressedCallback
 
 class LikedWorkoutsActivity : AppCompatActivity() {
 
@@ -34,6 +35,13 @@ class LikedWorkoutsActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_liked_workouts)
+
+        // Setup modern back press handling
+        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                finish()
+            }
+        })
 
         initializeViews()
         setupAdapter()

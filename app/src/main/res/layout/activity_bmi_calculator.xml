@@ -23,16 +23,16 @@
             android:layout_marginBottom="32dp">
 
             <ImageButton
-                android:id="@+id/backButton"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:layout_alignParentStart="true"
+                android:id="@+id/btnBack"
+                android:layout_width="@dimen/button_icon_size"
+                android:layout_height="@dimen/button_icon_size"
+                android:layout_margin="@dimen/spacing_sm"
                 android:background="?attr/selectableItemBackgroundBorderless"
-                android:contentDescription="Back button"
-                android:padding="12dp"
-                android:scaleType="centerInside"
                 android:src="@drawable/back"
-                app:tint="#FFFFFF" />
+                android:contentDescription="Back"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                android:tint="#FFFFFF" />
 
             <LinearLayout
                 android:layout_width="wrap_content"

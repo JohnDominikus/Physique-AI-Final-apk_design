@@ -33,7 +33,7 @@
                 android:layout_height="20dp"
                 android:src="@drawable/ic_info"
                 android:layout_marginEnd="12dp"
-                app:tint="@color/theme_primary" />
+                android:tint="@color/theme_primary" />
             
             <TextView
                 android:layout_width="0dp"
@@ -62,7 +62,7 @@
                 android:layout_height="20dp"
                 android:src="@drawable/settings"
                 android:layout_marginEnd="12dp"
-                app:tint="@color/theme_primary" />
+                android:tint="@color/theme_primary" />
             
             <TextView
                 android:layout_width="0dp"
@@ -98,7 +98,7 @@
                 android:layout_height="20dp"
                 android:src="@drawable/logout"
                 android:layout_marginEnd="12dp"
-                app:tint="@color/theme_error" />
+                android:tint="@color/theme_error" />
             
             <TextView
                 android:layout_width="0dp"

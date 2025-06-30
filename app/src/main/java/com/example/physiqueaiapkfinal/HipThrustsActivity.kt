@@ -140,67 +140,46 @@ class HipThrustsActivity : AppCompatActivity() {
 
     private fun startCamera() {
         val cameraProviderFuture = ProcessCameraProvider.getInstance(this)
-
+        
         cameraProviderFuture.addListener({
-            cameraProvider = cameraProviderFuture.get()
-            bindCameraUseCases()
+            try {
+                cameraProvider = cameraProviderFuture.get()
+                
+                val preview = Preview.Builder()
+                    .build()
+                    .also {
+                        it.setSurfaceProvider(binding.viewFinder.surfaceProvider)
+                    }
+                
+                val imageAnalyzer = ImageAnalysis.Builder()
+                    .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
+                    .build()
+                    .also {
+                        it.setAnalyzer(cameraExecutor) { imageProxy ->
+                            processImage(imageProxy)
+                        }
+                    }
+                
+                val cameraSelector = CameraSelector.DEFAULT_FRONT_CAMERA
+                
+                try {
+                    cameraProvider?.unbindAll()
+                    cameraProvider?.bindToLifecycle(
+                        this, cameraSelector, preview, imageAnalyzer
+                    )
+                } catch (e: Exception) {
+                    Log.e("HipThrusts", "Use case binding failed", e)
+                }
+                
+            } catch (e: Exception) {
+                Log.e("HipThrusts", "Camera provider binding failed", e)
+            }
         }, ContextCompat.getMainExecutor(this))
-    }
-
-    private fun bindCameraUseCases() {
-        val cameraProvider = this.cameraProvider ?: return
-
-        val preview = Preview.Builder()
-            .build()
-            .also {
-                it.setSurfaceProvider(binding.viewFinder.surfaceProvider)
-            }
-
-        // Mirror the preview for front camera
-        if (isUsingFrontCamera) {
-            binding.viewFinder.scaleX = -1f // Horizontal flip
-        } else {
-            binding.viewFinder.scaleX = 1f // Normal view
-        }
-
-        val imageAnalyzer = ImageAnalysis.Builder()
-            .setTargetResolution(android.util.Size(640, 480))
-            .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
-            .setImageQueueDepth(1)
-            .build()
-            .also {
-                it.setAnalyzer(cameraExecutor, PoseAnalyzer())
-            }
-
-        val cameraSelector = if (isUsingFrontCamera) {
-            CameraSelector.DEFAULT_FRONT_CAMERA
-        } else {
-            CameraSelector.DEFAULT_BACK_CAMERA
-        }
-
-        try {
-            cameraProvider.unbindAll()
-            cameraProvider.bindToLifecycle(
-                this,
-                cameraSelector,
-                preview,
-                imageAnalyzer
-            )
-
-            // Update camera status indicator
-            binding.tvCameraStatus.text =
-                if (isUsingFrontCamera) "Camera: Front (Mirrored)" else "Camera: Back"
-
-        } catch (exc: Exception) {
-            Log.e(TAG, "Use case binding failed", exc)
-            Toast.makeText(this, "Failed to start camera", Toast.LENGTH_SHORT).show()
-        }
     }
 
     private fun switchCamera() {
         isUsingFrontCamera = !isUsingFrontCamera
         Log.d(TAG, "Switching to ${if (isUsingFrontCamera) "front" else "back"} camera")
-        bindCameraUseCases()
 
         // Reset pose detection state when switching cameras
         resetPoseDetectionState()
@@ -217,21 +196,22 @@ class HipThrustsActivity : AppCompatActivity() {
         Log.d(TAG, "Pose detection state reset for camera switch")
     }
 
-    private inner class PoseAnalyzer : ImageAnalysis.Analyzer {
-        @androidx.camera.core.ExperimentalGetImage
-        override fun analyze(imageProxy: ImageProxy) {
+    private fun processImage(imageProxy: ImageProxy) {
+        try {
             val mediaImage = imageProxy.image
             if (mediaImage != null) {
-                val image =
-                    InputImage.fromMediaImage(mediaImage, imageProxy.imageInfo.rotationDegrees)
-
+                val image = InputImage.fromMediaImage(mediaImage, imageProxy.imageInfo.rotationDegrees)
+                
+                // Process pose detection
                 poseDetector.process(image)
                     .addOnSuccessListener { pose ->
-                        // Process pose detection results
-                        processPose(pose, imageProxy.width, imageProxy.height)
+                        // Handle pose detection results
+                        runOnUiThread {
+                            // Update UI with pose results
+                        }
                     }
                     .addOnFailureListener { e ->
-                        Log.e(TAG, "Pose detection failed: ${e.message}", e)
+                        Log.e("HipThrusts", "Pose detection failed", e)
                     }
                     .addOnCompleteListener {
                         imageProxy.close()
@@ -239,6 +219,9 @@ class HipThrustsActivity : AppCompatActivity() {
             } else {
                 imageProxy.close()
             }
+        } catch (e: Exception) {
+            Log.e("HipThrusts", "Error processing image", e)
+            imageProxy.close()
         }
     }
 
