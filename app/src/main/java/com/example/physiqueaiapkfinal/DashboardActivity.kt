@@ -288,13 +288,38 @@ class DashboardActivity : AppCompatActivity() {
     
     private fun setupClickListeners() {
         try {
-            // Settings icon (btnProfileMenu) click listener
-            btnProfileMenu?.setOnClickListener {
+            btnProfileMenu?.setOnClickListener { view ->
                 try {
-                    val intent = Intent(this, ProfileActivity::class.java)
-                    startActivity(intent)
+                    val popup = android.widget.PopupMenu(this, view)
+                    popup.menu.add("About")
+                    popup.menu.add("Profile")
+                    popup.menu.add("Logout")
+                    popup.setOnMenuItemClickListener { item ->
+                        when (item.title) {
+                            "About" -> {
+                                val intent = Intent(this, AboutActivity::class.java)
+                                startActivity(intent)
+                                true
+                            }
+                            "Profile" -> {
+                                val intent = Intent(this, ProfileActivity::class.java)
+                                startActivity(intent)
+                                true
+                            }
+                            "Logout" -> {
+                                // Perform logout logic
+                                com.google.firebase.auth.FirebaseAuth.getInstance().signOut()
+                                val intent = Intent(this, LoginActivity::class.java)
+                                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                                startActivity(intent)
+                                true
+                            }
+                            else -> false
+                        }
+                    }
+                    popup.show()
                 } catch (e: Exception) {
-                    Log.e("DashboardActivity", "Error navigating to settings", e)
+                    Log.e("DashboardActivity", "Error showing settings dropdown", e)
                 }
             }
             
@@ -348,8 +373,7 @@ class DashboardActivity : AppCompatActivity() {
             }
             
         } catch (e: Exception) {
-            Log.e("DashboardActivity", "Error setting up click listeners", e)
-            ErrorHandler.handleError(this, "Failed to setup interactions", e)
+            Log.e("DashboardActivity", "Error in setupClickListeners", e)
         }
     }
     
