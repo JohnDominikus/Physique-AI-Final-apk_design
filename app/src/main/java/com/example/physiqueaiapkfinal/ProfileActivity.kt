@@ -1,189 +1,372 @@
 package com.example.physiqueaiapkfinal
 
-import android.annotation.SuppressLint
 import android.app.DatePickerDialog
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import android.view.View
-import android.widget.*
-import androidx.appcompat.app.AlertDialog
+import android.webkit.MimeTypeMap
+import android.widget.EditText
+import android.widget.ImageButton
+import android.widget.ImageView
+import android.widget.LinearLayout
+import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import com.bumptech.glide.Glide
+import com.google.android.material.button.MaterialButton
 import com.google.android.material.textfield.TextInputEditText
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
-import java.util.*
+import com.google.firebase.storage.FirebaseStorage
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Locale
 
 class ProfileActivity : AppCompatActivity() {
 
     private lateinit var auth: FirebaseAuth
     private lateinit var firestore: FirebaseFirestore
+    private lateinit var storage: FirebaseStorage
     private var uid: String? = null
+    private var imageUri: Uri? = null
 
-    // Views from the modernized layout
-    private lateinit var etFullName: TextInputEditText
-    private lateinit var etEmail: TextInputEditText
-    private lateinit var etPhone: TextInputEditText
-    private lateinit var etBirthdate: TextInputEditText
-    private lateinit var btnSave: Button
-    private lateinit var btnCancel: Button
-    private lateinit var btnBack: ImageButton
+    // Views
+    private var profileImageView: ImageView? = null
+    private var etFullName: TextInputEditText? = null
+    private var etEmail: TextInputEditText? = null
+    private var etPhone: TextInputEditText? = null
+    private var etBirthdate: TextInputEditText? = null
+    private var btnEdit: ImageButton? = null
+    private var btnBack: ImageButton? = null
+    private var btnChangePhoto: MaterialButton? = null
+    private var btnSave: MaterialButton? = null
+    private var btnCancel: MaterialButton? = null
+    private var layoutActionButtons: LinearLayout? = null
+
+    // Idinagdag – para i-centralize ang koleksiyong gagamitin
+    private val USERS_COLLECTION = "userinfo"
+
+    private val imagePickerLauncher = registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
+        uri?.let {
+            try {
+                imageUri = it
+                profileImageView?.setImageURI(it)
+                uploadProfileImage()
+            } catch (e: Exception) {
+                Log.e("ProfileActivity", "Error setting image URI", e)
+                Toast.makeText(this, "Error loading image: ${e.message}", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_profile)
+        Log.d("ProfileActivity", "onCreate started")
+        
+        try {
+            setContentView(R.layout.activity_profile)
+            Log.d("ProfileActivity", "Layout set successfully")
 
-        auth = FirebaseAuth.getInstance()
-        firestore = FirebaseFirestore.getInstance()
-        uid = auth.currentUser?.uid
+            // Initialize Firebase services
+            auth = FirebaseAuth.getInstance()
+            firestore = FirebaseFirestore.getInstance()
+            storage = FirebaseStorage.getInstance()
+            uid = auth.currentUser?.uid
+            Log.d("ProfileActivity", "Firebase initialized, uid: $uid")
 
-        if (uid == null) {
-            Toast.makeText(this, "User not logged in", Toast.LENGTH_SHORT).show()
+            if (uid == null) {
+                Log.w("ProfileActivity", "User not logged in")
+                Toast.makeText(this, "User not logged in.", Toast.LENGTH_SHORT).show()
+                finish()
+                return
+            }
+
+            initializeViews()
+            setupListeners()
+            fetchUserInfo()
+            setEditMode(false) // Initial state is view mode
+            
+            Log.d("ProfileActivity", "onCreate completed successfully")
+            
+        } catch (e: Exception) {
+            Log.e("ProfileActivity", "Critical error in onCreate", e)
+            Toast.makeText(this, "Error loading profile: ${e.message}", Toast.LENGTH_LONG).show()
             finish()
-            return
         }
+    }
 
-        // Initialize views from modernized layout
-        etFullName = findViewById(R.id.etFullName)
-        etEmail = findViewById(R.id.etEmail)
-        etPhone = findViewById(R.id.etPhone)
-        etBirthdate = findViewById(R.id.etBirthdate)
-        btnSave = findViewById(R.id.btnSave)
-        btnCancel = findViewById(R.id.btnCancel)
-        btnBack = findViewById(R.id.btnBack)
-
-        setupListeners()
-        fetchUserInfoRealtime()
+    private fun initializeViews() {
+        try {
+            Log.d("ProfileActivity", "Initializing views...")
+            
+            profileImageView = findViewById(R.id.profileImageView)
+            etFullName = findViewById(R.id.etFullName)
+            etEmail = findViewById(R.id.etEmail)
+            etPhone = findViewById(R.id.etPhone)
+            etBirthdate = findViewById(R.id.etBirthdate)
+            btnEdit = findViewById(R.id.btnEdit)
+            btnBack = findViewById(R.id.btnBack)
+            btnChangePhoto = findViewById(R.id.btnChangePhoto)
+            btnSave = findViewById(R.id.btnSave)
+            btnCancel = findViewById(R.id.btnCancel)
+            layoutActionButtons = findViewById(R.id.layoutActionButtons)
+            
+            Log.d("ProfileActivity", "All views initialized successfully")
+            
+        } catch (e: Exception) {
+            Log.e("ProfileActivity", "Error initializing views", e)
+            throw e
+        }
     }
 
     private fun setupListeners() {
-        // Back button
-        btnBack.setOnClickListener {
-            finish()
-        }
+        try {
+            Log.d("ProfileActivity", "Setting up listeners...")
+            
+            btnBack?.setOnClickListener { 
+                Log.d("ProfileActivity", "Back button clicked")
+                finish() 
+            }
+            
+            btnEdit?.setOnClickListener { 
+                Log.d("ProfileActivity", "Edit button clicked")
+                setEditMode(true) 
+            }
+            
+            btnCancel?.setOnClickListener {
+                Log.d("ProfileActivity", "Cancel button clicked")
+                setEditMode(false)
+                fetchUserInfo() // Revert changes by fetching original data
+            }
+            
+            btnSave?.setOnClickListener { 
+                Log.d("ProfileActivity", "Save button clicked")
+                saveUserInfo() 
+            }
+            
+            btnChangePhoto?.setOnClickListener { 
+                Log.d("ProfileActivity", "Change photo button clicked")
+                imagePickerLauncher.launch("image/*") 
+            }
 
-        // Birthdate picker
-        etBirthdate.setOnClickListener {
-            showDatePicker()
-        }
-
-        // Save button
-        btnSave.setOnClickListener {
-            saveUserInfo()
-        }
-
-        // Cancel button
-        btnCancel.setOnClickListener {
-            fetchUserInfoRealtime() // Reset to original values
-            Toast.makeText(this, "Changes cancelled", Toast.LENGTH_SHORT).show()
+            etBirthdate?.setOnClickListener {
+                try {
+                    if (etBirthdate?.isFocusable == true) {
+                        Log.d("ProfileActivity", "Birthdate field clicked - showing date picker")
+                        showDatePickerDialog()
+                    }
+                } catch (e: Exception) {
+                    Log.e("ProfileActivity", "Error in birthdate click", e)
+                }
+            }
+            
+            Log.d("ProfileActivity", "Listeners setup completed")
+            
+        } catch (e: Exception) {
+            Log.e("ProfileActivity", "Error setting up listeners", e)
+            throw e
         }
     }
 
-    private fun showDatePicker() {
-        val calendar = Calendar.getInstance()
-        val datePickerDialog = DatePickerDialog(
-            this,
-            { _, year, month, dayOfMonth ->
-                val formattedDate = "${month + 1}/$dayOfMonth/$year"
-                etBirthdate.setText(formattedDate)
-            },
-            calendar.get(Calendar.YEAR),
-            calendar.get(Calendar.MONTH),
-            calendar.get(Calendar.DAY_OF_MONTH)
-        )
-        datePickerDialog.show()
+    private fun setEditMode(isEditing: Boolean) {
+        try {
+            Log.d("ProfileActivity", "Setting edit mode: $isEditing")
+            
+            etFullName?.isFocusableInTouchMode = isEditing
+            etEmail?.isFocusableInTouchMode = isEditing
+            etPhone?.isFocusableInTouchMode = isEditing
+            
+            etBirthdate?.isFocusable = isEditing
+            etBirthdate?.isFocusableInTouchMode = false // Keep it not directly editable
+            etBirthdate?.isClickable = isEditing
+
+            if (!isEditing) {
+                etFullName?.clearFocus()
+                etEmail?.clearFocus()
+                etPhone?.clearFocus()
+            }
+
+            layoutActionButtons?.visibility = if (isEditing) View.VISIBLE else View.GONE
+            btnChangePhoto?.visibility = if (isEditing) View.VISIBLE else View.GONE
+            
+            Log.d("ProfileActivity", "Edit mode set successfully")
+            
+        } catch (e: Exception) {
+            Log.e("ProfileActivity", "Error setting edit mode", e)
+        }
+    }
+
+    private fun fetchUserInfo() {
+        try {
+            Log.d("ProfileActivity", "Fetching user info for uid: $uid")
+            uid?.let { userId ->
+                firestore.collection(USERS_COLLECTION).document(userId).get()
+                    .addOnSuccessListener { document ->
+                        if (document != null && document.exists()) {
+                            Log.d("ProfileActivity", "User document found")
+                            
+                            val personal = document.get("personalInfo") as? Map<*, *>
+                            val first = personal?.get("firstName") as? String ?: ""
+                            val last  = personal?.get("lastName")  as? String ?: ""
+                            etFullName?.setText("$first $last".trim())
+                            etEmail?.setText(personal?.get("email") as? String ?: "")
+                            etPhone?.setText(personal?.get("phone") as? String ?: "")
+
+                            val ts = personal?.get("birthdate")
+                            val birthText = when (ts) {
+                                is com.google.firebase.Timestamp -> {
+                                    SimpleDateFormat("MMMM dd, yyyy", Locale.US).format(ts.toDate())
+                                }
+                                is java.util.Date -> {
+                                    SimpleDateFormat("MMMM dd, yyyy", Locale.US).format(ts)
+                                }
+                                else -> ts?.toString() ?: ""
+                            }
+                            etBirthdate?.setText(birthText)
+
+                            val photoUrl = document.getString("profilePhotoUrl")
+                            if (!photoUrl.isNullOrEmpty()) {
+                                Log.d("ProfileActivity", "Loading profile photo: $photoUrl")
+                                try {
+                                    profileImageView?.let { imageView ->
+                                        Glide.with(this@ProfileActivity)
+                                            .load(photoUrl)
+                                            .circleCrop()
+                                            .into(imageView)
+                                    }
+                                } catch (e: Exception) {
+                                    Log.e("ProfileActivity", "Error loading profile photo", e)
+                                }
+                            }
+                            
+                            Log.d("ProfileActivity", "User info loaded successfully")
+                        } else {
+                            Log.w("ProfileActivity", "No user document found")
+                            Toast.makeText(this@ProfileActivity, "No profile data found.", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                    .addOnFailureListener { e ->
+                        Log.e("ProfileActivity", "Failed to fetch user info", e)
+                        Toast.makeText(this@ProfileActivity, "Failed to load profile: ${e.message}", Toast.LENGTH_SHORT).show()
+                    }
+            }
+        } catch (e: Exception) {
+            Log.e("ProfileActivity", "Error in fetchUserInfo", e)
+        }
     }
 
     private fun saveUserInfo() {
-        val fullName = etFullName.text.toString().trim()
-        val email = etEmail.text.toString().trim()
-        val phone = etPhone.text.toString().trim()
-        val birthdate = etBirthdate.text.toString().trim()
+        try {
+            Log.d("ProfileActivity", "Saving user info...")
+            val fullName = etFullName?.text.toString().trim()
+            val email    = etEmail?.text.toString().trim()
+            val phone    = etPhone?.text.toString().trim()
+            val birth    = etBirthdate?.text.toString().trim()
 
-        // Validate input
-        if (fullName.isEmpty()) {
-            Toast.makeText(this, "Please enter your full name", Toast.LENGTH_SHORT).show()
-            return
-        }
-
-        val nameParts = fullName.split(" ", limit = 2)
-        val firstName = nameParts.getOrNull(0)?.trim().orEmpty()
-        val lastName = nameParts.getOrNull(1)?.trim().orEmpty()
-
-        if (firstName.isEmpty() || lastName.isEmpty()) {
-            Toast.makeText(this, "Please enter both first and last name", Toast.LENGTH_SHORT).show()
-            return
-        }
-
-        // Format phone number
-        val formattedPhone = formatPhoneNumber(phone)
-        if (formattedPhone == null && phone.isNotEmpty()) {
-            Toast.makeText(this, "Invalid phone format. Use 09XXXXXXXXX", Toast.LENGTH_LONG).show()
-            return
-        }
-
-        // Show confirmation dialog
-        AlertDialog.Builder(this)
-            .setTitle("Confirm Changes")
-            .setMessage("Save these changes to your profile?")
-            .setPositiveButton("Save") { _, _ ->
-                updateFirestore(firstName, lastName, email, formattedPhone ?: "", birthdate)
+            if (fullName.isEmpty() || email.isEmpty()) {
+                Toast.makeText(this, "Full name and email are required.", Toast.LENGTH_SHORT).show()
+                return
             }
-            .setNegativeButton("Cancel", null)
-            .show()
-    }
 
-    private fun formatPhoneNumber(phone: String): String? {
-        return when {
-            phone.isEmpty() -> ""
-            phone.startsWith("09") && phone.length == 11 -> "+63${phone.substring(1)}"
-            phone.startsWith("9") && phone.length == 10 -> "+63$phone"
-            phone.startsWith("+63") && phone.length == 13 -> phone
-            else -> null
+            // Hatiin ang pangalan para ma-store nang hiwalay
+            val nameParts = fullName.split(" ", limit = 2)
+            val first = nameParts.getOrNull(0) ?: ""
+            val last  = nameParts.getOrNull(1) ?: ""
+
+            val userUpdates = hashMapOf<String, Any>(
+                "personalInfo.firstName" to first,
+                "personalInfo.lastName"  to last,
+                "personalInfo.email"     to email,
+                "personalInfo.phone"     to phone,
+                "personalInfo.birthdate" to birth  // pwede ring i-convert sa Date kung gusto mo
+            )
+
+            uid?.let { userId ->
+                firestore.collection(USERS_COLLECTION).document(userId).update(userUpdates)
+                    .addOnSuccessListener {
+                        Log.d("ProfileActivity", "Profile updated successfully")
+                        Toast.makeText(this@ProfileActivity, "Profile updated successfully.", Toast.LENGTH_SHORT).show()
+                        setEditMode(false)
+                    }
+                    .addOnFailureListener { e ->
+                        Log.e("ProfileActivity", "Failed to update profile", e)
+                        Toast.makeText(this@ProfileActivity, "Failed to update profile: ${e.message}", Toast.LENGTH_SHORT).show()
+                    }
+            }
+        } catch (e: Exception) {
+            Log.e("ProfileActivity", "Error in saveUserInfo", e)
+            Toast.makeText(this, "Error saving profile: ${e.message}", Toast.LENGTH_SHORT).show()
         }
     }
+    
+    private fun uploadProfileImage() {
+        try {
+            imageUri?.let { uri ->
+                // kunin ang tamang extension (jpg/png/webp, etc.)
+                val mime  = contentResolver.getType(uri) ?: "image/jpeg"
+                val ext   = MimeTypeMap.getSingleton()
+                              .getExtensionFromMimeType(mime) ?: "jpg"
 
-    private fun updateFirestore(firstName: String, lastName: String, email: String, phone: String, birthdate: String) {
-        val updates = mapOf(
-            "personalInfo.firstName" to firstName,
-            "personalInfo.lastName" to lastName,
-            "personalInfo.email" to email,
-            "personalInfo.phone" to phone,
-            "personalInfo.birthdate" to birthdate
-        )
+                val storageRef = storage.reference.child("profile_images/$uid.jpg")
+                Log.d("ProfileUpload", "TARGET PATH = ${storageRef.path}")
 
-        firestore.collection("userinfo").document(uid!!)
-            .update(updates)
-            .addOnSuccessListener {
-                Toast.makeText(this, "Profile updated successfully!", Toast.LENGTH_SHORT).show()
-            }
-            .addOnFailureListener { exception ->
-                Toast.makeText(this, "Update failed: ${exception.message}", Toast.LENGTH_LONG).show()
-            }
+                storageRef.putFile(uri)
+                    .addOnSuccessListener {
+                        storageRef.downloadUrl.addOnSuccessListener { downloadUrl ->
+                            firestore.collection(USERS_COLLECTION)
+                                .document(uid!!)
+                                .update("profilePhotoUrl", downloadUrl.toString())
+                                .addOnSuccessListener {
+                                    Toast.makeText(
+                                        this,
+                                        "Profile photo updated!",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                    // refresh Dashboard photo via listener
+                                }
+                        }
+                    }
+                    .addOnFailureListener { e ->
+                        Toast.makeText(
+                            this,
+                            "Upload failed: ${e.message}",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+            } ?: Toast.makeText(this, "No image selected", Toast.LENGTH_SHORT).show()
+        } catch (e: Exception) {
+            Toast.makeText(this, "Error: ${e.message}", Toast.LENGTH_SHORT).show()
+        }
     }
 
-    @SuppressLint("SetTextI18n")
-    private fun fetchUserInfoRealtime() {
-        firestore.collection("userinfo").document(uid!!)
-            .addSnapshotListener { document, error ->
-                if (error != null) {
-                    Toast.makeText(this, "Error: ${error.message}", Toast.LENGTH_SHORT).show()
-                    return@addSnapshotListener
+    private fun showDatePickerDialog() {
+        try {
+            Log.d("ProfileActivity", "Showing date picker dialog")
+            
+            val calendar = Calendar.getInstance()
+            val year = calendar.get(Calendar.YEAR)
+            val month = calendar.get(Calendar.MONTH)
+            val day = calendar.get(Calendar.DAY_OF_MONTH)
+
+            val datePickerDialog = DatePickerDialog(this, { _, selectedYear, selectedMonth, selectedDay ->
+                try {
+                    val selectedDate = Calendar.getInstance()
+                    selectedDate.set(selectedYear, selectedMonth, selectedDay)
+                    val sdf = SimpleDateFormat("MMMM dd, yyyy", Locale.US)
+                    etBirthdate?.setText(sdf.format(selectedDate.time))
+                    Log.d("ProfileActivity", "Date selected successfully")
+                } catch (e: Exception) {
+                    Log.e("ProfileActivity", "Error setting selected date", e)
                 }
-
-                if (document != null && document.exists()) {
-                    val personal = document.get("personalInfo") as? Map<*, *>
-                    
-                    val firstName = personal?.get("firstName")?.toString() ?: ""
-                    val lastName = personal?.get("lastName")?.toString() ?: ""
-                    val email = personal?.get("email")?.toString() ?: ""
-                    val phone = personal?.get("phone")?.toString() ?: ""
-                    val birthdate = personal?.get("birthdate")?.toString() ?: ""
-
-                    // Update the input fields
-                    etFullName.setText("$firstName $lastName".trim())
-                    etEmail.setText(email)
-                    etPhone.setText(phone)
-                    etBirthdate.setText(birthdate)
-                }
-            }
+            }, year, month, day)
+            
+            datePickerDialog.show()
+            
+        } catch (e: Exception) {
+            Log.e("ProfileActivity", "Error showing date picker", e)
+            Toast.makeText(this, "Error showing date picker: ${e.message}", Toast.LENGTH_SHORT).show()
+        }
     }
 }

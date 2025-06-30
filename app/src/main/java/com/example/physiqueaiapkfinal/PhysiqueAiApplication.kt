@@ -4,6 +4,9 @@ import android.app.Application
 import android.content.Context
 import android.content.SharedPreferences
 import android.util.Log
+import com.google.firebase.FirebaseApp
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 import java.io.PrintWriter
 import java.io.StringWriter
 import java.text.SimpleDateFormat
@@ -17,6 +20,9 @@ class PhysiqueAiApplication : Application() {
         super.onCreate()
         
         try {
+            // Initialize Firebase first
+            initializeFirebase()
+            
             crashPrefs = getSharedPreferences("CRASH_REPORTS", Context.MODE_PRIVATE)
             Log.d("PhysiqueAI", "Application started successfully")
             
@@ -29,6 +35,22 @@ class PhysiqueAiApplication : Application() {
         } catch (e: Exception) {
             Log.e("PhysiqueAI", "Application startup failed", e)
             ErrorHandler.handleCrash(this, e, "Application startup")
+        }
+    }
+
+    private fun initializeFirebase() {
+        try {
+            // Initialize Firebase
+            FirebaseApp.initializeApp(this)
+            
+            // Initialize Auth and Firestore
+            FirebaseAuth.getInstance()
+            FirebaseFirestore.getInstance()
+            
+            Log.d("PhysiqueAI", "Firebase initialized successfully")
+        } catch (e: Exception) {
+            Log.e("PhysiqueAI", "Failed to initialize Firebase", e)
+            throw e // Rethrow as this is critical
         }
     }
     

@@ -30,6 +30,7 @@ import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
 import com.google.firebase.firestore.Query
+import com.google.firebase.firestore.DocumentSnapshot
 import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.ExecutorService
@@ -38,6 +39,14 @@ import java.util.concurrent.TimeUnit
 import com.example.physiqueaiapkfinal.WorkoutTodo
 import com.example.physiqueaiapkfinal.MealTodo
 import com.example.physiqueaiapkfinal.UserMedicalInfo
+import android.text.SpannableString
+import android.text.style.StyleSpan
+import android.text.style.ForegroundColorSpan
+import android.text.style.RelativeSizeSpan
+import android.graphics.Typeface
+import androidx.core.content.ContextCompat
+import com.bumptech.glide.Glide
+import com.google.firebase.storage.FirebaseStorage
 
 // Data classes for dashboard
 data class DashboardStats(
@@ -170,6 +179,9 @@ class DashboardActivity : AppCompatActivity() {
     private var rvMealActivities: RecyclerView? = null
     private var rvWorkoutActivities: RecyclerView? = null
 
+    // ======== idinagdag =========
+    private val PROFILE_COLLECTION = "userinfo"
+
     override fun onCreate(savedInstanceState: Bundle?) {
         try {
             super.onCreate(savedInstanceState)
@@ -253,8 +265,6 @@ class DashboardActivity : AppCompatActivity() {
             tvWorkoutCount = findViewById(R.id.tvWorkoutCount)
             tvCaloriesBurned = findViewById(R.id.tvCaloriesBurned)
             tvTodoCount = findViewById(R.id.tvTodoCount)
-            tvCaloriesProgress = findViewById(R.id.tvCaloriesProgress)
-            tvWorkoutsProgress = findViewById(R.id.tvWorkoutsProgress)
             progressCalories = findViewById(R.id.progressCalories)
             progressWorkouts = findViewById(R.id.progressWorkouts)
             rvRecentActivities = findViewById(R.id.rvRecentActivities)
@@ -288,38 +298,85 @@ class DashboardActivity : AppCompatActivity() {
     
     private fun setupClickListeners() {
         try {
+            // Enhanced settings button with better error handling
             btnProfileMenu?.setOnClickListener { view ->
+                Log.d("DashboardActivity", "Settings button clicked!")
                 try {
-                    val popup = android.widget.PopupMenu(this, view)
-                    popup.menu.add("About")
-                    popup.menu.add("Profile")
-                    popup.menu.add("Logout")
+                    // Create popup menu with proper context
+                    val popup = android.widget.PopupMenu(this@DashboardActivity, view)
+                    Log.d("DashboardActivity", "Popup menu created")
+                    
+                    // Inflate menu from resources for reliable IDs/titles
+                    try {
+                        popup.menuInflater.inflate(R.menu.settings_menu, popup.menu)
+                        Log.d("DashboardActivity", "Menu inflated successfully")
+                    } catch (e: Exception) {
+                        Log.e("DashboardActivity", "Error inflating settings menu", e)
+                        Toast.makeText(this@DashboardActivity, "Menu error", Toast.LENGTH_SHORT).show()
+                        return@setOnClickListener
+                    }
+                    
+                    // Set menu item click listener with enhanced error handling using item IDs
                     popup.setOnMenuItemClickListener { item ->
-                        when (item.title) {
-                            "About" -> {
-                                val intent = Intent(this, AboutActivity::class.java)
-                                startActivity(intent)
-                                true
+                        try {
+                            when (item.itemId) {
+                                R.id.menu_profile -> {
+                                    try {
+                                        val intent = Intent(this@DashboardActivity, ProfileActivity::class.java)
+                                        startActivity(intent)
+                                    } catch (e: Exception) {
+                                        Log.e("DashboardActivity", "Error navigating to Profile", e)
+                                        Toast.makeText(this@DashboardActivity, "Cannot open Profile: ${e.message}", Toast.LENGTH_LONG).show()
+                                    }
+                                    true
+                                }
+                                R.id.menu_logout -> {
+                                    try {
+                                        com.google.firebase.auth.FirebaseAuth.getInstance().signOut()
+                                        cleanupListeners()
+                                        val intent = Intent(this@DashboardActivity, LoginActivity::class.java)
+                                        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                                        startActivity(intent)
+                                        finish()
+                                    } catch (e: Exception) {
+                                        Log.e("DashboardActivity", "Error during logout", e)
+                                        Toast.makeText(this@DashboardActivity, "Logout failed", Toast.LENGTH_SHORT).show()
+                                    }
+                                    true
+                                }
+                                R.id.menu_about -> {
+                                    try {
+                                        val intent = Intent(this@DashboardActivity, AboutActivity::class.java)
+                                        startActivity(intent)
+                                    } catch (e: Exception) {
+                                        Log.e("DashboardActivity", "Error navigating to About", e)
+                                        Toast.makeText(this@DashboardActivity, "Cannot open About", Toast.LENGTH_SHORT).show()
+                                    }
+                                    true
+                                }
+                                else -> {
+                                    Log.w("DashboardActivity", "Unknown menu item id: ${item.itemId}")
+                                    false
+                                }
                             }
-                            "Profile" -> {
-                                val intent = Intent(this, ProfileActivity::class.java)
-                                startActivity(intent)
-                                true
-                            }
-                            "Logout" -> {
-                                // Perform logout logic
-                                com.google.firebase.auth.FirebaseAuth.getInstance().signOut()
-                                val intent = Intent(this, LoginActivity::class.java)
-                                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                                startActivity(intent)
-                                true
-                            }
-                            else -> false
+                        } catch (e: Exception) {
+                            Log.e("DashboardActivity", "Error handling menu item click", e)
+                            Toast.makeText(this@DashboardActivity, "Menu action failed", Toast.LENGTH_SHORT).show()
+                            false
                         }
                     }
-                    popup.show()
+                    
+                    // Show popup with error handling
+                    try {
+                        popup.show()
+                    } catch (e: Exception) {
+                        Log.e("DashboardActivity", "Error showing popup menu", e)
+                        Toast.makeText(this@DashboardActivity, "Cannot show menu", Toast.LENGTH_SHORT).show()
+                    }
+                    
                 } catch (e: Exception) {
-                    Log.e("DashboardActivity", "Error showing settings dropdown", e)
+                    Log.e("DashboardActivity", "Error creating settings menu", e)
+                    Toast.makeText(this@DashboardActivity, "Settings menu error", Toast.LENGTH_SHORT).show()
                 }
             }
             
@@ -372,8 +429,42 @@ class DashboardActivity : AppCompatActivity() {
                 }
             }
             
+            // TEMPORARY: Test direct profile navigation (for debugging)
+            cardBMI?.setOnClickListener {
+                try {
+                    Log.d("DashboardActivity", "BMI card clicked - testing profile navigation")
+                    val intent = Intent(this, ProfileActivity::class.java)
+                    startActivity(intent)
+                    Log.d("DashboardActivity", "Profile navigation from BMI card successful")
+                } catch (e: Exception) {
+                    Log.e("DashboardActivity", "Error navigating to Profile from BMI card", e)
+                    Toast.makeText(this, "Profile error: ${e.message}", Toast.LENGTH_LONG).show()
+                }
+            }
+            
         } catch (e: Exception) {
             Log.e("DashboardActivity", "Error in setupClickListeners", e)
+        }
+    }
+    
+    // Helper method to cleanup listeners before logout
+    private fun cleanupListeners() {
+        try {
+            userInfoListener?.remove()
+            statsListener?.remove()
+            todosListener?.remove()
+            mealTodosListener?.remove()
+            activitiesListener?.remove()
+            workoutTodoListener?.remove()
+            mealTodoListener?.remove()
+            userStatsListener?.remove()
+            
+            // Shutdown background executor
+            backgroundExecutor.shutdown()
+            
+            Log.d("DashboardActivity", "All listeners cleaned up")
+        } catch (e: Exception) {
+            Log.e("DashboardActivity", "Error cleaning up listeners", e)
         }
     }
     
@@ -429,47 +520,91 @@ class DashboardActivity : AppCompatActivity() {
     
     private fun setupUserInfoListener() {
         try {
-            userInfoListener = firestore.collection("users")
+            userInfoListener = firestore.collection(PROFILE_COLLECTION)
                 .document(userId!!)
                 .addSnapshotListener { snapshot, error ->
-                    backgroundExecutor.execute {
-                        try {
-                            if (error != null) {
-                                Log.e("DashboardActivity", "User info listener error", error)
-                                return@execute
-                            }
-                            
-                            if (snapshot != null && snapshot.exists()) {
-                                val userData = snapshot.data
-                                val personalInfo = userData?.get("personalInfo") as? Map<String, Any>
-                                val bmiInfo = userData?.get("bmiInfo") as? Map<String, Any>
-                                
-                                // Update UI on main thread
-                                mainHandler?.post {
-                                    try {
-                                        updateUserInfo(personalInfo, bmiInfo)
-                                    } catch (e: Exception) {
-                                        Log.e("DashboardActivity", "Error updating user info", e)
-                                    }
-                                }
-                            } else {
-                                Log.w("DashboardActivity", "User document not found")
-                                mainHandler?.post {
-                                    try {
-                                        showEmptyUserState()
-                                    } catch (e: Exception) {
-                                        Log.e("DashboardActivity", "Error showing empty user state", e)
-                                    }
-                                }
-                            }
-                        } catch (e: Exception) {
-                            Log.e("DashboardActivity", "Error processing user info", e)
-                        }
+                    if (error != null) {
+                        Log.e("DashboardActivity", "User info listener error", error)
+                        return@addSnapshotListener
+                    }
+                    snapshot?.let { safeSnap ->
+                        // ipasa ang buong snapshot para magamit ang fallback logic sa UI
+                        mainHandler?.post { updateUserInfoFromSnapshot(safeSnap) }
                     }
                 }
         } catch (e: Exception) {
             Log.e("DashboardActivity", "Error setting up user info listener", e)
         }
+    }
+    
+    private fun updateUserInfoFromSnapshot(doc: DocumentSnapshot) {
+        val personal = doc.get("personalInfo") as? Map<*, *> ?: return
+        val firstName = personal["firstName"] as? String ?: return
+        val email     = personal["email"]     as? String ?: return
+
+        /* ======== Build styled "Welcome back, Firstname!" ======== */
+        val welcomeRaw = "Welcome back, $firstName!"
+        val spannable  = SpannableString(welcomeRaw).apply {
+            val start = "Welcome back, ".length
+            val end   = welcomeRaw.length
+
+            // Bold
+            setSpan(StyleSpan(Typeface.BOLD), start, end, 0)
+
+            // Black color
+            val black = ContextCompat.getColor(this@DashboardActivity, android.R.color.black)
+            setSpan(ForegroundColorSpan(black), start, end, 0)
+
+            // 1.2× size (adjust as you like)
+            setSpan(RelativeSizeSpan(1.2f), start, end, 0)
+        }
+        tvWelcome?.text = spannable
+        /* ========================================================= */
+
+        tvEmail?.text = email
+        tvFullName?.visibility = View.GONE      // wala nang duplicate
+
+        // motivation text (walang pagbabago)
+        val hour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY)
+        tvMotivation?.text = when {
+            hour < 12 -> "Good morning! Ready to crush your goals?"
+            hour < 17 -> "Good afternoon! Keep pushing forward!"
+            else      -> "Good evening! Great work today!"
+        }
+
+        /* ==================  B M I   U P D A T E  ================== */
+        val bmiMap = doc.get("bmiInfo") as? Map<*, *>
+        val bmiVal = (bmiMap?.get("bmi") as? Number)?.toDouble() ?: -1.0
+        if (bmiVal > 0) {
+            // I-display ang value
+            tvBMIValue?.text = String.format("%.1f", bmiVal)
+
+            // Tukuyin ang kategorya para sa kulay
+            val bmiCategory = when {
+                bmiVal < 18.5 -> "underweight"
+                bmiVal < 25   -> "normal"
+                bmiVal < 30   -> "overweight"
+                else          -> "obese"
+            }
+            cardBMI?.setCardBackgroundColor(getBMIColor(bmiCategory))
+        }
+        /* ============================================================ */
+
+        /* ======== Profile photo ======== */
+        val photoUrl = doc.getString("profilePhotoUrl")
+        if (!photoUrl.isNullOrBlank()) {
+            try {
+                ivProfileImage?.let { img ->
+                    Glide.with(this)
+                        .load(photoUrl)
+                        .circleCrop()
+                        .into(img)
+                }
+            } catch (e: Exception) {
+                Log.e("DashboardActivity", "Error loading profile image", e)
+            }
+        }
+        /* =========================================== */
     }
     
     private fun setupStatsListener() {
@@ -652,50 +787,6 @@ class DashboardActivity : AppCompatActivity() {
         }
     }
     
-    private fun updateUserInfo(personalInfo: Map<String, Any>?, bmiInfo: Map<String, Any>?) {
-        try {
-            runOnUiThread {
-                try {
-                    // Update personal info
-                    personalInfo?.let { info ->
-                        val firstName = info["firstName"] as? String ?: ""
-                        val lastName = info["lastName"] as? String ?: ""
-                        val email = info["email"] as? String ?: ""
-                        
-                        tvWelcome?.text = "Welcome back, $firstName!"
-                        tvFullName?.text = "$firstName $lastName"
-                        tvEmail?.text = email
-                        
-                        // Set motivation based on time
-                        val currentHour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY)
-                        val motivation = when {
-                            currentHour < 12 -> "Good morning! Ready to crush your goals?"
-                            currentHour < 17 -> "Good afternoon! Keep pushing forward!"
-                            else -> "Good evening! Great work today!"
-                        }
-                        tvMotivation?.text = motivation
-                    }
-                    
-                    // Update BMI info
-                    bmiInfo?.let { bmi ->
-                        val bmiValue = bmi["bmi"] as? Double ?: 0.0
-                        val bmiCategory = bmi["category"] as? String ?: "Unknown"
-                        
-                        tvBMIValue?.text = String.format("%.1f", bmiValue)
-                        
-                        // Set BMI card color based on category
-                        cardBMI?.setCardBackgroundColor(getBMIColor(bmiCategory))
-                    }
-                    
-                } catch (e: Exception) {
-                    Log.e("DashboardActivity", "Error updating UI with user info", e)
-                }
-            }
-        } catch (e: Exception) {
-            Log.e("DashboardActivity", "Error in updateUserInfo", e)
-        }
-    }
-    
     private fun updateDashboardStats(stats: Map<String, Any>?) {
         try {
             runOnUiThread {
@@ -796,15 +887,11 @@ class DashboardActivity : AppCompatActivity() {
     }
     
     private fun showEmptyUserState() {
-        try {
-            runOnUiThread {
-                tvWelcome?.text = "Welcome!"
-                tvFullName?.text = "User"
-                tvEmail?.text = "No email available"
-                tvMotivation?.text = "Complete your profile to get started!"
-            }
-        } catch (e: Exception) {
-            Log.e("DashboardActivity", "Error showing empty user state", e)
+        runOnUiThread {
+            tvWelcome?.text = "Welcome!"
+            tvFullName?.visibility = View.GONE
+            tvEmail?.text = "No email available"
+            tvMotivation?.text = "Complete your profile to get started!"
         }
     }
     

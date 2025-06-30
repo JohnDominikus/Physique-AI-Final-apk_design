@@ -91,7 +91,7 @@ class BmiCalculatorActivity : AppCompatActivity() {
             ageIncreaseButton = findViewById(R.id.agePlus)
             ageTextView = findViewById(R.id.ageValue)
             calculateBMIButton = findViewById(R.id.calculateButton)
-            backButton = findViewById(R.id.backButton)
+            backButton = findViewById(R.id.btnBack)
         } catch (e: Exception) {
             Log.e("BmiCalculatorActivity", "Error initializing views", e)
             handleError("Failed to initialize interface", e)

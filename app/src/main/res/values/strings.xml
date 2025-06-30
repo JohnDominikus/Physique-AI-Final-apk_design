@@ -28,7 +28,7 @@
     <string name="search_meals_hint">Search for meals</string>
     <string name="add_meal">Add Meal</string>
     <string name="nutrition_summary_default">Nutrition summary</string>
-    
+
     <!-- BMI Results -->
     <string name="your_bmi">Your BMI</string>
     <string name="normal_bmi_range">Normal BMI Range: 18.5 - 24.9</string>
@@ -45,7 +45,7 @@
     <string name="obese_value">&gt;= 30.0</string>
     <string name="save_bmi">Save BMI Result</string>
     <string name="back_to_calculator">Back to Calculator</string>
-    
+
     <!-- Workout -->
     <string name="workout_image">Workout image</string>
     <string name="remove_from_liked">Remove from liked workouts</string>
@@ -89,6 +89,10 @@
     <string name="squat_counter_text">Squats: %1$d</string>
     <string name="front_raise_counter_text">Front Raises: %1$d</string>
     <string name="hip_thrust_counter_text">Hip Thrusts: %1$d</string>
+    <string name="windmill_count">Windmills: %1$d</string>
+    <string name="military_press_counter_text">Military Press: %1$d</string>
+    <string name="sit_up_counter_text">Sit-ups: %1$d</string>
+    <string name="hammer_curl_counter_text">Hammer Curls: %1$d</string>
 
     <!-- Water Reminder -->
     <string name="water_reminder_title">💧 Time to Drink Water!</string>

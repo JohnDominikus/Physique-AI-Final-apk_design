@@ -24,6 +24,7 @@ import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 import com.example.physiqueaiapkfinal.WorkoutTodo
 import com.example.physiqueaiapkfinal.UserMedicalInfo
+import android.view.View
 
 // Import UserMedicalInfo from DietaryTodoActivity
 
@@ -32,7 +33,7 @@ data class WorkoutItem(
     val id: String = "",
     val name: String = "",
     val gif_url: String = "",
-    val muscle_groups: List<String> = listOf(),
+    val muscle_groups: String = "",
     val safety_warning: String = "",
     val calories_per_minute: Int = 0
 )
@@ -300,38 +301,26 @@ class WorkoutTodoActivity : AppCompatActivity() {
     private fun loadWorkoutDataAsync(onComplete: () -> Unit) {
         backgroundExecutor.execute {
             try {
-        firestore.collection("workouts")
-                    .limit(50) // Limit to prevent large data loads
-            .get()
-            .addOnSuccessListener { documents ->
-                        try {
-                            mainHandler.post {
-                workoutList.clear()
-                for (document in documents) {
-                    val workout = document.toObject(WorkoutItem::class.java).copy(id = document.id)
-                    workoutList.add(workout)
-                }
-                
-                                // Add sample workouts if none exist
-                                if (workoutList.isEmpty()) {
-                                    addSampleWorkouts()
-                                } else {
-                                    setupWorkoutSpinner()
-                                }
-                                
-                                incrementLoadedComponents()
-                                onComplete()
+                firestore.collection("workoutcollection")
+                    .limit(50)
+                    .get()
+                    .addOnSuccessListener { docs ->
+                        mainHandler.post {
+                            workoutList.clear()
+                            docs.forEach { d ->
+                                d.toObject(WorkoutItem::class.java)
+                                    ?.copy(id = d.id)
+                                    ?.let { workoutList.add(it) }
                             }
-                        } catch (e: Exception) {
-                            handleError("Error processing workouts", e)
+                            setupWorkoutSpinner()
+                            incrementLoadedComponents()
                             onComplete()
                         }
                     }
                     .addOnFailureListener { e ->
                         handleError("Failed to load workouts", e)
-                        // Add sample workouts as fallback
                         mainHandler.post {
-                            addSampleWorkouts()
+                            setupWorkoutSpinner()
                             incrementLoadedComponents()
                             onComplete()
                         }
@@ -339,7 +328,7 @@ class WorkoutTodoActivity : AppCompatActivity() {
             } catch (e: Exception) {
                 handleError("Workout data loading error", e)
                 mainHandler.post {
-                    addSampleWorkouts()
+                    setupWorkoutSpinner()
                     incrementLoadedComponents()
                     onComplete()
                 }
@@ -347,103 +336,40 @@ class WorkoutTodoActivity : AppCompatActivity() {
         }
     }
     
-    private fun addSampleWorkouts() {
-        workoutList.addAll(listOf(
-            WorkoutItem(
-                id = "1",
-                name = "Push-ups",
-                gif_url = "",
-                muscle_groups = listOf("Chest", "Arms", "Core"),
-                safety_warning = "Keep your body in a straight line",
-                calories_per_minute = 8
-            ),
-            WorkoutItem(
-                id = "2", 
-                name = "Squats",
-                gif_url = "",
-                muscle_groups = listOf("Legs", "Glutes", "Core"),
-                safety_warning = "Keep knees behind toes",
-                calories_per_minute = 6
-            ),
-            WorkoutItem(
-                id = "3",
-                name = "Burpees", 
-                gif_url = "",
-                muscle_groups = listOf("Full Body", "Core", "Cardio"),
-                safety_warning = "Land softly on jumps",
-                calories_per_minute = 12
-            ),
-            WorkoutItem(
-                id = "4",
-                name = "Plank",
-                gif_url = "",
-                muscle_groups = listOf("Core", "Arms", "Back"),
-                safety_warning = "Keep back straight, no sagging",
-                calories_per_minute = 4
-            ),
-            WorkoutItem(
-                id = "5",
-                name = "Jumping Jacks",
-                gif_url = "",
-                muscle_groups = listOf("Full Body", "Cardio"),
-                safety_warning = "Land on balls of feet",
-                calories_per_minute = 10
-            ),
-            WorkoutItem(
-                id = "6",
-                name = "Lunges",
-                gif_url = "",
-                muscle_groups = listOf("Legs", "Glutes", "Core"),
-                safety_warning = "Keep front knee at 90 degrees",
-                calories_per_minute = 7
-            ),
-            WorkoutItem(
-                id = "7",
-                name = "Mountain Climbers",
-                gif_url = "",
-                muscle_groups = listOf("Core", "Arms", "Cardio"),
-                safety_warning = "Keep hips level",
-                calories_per_minute = 11
-            ),
-            WorkoutItem(
-                id = "8",
-                name = "Sit-ups",
-                gif_url = "",
-                muscle_groups = listOf("Core", "Abs"),
-                safety_warning = "Don't pull on neck",
-                calories_per_minute = 5
-            )
-        ))
-        setupWorkoutSpinner()
-    }
-    
     private fun setupWorkoutSpinner() {
         try {
             if (workoutList.isEmpty()) {
                 showError("No workouts available")
-                // Add fallback sample data
-                addSampleWorkouts()
+                workoutSpinner.isEnabled = false
+                return
             }
-            val workoutOptions = mutableListOf("Select Exercise")
-            workoutOptions.addAll(workoutList.map { it.name })
-            val spinnerAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, workoutOptions).apply {
-                setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-            }
+
+            val options = mutableListOf("Select Exercise")
+            options.addAll(workoutList.map { it.name })
+
+            val adapter = ArrayAdapter(
+                this,
+                android.R.layout.simple_spinner_item,
+                options
+            ).also { it.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item) }
+
             mainHandler.post {
-                workoutSpinner.adapter = spinnerAdapter
+                workoutSpinner.adapter = adapter
                 workoutSpinner.isEnabled = true
             }
-            // Filtration logic
-            etWorkoutSearch.addTextChangedListener(object : android.text.TextWatcher {
-                override fun afterTextChanged(s: android.text.Editable?) {
-                    val filtered = workoutList.filter { it.name.contains(s.toString(), ignoreCase = true) }
-                    val filteredOptions = mutableListOf("Select Exercise")
-                    filteredOptions.addAll(filtered.map { it.name })
-                    val filterAdapter = ArrayAdapter(this@WorkoutTodoActivity, android.R.layout.simple_spinner_item, filteredOptions)
-                    filterAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-                    mainHandler.post {
-                        workoutSpinner.adapter = filterAdapter
-                    }
+
+            /* search/filter */
+            etWorkoutSearch.addTextChangedListener(object : TextWatcher {
+                override fun afterTextChanged(s: Editable?) {
+                    val filtered = workoutList
+                        .filter { it.name.contains(s.toString(), true) }
+                        .map { it.name }
+                    val fAdapter = ArrayAdapter(
+                        this@WorkoutTodoActivity,
+                        android.R.layout.simple_spinner_item,
+                        mutableListOf("Select Exercise").apply { addAll(filtered) }
+                    ).also { it.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item) }
+                    mainHandler.post { workoutSpinner.adapter = fAdapter }
                 }
                 override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
                 override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
@@ -554,41 +480,26 @@ class WorkoutTodoActivity : AppCompatActivity() {
     
     private fun checkMedicalWarnings(workout: WorkoutItem) {
         try {
-        var warningMessage = ""
-        
-        // Check safety warnings
-        if (workout.safety_warning.isNotEmpty()) {
-            warningMessage += "⚠️ Safety Warning: ${workout.safety_warning}\n"
-        }
-        
-        // Check user medical conditions
-        userMedicalInfo?.let { medicalInfo ->
-            // Check for fractures/injuries
-            val relevantInjuries = medicalInfo.injuries.filter { injury ->
-                workout.muscle_groups.any { muscle ->
-                    injury.contains(muscle, ignoreCase = true) || 
-                    muscle.contains(injury, ignoreCase = true)
+            var msg = ""
+            if (workout.safety_warning.isNotEmpty())
+                msg += "⚠️ Safety Warning: ${workout.safety_warning}\n"
+
+            val groups = workout.muscle_groups.toGroupList()
+            userMedicalInfo?.let { med ->
+                val relevant = med.injuries.filter { inj ->
+                    groups.any { mus -> inj.contains(mus, true) || mus.contains(inj, true) }
                 }
+                if (relevant.isNotEmpty())
+                    msg += "🚨 Medical Alert: You have reported injuries in: ${relevant.joinToString(", ")}. " +
+                           "This workout targets: ${groups.joinToString(", ")}.\n"
+
+                if (med.fitnessLevel == "Beginner" && groups.contains("Core"))
+                    msg += "💡 Beginner Tip: Start with lower intensity and gradually increase.\n"
             }
-            
-            if (relevantInjuries.isNotEmpty()) {
-                warningMessage += "🚨 Medical Alert: You have reported injuries in: ${relevantInjuries.joinToString(", ")}. " +
-                        "This workout targets: ${workout.muscle_groups.joinToString(", ")}. Please consult your doctor.\n"
-            }
-            
-            // Check fitness level
-            if (medicalInfo.fitnessLevel == "Beginner" && workout.muscle_groups.contains("Core")) {
-                warningMessage += "💡 Beginner Tip: Start with lower intensity and gradually increase.\n"
-            }
-        }
-        
+
             mainHandler.post {
-        if (warningMessage.isNotEmpty()) {
-            tvWarning.text = warningMessage
-            tvWarning.visibility = android.view.View.VISIBLE
-        } else {
-            tvWarning.visibility = android.view.View.GONE
-                }
+                tvWarning.text = msg
+                tvWarning.visibility = if (msg.isNotEmpty()) View.VISIBLE else View.GONE
             }
         } catch (e: Exception) {
             handleError("Error checking medical warnings", e)
@@ -671,7 +582,7 @@ class WorkoutTodoActivity : AppCompatActivity() {
                     seconds = seconds,
                     scheduledDate = selectedDate,
                     userId = userId,
-                    muscleGroups = workout.muscle_groups,
+                    muscleGroups = workout.muscle_groups.toGroupList(),
                     estimatedCalories = estimatedCalories,
                     isCompleted = false,
                     durationMinutes = if (minutes > 0 || seconds > 0) minutes + (seconds / 60) else 0
@@ -1044,4 +955,8 @@ class WorkoutTodoAdapter(
     }
     
     override fun getItemCount() = todoList.size
-} 
+}
+
+/* Helper para gawing List kapag kailangan */
+private fun String.toGroupList(): List<String> =
+    split(",").map { it.trim() }.filter { it.isNotEmpty() } 

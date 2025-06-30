@@ -36,7 +36,7 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent"
-                android:tint="@color/black" />
+                app:tint="@color/black" />
 
             <!-- Title -->
             <TextView
@@ -65,30 +65,26 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent"
-                android:tint="@color/black" />
+                app:tint="@color/black" />
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.cardview.widget.CardView>
 
-    <!-- Profile Info Card -->
-    <androidx.cardview.widget.CardView
-        android:id="@+id/cardProfileInfo"
+    <!-- ScrollView for Profile Content -->
+    <ScrollView
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_margin="@dimen/spacing_lg"
-        app:cardCornerRadius="@dimen/card_corner_radius_large"
-        app:cardElevation="@dimen/card_elevation_medium"
-        app:cardBackgroundColor="@color/surface_light"
-        app:strokeColor="@color/theme_primary_light"
-        app:strokeWidth="1dp"
-        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_height="0dp"
+        android:clipToPadding="false"
+        android:paddingBottom="@dimen/spacing_xxl"
+        app:layout_constraintTop_toBottomOf="@id/cardTopBar"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/cardTopBar">
+        app:layout_constraintEnd_toEndOf="parent">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="@dimen/spacing_xxxl">
+            android:padding="@dimen/spacing_lg">
 
             <!-- Profile Image Section -->
             <LinearLayout
@@ -131,7 +127,9 @@
                     app:icon="@drawable/camera"
                     app:iconTint="@color/theme_secondary"
                     app:iconGravity="textStart"
-                    app:iconPadding="@dimen/spacing_sm" />
+                    app:iconPadding="@dimen/spacing_sm"
+                    android:visibility="gone"
+                    tools:visibility="visible"/>
             </LinearLayout>
 
             <!-- Profile Information -->
@@ -142,73 +140,67 @@
 
                 <!-- Full Name -->
                 <com.google.android.material.textfield.TextInputLayout
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="@dimen/spacing_md"
                     android:hint="Full Name"
                     app:boxStrokeColor="@color/theme_secondary"
                     app:hintTextColor="?attr/textColorSecondary"
-                    app:boxBackgroundMode="outline"
                     app:startIconDrawable="@drawable/ic_user">
 
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/etFullName"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="John Doe"
-                        android:textColor="?attr/textColorPrimary"
                         android:inputType="textPersonName" />
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <!-- Email -->
                 <com.google.android.material.textfield.TextInputLayout
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="@dimen/spacing_md"
                     android:hint="Email Address"
                     app:boxStrokeColor="@color/theme_secondary"
                     app:hintTextColor="?attr/textColorSecondary"
-                    app:boxBackgroundMode="outline"
                     app:startIconDrawable="@drawable/ic_email">
 
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/etEmail"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="johndoe@email.com"
-                        android:textColor="?attr/textColorPrimary"
                         android:inputType="textEmailAddress" />
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <!-- Phone -->
                 <com.google.android.material.textfield.TextInputLayout
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="@dimen/spacing_md"
                     android:hint="Phone Number"
                     app:boxStrokeColor="@color/theme_secondary"
                     app:hintTextColor="?attr/textColorSecondary"
-                    app:boxBackgroundMode="outline"
                     app:startIconDrawable="@drawable/phone">
 
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/etPhone"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="+1 234 567 8900"
-                        android:textColor="?attr/textColorPrimary"
                         android:inputType="phone" />
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <!-- Birthdate -->
                 <com.google.android.material.textfield.TextInputLayout
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="@dimen/spacing_xl"
                     android:hint="Birthdate"
                     app:boxStrokeColor="@color/theme_secondary"
                     app:hintTextColor="?attr/textColorSecondary"
-                    app:boxBackgroundMode="outline"
                     app:startIconDrawable="@drawable/ic_calendar"
                     app:endIconMode="custom"
                     app:endIconDrawable="@drawable/ic_calendar">
@@ -217,8 +209,6 @@
                         android:id="@+id/etBirthdate"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="January 15, 1990"
-                        android:textColor="?attr/textColorPrimary"
                         android:focusable="false"
                         android:clickable="true"
                         android:inputType="none" />
@@ -226,10 +216,13 @@
 
                 <!-- Action Buttons -->
                 <LinearLayout
+                    android:id="@+id/layoutActionButtons"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
-                    android:gravity="center">
+                    android:gravity="center"
+                    android:visibility="gone"
+                    tools:visibility="visible">
 
                     <!-- Save Button -->
                     <com.google.android.material.button.MaterialButton
@@ -251,93 +244,23 @@
                     <!-- Cancel Button -->
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/btnCancel"
+                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                         android:layout_width="0dp"
                         android:layout_height="@dimen/button_height_large"
                         android:layout_weight="1"
                         android:layout_marginStart="@dimen/spacing_sm"
                         android:text="Cancel"
+                        android:textColor="@color/theme_secondary"
                         android:textSize="@dimen/text_body_large"
                         android:textStyle="bold"
-                        android:textColor="@color/theme_secondary"
-                        android:backgroundTint="@android:color/transparent"
+                        app:cornerRadius="16dp"
                         app:strokeColor="@color/theme_secondary"
                         app:strokeWidth="2dp"
-                        app:cornerRadius="16dp"
                         app:icon="@drawable/close"
-                        app:iconTint="@color/theme_secondary"
                         app:iconGravity="textStart"
                         app:iconPadding="@dimen/spacing_sm" />
                 </LinearLayout>
             </LinearLayout>
         </LinearLayout>
-    </androidx.cardview.widget.CardView>
-
-    <!-- Additional Actions Card -->
-    <androidx.cardview.widget.CardView
-        android:id="@+id/cardActions"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_margin="@dimen/spacing_lg"
-        app:cardCornerRadius="@dimen/card_corner_radius_large"
-        app:cardElevation="@dimen/card_elevation_medium"
-        app:cardBackgroundColor="@color/surface_light"
-        app:strokeColor="@color/theme_accent_light"
-        app:strokeWidth="1dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/cardProfileInfo">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="@dimen/spacing_xl">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Quick Actions"
-                android:textSize="@dimen/text_title_medium"
-                android:textStyle="bold"
-                android:textColor="?attr/textColorPrimary"
-                android:layout_marginBottom="@dimen/spacing_lg" />
-
-            <!-- Settings Button -->
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnSettings"
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/button_height_large"
-                android:layout_marginBottom="@dimen/spacing_md"
-                android:text="Settings"
-                android:textSize="@dimen/text_body_large"
-                android:textStyle="bold"
-                android:textColor="@color/theme_accent"
-                android:backgroundTint="@android:color/transparent"
-                app:strokeColor="@color/theme_accent"
-                app:strokeWidth="2dp"
-                app:cornerRadius="16dp"
-                app:icon="@drawable/settings"
-                app:iconTint="@color/theme_accent"
-                app:iconGravity="textStart"
-                app:iconPadding="@dimen/spacing_sm" />
-
-            <!-- Logout Button -->
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnLogout"
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/button_height_large"
-                android:text="Logout"
-                android:textSize="@dimen/text_body_large"
-                android:textStyle="bold"
-                android:textColor="@color/error"
-                android:backgroundTint="@android:color/transparent"
-                app:strokeColor="@color/error"
-                app:strokeWidth="2dp"
-                app:cornerRadius="16dp"
-                app:icon="@drawable/logout"
-                app:iconTint="@color/error"
-                app:iconGravity="textStart"
-                app:iconPadding="@dimen/spacing_sm" />
-        </LinearLayout>
-    </androidx.cardview.widget.CardView>
+    </ScrollView>
 </androidx.constraintlayout.widget.ConstraintLayout>

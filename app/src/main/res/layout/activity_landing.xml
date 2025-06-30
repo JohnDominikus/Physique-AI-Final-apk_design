@@ -79,7 +79,7 @@
 
             <!-- Action Buttons Section -->
             <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnSignIn"
+                android:id="@+id/btnNewSignIn"
                 android:layout_width="match_parent"
                 android:layout_height="64dp"
                 android:layout_marginBottom="20dp"
@@ -117,7 +117,8 @@
                 app:icon="@drawable/add"
                 app:iconGravity="textStart"
                 app:iconPadding="12dp"
-                app:iconTint="@color/absolute_white" />
+                app:iconTint="@color/absolute_white"
+                android:onClick="onCreateAccountClicked" />
 
             <!-- Divider Section -->
             <LinearLayout

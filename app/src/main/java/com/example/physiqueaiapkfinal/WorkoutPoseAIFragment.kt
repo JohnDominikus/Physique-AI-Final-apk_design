@@ -103,6 +103,27 @@ class WorkoutPoseAIFragment : Fragment() {
                             Log.d(TAG, "Navigating to DumbbellFrontRaiseActivity")
                             DumbbellFrontRaiseActivity::class.java
                         }
+                        workoutName.contains("hammer curl", ignoreCase = true) ||
+                        workoutName.contains("hammer", ignoreCase = true) && 
+                        workoutName.contains("curl", ignoreCase = true) -> {
+                            Log.d(TAG, "Navigating to DumbbellHammerCurlActivity")
+                            DumbbellHammerCurlActivity::class.java
+                        }
+                        workoutName.contains("military press", ignoreCase = true) ||
+                        workoutName.contains("shoulder press", ignoreCase = true) -> {
+                            Log.d(TAG, "Navigating to MilitaryPressActivity")
+                            MilitaryPressActivity::class.java
+                        }
+                        workoutName.contains("sit up", ignoreCase = true) ||
+                        workoutName.contains("situp", ignoreCase = true) ||
+                        workoutName.contains("crunch", ignoreCase = true) -> {
+                            Log.d(TAG, "Navigating to SitUpsActivity")
+                            SitUpsActivity::class.java
+                        }
+                        workoutName.contains("windmill", ignoreCase = true) -> {
+                            Log.d(TAG, "Navigating to WindmillActivity")
+                            WindmillActivity::class.java
+                        }
                         workoutName.contains("push", ignoreCase = true) && 
                         workoutName.contains("up", ignoreCase = true) -> {
                             Log.d(TAG, "Navigating to StreamActivity (Push-ups)")

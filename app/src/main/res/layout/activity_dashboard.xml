@@ -247,23 +247,6 @@
                             android:layout_weight="1"
                             android:orientation="vertical">
 
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Today"
-                                android:textSize="12sp"
-                                android:textColor="@color/white"
-                                android:fontFamily="@font/poppins_medium" />
-
-                            <TextView
-                                android:id="@+id/tvCaloriesProgress"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="250 today"
-                                android:textSize="16sp"
-                                android:textColor="@color/white"
-                                android:fontFamily="@font/poppins_bold" />
-
                             <ProgressBar
                                 android:id="@+id/progressCalories"
                                 style="?android:attr/progressBarStyleHorizontal"
@@ -283,22 +266,6 @@
                             android:orientation="vertical"
                             android:layout_marginStart="16dp">
 
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Workouts"
-                                android:textSize="12sp"
-                                android:textColor="@color/white"
-                                android:fontFamily="@font/poppins_medium" />
-
-                            <TextView
-                                android:id="@+id/tvWorkoutsProgress"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="2 today"
-                                android:textSize="16sp"
-                                android:textColor="@color/white"
-                                android:fontFamily="@font/poppins_bold" />
 
                             <ProgressBar
                                 android:id="@+id/progressWorkouts"

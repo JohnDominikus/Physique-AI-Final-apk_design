@@ -36,240 +36,234 @@ class LoginActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        Log.d(TAG, "LoginActivity onCreate started")
         
         try {
+            // Set content view first
             setContentView(R.layout.activity_login)
+            Log.d(TAG, "Layout set successfully")
+
+            // Show success toast
+            Toast.makeText(this, "Login screen loaded successfully!", Toast.LENGTH_SHORT).show()
             
-            // Initialize Firebase Auth first
-            initializeFirebase()
-            
-            // Initialize SharedPreferences
-            initializeSharedPreferences()
-            
-            // If user is already logged in, navigate to the Dashboard
-            if (isUserLoggedIn()) {
-                navigateToDashboard()
-                return
+            // Initialize Firebase Auth with error handling
+            try {
+                auth = FirebaseAuth.getInstance()
+                Log.d(TAG, "Firebase Auth initialized")
+            } catch (e: Exception) {
+                Log.e(TAG, "Firebase Auth failed, using fallback", e)
+                // Continue without Firebase for now
             }
             
-            // Initialize UI elements safely
-            initializeUIElements()
+            // Initialize SharedPreferences with error handling
+            try {
+                sharedPreferences = getSharedPreferences("USER_DATA", MODE_PRIVATE)
+                Log.d(TAG, "SharedPreferences initialized")
+            } catch (e: Exception) {
+                Log.e(TAG, "SharedPreferences failed", e)
+                // Continue without SharedPreferences for now
+            }
             
-            // Setup click listeners
-            setupClickListeners()
-            
-        } catch (e: Exception) {
-            Log.e(TAG, "Error in onCreate", e)
-            // Show error to user and potentially close activity
-            showError("Failed to initialize login screen: ${e.message}")
-        }
-    }
-
-    private fun initializeFirebase() {
-        try {
-            auth = FirebaseAuth.getInstance()
-            Log.d(TAG, "Firebase Auth initialized successfully")
-        } catch (e: Exception) {
-            Log.e(TAG, "Failed to initialize Firebase Auth", e)
-            showError("Failed to initialize authentication system")
-            throw e
-        }
-    }
-
-    private fun initializeSharedPreferences() {
-        try {
-            sharedPreferences = getSharedPreferences("USER_DATA", MODE_PRIVATE)
-            Log.d(TAG, "SharedPreferences initialized successfully")
-        } catch (e: Exception) {
-            Log.e(TAG, "Failed to initialize SharedPreferences", e)
-            showError("Failed to initialize user preferences")
-            throw e
-        }
-    }
-
-    private fun initializeUIElements() {
-        try {
             // Initialize UI elements with null safety
-            etEmail = findViewById<EditText>(R.id.etEmail)
-            etPassword = findViewById<EditText>(R.id.etPassword)
-            btnLogin = findViewById<Button>(R.id.btnLogin)
-            btnBack = findViewById<ImageButton>(R.id.btnBack)
-            cbRememberMe = findViewById<CheckBox>(R.id.cbRememberMe)
-            tvForgotPassword = findViewById<TextView>(R.id.tvForgotPassword)
-            tvRegister = findViewById<TextView>(R.id.tvRegister)
+            initializeUIElementsSafely()
             
-            // Verify all elements were found
-            if (etEmail == null || etPassword == null || btnLogin == null) {
-                throw Exception("Critical UI elements not found")
-            }
+            // Setup click listeners with error handling
+            setupClickListenersSafely()
             
-            Log.d(TAG, "UI elements initialized successfully")
+            Log.d(TAG, "LoginActivity onCreate completed successfully")
+            
         } catch (e: Exception) {
-            Log.e(TAG, "Failed to initialize UI elements", e)
-            showError("Failed to initialize user interface")
-            throw e
+            Log.e(TAG, "Critical error in LoginActivity onCreate", e)
+            Toast.makeText(this, "Error loading login screen", Toast.LENGTH_LONG).show()
+            
+            // Emergency fallback - go back to landing
+            try {
+                finish()
+            } catch (e2: Exception) {
+                Log.e(TAG, "Failed to finish activity", e2)
+            }
         }
     }
 
-    private fun setupClickListeners() {
+    private fun initializeUIElementsSafely() {
         try {
-            // Handle forgot password click
-            tvForgotPassword?.setOnClickListener {
+            Log.d(TAG, "Initializing UI elements")
+            
+            etEmail = findViewById(R.id.etEmail)
+            etPassword = findViewById(R.id.etPassword)
+            btnLogin = findViewById(R.id.btnLogin)
+            btnBack = findViewById(R.id.btnBack)
+            cbRememberMe = findViewById(R.id.cbRememberMe)
+            tvForgotPassword = findViewById(R.id.tvForgotPassword)
+            tvRegister = findViewById(R.id.tvRegister)
+            
+            Log.d(TAG, "UI elements found successfully")
+            
+        } catch (e: Exception) {
+            Log.e(TAG, "Error finding UI elements", e)
+            // Continue anyway - some elements might still work
+        }
+    }
+
+    private fun setupClickListenersSafely() {
+        try {
+            Log.d(TAG, "Setting up click listeners")
+            
+            // Back button - always works
+            btnBack?.setOnClickListener {
+                Log.d(TAG, "Back button clicked")
                 try {
-                    val intent = Intent(this, ForgotPasswordActivity::class.java)
-                    startActivity(intent)
+                    finish()
                 } catch (e: Exception) {
-                    Log.e(TAG, "Failed to navigate to forgot password", e)
-                    showError("Failed to open forgot password screen")
+                    Log.e(TAG, "Error finishing activity", e)
                 }
             }
 
-            // Handle login button click
+            // Login button
             btnLogin?.setOnClickListener {
+                Log.d(TAG, "Login button clicked")
+                Toast.makeText(this, "Login button works!", Toast.LENGTH_SHORT).show()
                 handleLoginClick()
             }
 
-            // Back button to navigate to the landing activity
-            btnBack?.setOnClickListener {
-                try {
-                    startActivity(Intent(this, LandingActivity::class.java))
-                    finish()
-                } catch (e: Exception) {
-                    Log.e(TAG, "Failed to navigate back", e)
-                    finish() // Just close this activity if navigation fails
-                }
-            }
-
-            // Remember me checkbox functionality
-            cbRememberMe?.setOnCheckedChangeListener { _, isChecked ->
-                try {
-                    val editor = sharedPreferences.edit()
-                    editor.putBoolean("REMEMBER_ME", isChecked)
-                    editor.apply()
-                } catch (e: Exception) {
-                    Log.e(TAG, "Failed to save remember me preference", e)
-                }
-            }
-
-            // Add functionality for "Don't have an account? Register"
+            // Register link
             tvRegister?.setOnClickListener {
+                Log.d(TAG, "Register link clicked")
                 try {
                     val intent = Intent(this, RegisterActivity::class.java)
                     startActivity(intent)
                 } catch (e: Exception) {
-                    Log.e(TAG, "Failed to navigate to register", e)
-                    showError("Failed to open registration screen")
+                    Log.e(TAG, "Failed to start RegisterActivity", e)
+                    Toast.makeText(this, "Error opening registration", Toast.LENGTH_SHORT).show()
+                }
+            }
+
+            // Forgot password
+            tvForgotPassword?.setOnClickListener {
+                Log.d(TAG, "Forgot password clicked")
+                try {
+                    val intent = Intent(this, ForgotPasswordActivity::class.java)
+                    startActivity(intent)
+                } catch (e: Exception) {
+                    Log.e(TAG, "Failed to start ForgotPasswordActivity", e)
+                    Toast.makeText(this, "Error opening forgot password", Toast.LENGTH_SHORT).show()
+                }
+            }
+
+            // Remember me checkbox
+            cbRememberMe?.setOnCheckedChangeListener { _, isChecked ->
+                Log.d(TAG, "Remember me: $isChecked")
+                try {
+                    if (::sharedPreferences.isInitialized) {
+                        sharedPreferences.edit()
+                            .putBoolean("REMEMBER_ME", isChecked)
+                            .apply()
+                    }
+                } catch (e: Exception) {
+                    Log.e(TAG, "Error saving remember me", e)
                 }
             }
             
-            Log.d(TAG, "Click listeners setup successfully")
+            Log.d(TAG, "Click listeners setup completed")
+            
         } catch (e: Exception) {
-            Log.e(TAG, "Failed to setup click listeners", e)
-            showError("Failed to setup user interactions")
+            Log.e(TAG, "Error setting up click listeners", e)
         }
     }
 
     private fun handleLoginClick() {
         try {
-            val email = etEmail?.text?.toString()?.trim()?.lowercase() ?: ""
+            Log.d(TAG, "Handling login click")
+            
+            val email = etEmail?.text?.toString()?.trim() ?: ""
             val password = etPassword?.text?.toString()?.trim() ?: ""
 
             if (email.isEmpty() || password.isEmpty()) {
-                showError("Please enter both email and password")
+                Toast.makeText(this, "Please enter email and password", Toast.LENGTH_SHORT).show()
                 return
             }
 
             if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-                showError("Please enter a valid email address")
+                Toast.makeText(this, "Please enter a valid email", Toast.LENGTH_SHORT).show()
                 return
             }
 
-            // Disable login button to prevent multiple clicks
+            // Disable login button
             btnLogin?.isEnabled = false
+            Toast.makeText(this, "Signing in...", Toast.LENGTH_SHORT).show()
 
-            loginUser(email, password)
+            // Perform login with Firebase if available
+            if (::auth.isInitialized) {
+                performFirebaseLogin(email, password)
+            } else {
+                Toast.makeText(this, "Authentication not available", Toast.LENGTH_SHORT).show()
+                btnLogin?.isEnabled = true
+            }
+            
         } catch (e: Exception) {
             Log.e(TAG, "Error in handleLoginClick", e)
-            showError("Failed to process login: ${e.message}")
+            Toast.makeText(this, "Login error: ${e.message}", Toast.LENGTH_SHORT).show()
             btnLogin?.isEnabled = true
         }
     }
 
-    // Check if the user is logged in
-    private fun isUserLoggedIn(): Boolean {
-        return try {
-            val storedUserId = sharedPreferences.getString(USER_ID_KEY, null)
-            val lastLoginTimestamp = sharedPreferences.getLong(TIMESTAMP_KEY, 0)
-            if (storedUserId == null || lastLoginTimestamp == 0L) return false
-            val currentTime = System.currentTimeMillis()
-            val daysSinceLastLogin = TimeUnit.MILLISECONDS.toDays(currentTime - lastLoginTimestamp)
-            daysSinceLastLogin < COOKIE_EXPIRATION_DAYS
-        } catch (e: Exception) {
-            Log.e(TAG, "Error checking login status", e)
-            false
-        }
-    }
-
-    // Handle user login with Firebase
-    private fun loginUser(email: String, password: String) {
+    private fun performFirebaseLogin(email: String, password: String) {
         try {
             auth.signInWithEmailAndPassword(email, password)
                 .addOnCompleteListener { task ->
-                    // Re-enable login button
                     btnLogin?.isEnabled = true
                     
                     if (task.isSuccessful) {
+                        Log.d(TAG, "Login successful")
+                        Toast.makeText(this, "Login successful!", Toast.LENGTH_SHORT).show()
+                        
                         val user = auth.currentUser
-                        user?.let {
-                            saveUserSession(it.uid, email)
-                            showSuccess("Login successful!")
+                        if (user != null) {
+                            saveUserSession(user.uid, email)
                             navigateToDashboard()
-                        } ?: run {
-                            showError("Failed to get user information")
                         }
                     } else {
-                        val errorMessage = task.exception?.message ?: "Authentication failed"
-                        Log.e(TAG, "Login failed: $errorMessage")
-                        showError("Login failed: $errorMessage")
+                        Log.e(TAG, "Login failed: ${task.exception?.message}")
+                        Toast.makeText(this, "Login failed: ${task.exception?.message}", Toast.LENGTH_SHORT).show()
                     }
                 }
                 .addOnFailureListener { exception ->
                     btnLogin?.isEnabled = true
                     Log.e(TAG, "Login exception", exception)
-                    showError("Login failed: ${exception.message}")
+                    Toast.makeText(this, "Login error: ${exception.message}", Toast.LENGTH_SHORT).show()
                 }
         } catch (e: Exception) {
+            Log.e(TAG, "Error in performFirebaseLogin", e)
+            Toast.makeText(this, "Authentication error", Toast.LENGTH_SHORT).show()
             btnLogin?.isEnabled = true
-            Log.e(TAG, "Error in loginUser", e)
-            showError("Failed to login: ${e.message}")
         }
     }
 
-    // Save user session to SharedPreferences
     private fun saveUserSession(userId: String, userEmail: String) {
         try {
-            val editor = sharedPreferences.edit()
-            editor.putString(USER_ID_KEY, userId)
-            editor.putString(USER_EMAIL_KEY, userEmail)
-            editor.putLong(TIMESTAMP_KEY, System.currentTimeMillis())
-            editor.apply()
-            Log.d(TAG, "User session saved successfully")
+            if (::sharedPreferences.isInitialized) {
+                sharedPreferences.edit()
+                    .putString(USER_ID_KEY, userId)
+                    .putString(USER_EMAIL_KEY, userEmail)
+                    .putLong(TIMESTAMP_KEY, System.currentTimeMillis())
+                    .apply()
+                Log.d(TAG, "User session saved")
+            }
         } catch (e: Exception) {
-            Log.e(TAG, "Failed to save user session", e)
-            // Don't show error to user as login was successful
+            Log.e(TAG, "Error saving user session", e)
         }
     }
 
-    // Navigate to the dashboard (or main activity)
     private fun navigateToDashboard() {
         try {
-            val intent = Intent(this, SplashActivity::class.java)
+            Log.d(TAG, "Navigating to dashboard")
+            val intent = Intent(this, DashboardActivity::class.java)
             intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
             startActivity(intent)
             finish()
         } catch (e: Exception) {
-            Log.e(TAG, "Failed to navigate to dashboard", e)
-            showError("Login successful but failed to open dashboard")
+            Log.e(TAG, "Error navigating to dashboard", e)
+            Toast.makeText(this, "Navigation error", Toast.LENGTH_SHORT).show()
         }
     }
 

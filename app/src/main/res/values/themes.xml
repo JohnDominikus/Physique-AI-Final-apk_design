@@ -29,6 +29,12 @@
         <item name="android:textColorTertiary">@color/text_tertiary_light</item>
         <item name="android:textColorHint">@color/text_hint_light</item>
         
+        <!-- ==== REQUIRED: non-android text colors for ?attr/textColorPrimary, etc. ==== -->
+        <item name="textColorPrimary">@color/text_primary_light</item>
+        <item name="textColorSecondary">@color/text_secondary_light</item>
+        <item name="textColorTertiary">@color/text_tertiary_light</item>
+        <item name="textColorHint">@color/text_hint_light</item>
+        
         <!-- ========== COMPONENT STYLING ========== -->
         <item name="colorControlNormal">@color/border_light</item>
         <item name="colorControlActivated">@color/border_focus</item>
@@ -185,6 +191,12 @@
         <item name="android:textColorPrimary">@color/text_primary_dark</item>
         <item name="android:textColorSecondary">@color/text_secondary_dark</item>
         <item name="android:textColorTertiary">@color/text_tertiary_dark</item>
+        
+        <!-- ==== REQUIRED non-android text colors (dark) ==== -->
+        <item name="textColorPrimary">@color/text_primary_dark</item>
+        <item name="textColorSecondary">@color/text_secondary_dark</item>
+        <item name="textColorTertiary">@color/text_tertiary_dark</item>
+        <item name="textColorHint">@color/dark_text_hint</item>
         
         <!-- ========== STATUS BAR & NAVIGATION ========== -->
         <item name="android:statusBarColor">@color/surface_dark</item>
