@@ -103,20 +103,28 @@ class WorkoutPoseAIFragment : Fragment() {
                             Log.d(TAG, "Navigating to DumbbellFrontRaiseActivity")
                             DumbbellFrontRaiseActivity::class.java
                         }
-                        workoutName.contains("hammer curl", ignoreCase = true) ||
-                        workoutName.contains("hammer", ignoreCase = true) && 
-                        workoutName.contains("curl", ignoreCase = true) -> {
+                        workoutName.contains("hammer curl", true)   ||   // may espasyo
+                        workoutName.contains("hammer-curl", true)   ||   // may gitling
+                        workoutName.contains("hammercurl",  true)   ||   // walang espasyo
+                        (workoutName.contains("hammer", true) && workoutName.contains("curl", true)) -> {
                             Log.d(TAG, "Navigating to DumbbellHammerCurlActivity")
                             DumbbellHammerCurlActivity::class.java
                         }
-                        workoutName.contains("military press", ignoreCase = true) ||
-                        workoutName.contains("shoulder press", ignoreCase = true) -> {
+                        workoutName.contains("military press", true) ||          // may espasyo
+                        workoutName.contains("military-press", true) ||          // may gitling
+                        workoutName.contains("militarypress", true)  ||          // walang espasyo
+                        (workoutName.contains("military", true) &&               // hiwalay pero pareho
+                         workoutName.contains("press",    true))      ||
+                        workoutName.contains("shoulder press", true) -> {
                             Log.d(TAG, "Navigating to MilitaryPressActivity")
                             MilitaryPressActivity::class.java
                         }
-                        workoutName.contains("sit up", ignoreCase = true) ||
-                        workoutName.contains("situp", ignoreCase = true) ||
-                        workoutName.contains("crunch", ignoreCase = true) -> {
+                        workoutName.contains("sit up",  true)  ||   // may espasyo
+                        workoutName.contains("sit-up",  true)  ||   // may gitling
+                        workoutName.contains("situps",  true)  ||   // may s
+                        workoutName.contains("situp",   true)  ||   // walang espasyo
+                        (workoutName.contains("sit", true) && workoutName.contains("up", true)) ||
+                        workoutName.contains("crunch",  true)  -> {
                             Log.d(TAG, "Navigating to SitUpsActivity")
                             SitUpsActivity::class.java
                         }

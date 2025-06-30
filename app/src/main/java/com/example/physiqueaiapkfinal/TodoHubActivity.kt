@@ -81,7 +81,6 @@ class TodoHubActivity : AppCompatActivity() {
         try {
             cardWorkoutTodo = findViewById(R.id.cardWorkoutTodo)
             cardDietaryTodo = findViewById(R.id.cardDietaryTodo)
-            cardOutdoorActivity = findViewById(R.id.cardOutdoorActivity)
             backButton = findViewById(R.id.backButton)
             bottomNavigation = findViewById(R.id.bottom_navigation)
             
