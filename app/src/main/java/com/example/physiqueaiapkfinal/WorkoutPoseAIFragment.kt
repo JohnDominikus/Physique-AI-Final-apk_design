@@ -46,7 +46,7 @@ class WorkoutPoseAIFragment : Fragment() {
         try {
             // Setup pose analysis button
             view?.findViewById<Button>(R.id.startPostureButton)?.setOnClickListener {
-                navigateToPoseActivity()
+                navigateToCorrectPoseActivity()
             }
             
             // Setup other UI elements if they exist
@@ -71,7 +71,83 @@ class WorkoutPoseAIFragment : Fragment() {
         }
     }
     
-    private fun navigateToPoseActivity() {
+    private fun navigateToCorrectPoseActivity() {
+        val workoutId = this.workoutId
+        if (workoutId == null) {
+            Toast.makeText(requireContext(), "Workout ID not available", Toast.LENGTH_SHORT).show()
+            return
+        }
+        
+        // First, get the workout details to determine which AI activity to launch
+        db.collection("workoutcollection").document(workoutId)
+            .get()
+            .addOnSuccessListener { document ->
+                if (document.exists()) {
+                    val workoutName = document.getString("name")?.lowercase() ?: ""
+                    Log.d(TAG, "Workout name: $workoutName")
+                    
+                    val targetActivity = when {
+                        workoutName.contains("hip thrust", ignoreCase = true) || 
+                        workoutName.contains("hip-thrust", ignoreCase = true) ||
+                        workoutName.contains("hipthrust", ignoreCase = true) -> {
+                            Log.d(TAG, "Navigating to HipThrustsActivity")
+                            HipThrustsActivity::class.java
+                        }
+                        workoutName.contains("squat", ignoreCase = true) -> {
+                            Log.d(TAG, "Navigating to SquatActivity")
+                            SquatActivity::class.java
+                        }
+                        workoutName.contains("dumbbell", ignoreCase = true) && 
+                        workoutName.contains("front", ignoreCase = true) && 
+                        workoutName.contains("raise", ignoreCase = true) -> {
+                            Log.d(TAG, "Navigating to DumbbellFrontRaiseActivity")
+                            DumbbellFrontRaiseActivity::class.java
+                        }
+                        workoutName.contains("push", ignoreCase = true) && 
+                        workoutName.contains("up", ignoreCase = true) -> {
+                            Log.d(TAG, "Navigating to StreamActivity (Push-ups)")
+                            StreamActivity::class.java
+                        }
+                        else -> {
+                            Log.d(TAG, "No specific AI activity found, using generic PoseActivity")
+                            PoseActivity::class.java
+                        }
+                    }
+                    
+                    try {
+                        val intent = Intent(requireContext(), targetActivity).apply {
+                            putExtra("workoutId", workoutId)
+                            putExtra("workout_name", workoutName)
+                        }
+                        
+                        // Use modern activity transition
+                        val options = ActivityOptionsCompat.makeCustomAnimation(
+                            requireContext(),
+                            R.anim.slide_in_right,
+                            R.anim.slide_out_left
+                        )
+                        
+                        startActivity(intent, options.toBundle())
+                        
+                    } catch (e: Exception) {
+                        Log.e(TAG, "Error navigating to specific pose activity", e)
+                        // Fallback to generic PoseActivity
+                        fallbackToPoseActivity()
+                    }
+                } else {
+                    Log.e(TAG, "Workout document not found")
+                    Toast.makeText(requireContext(), "Workout not found", Toast.LENGTH_SHORT).show()
+                }
+            }
+            .addOnFailureListener { e ->
+                Log.e(TAG, "Error fetching workout details", e)
+                Toast.makeText(requireContext(), "Error loading workout", Toast.LENGTH_SHORT).show()
+                // Fallback to generic PoseActivity
+                fallbackToPoseActivity()
+            }
+    }
+    
+    private fun fallbackToPoseActivity() {
         try {
             val intent = Intent(requireContext(), PoseActivity::class.java)
             
@@ -84,8 +160,8 @@ class WorkoutPoseAIFragment : Fragment() {
             
             startActivity(intent, options.toBundle())
         } catch (e: Exception) {
-            Log.e("WorkoutPoseAI", "Error navigating to pose activity", e)
-            // Fallback to simple navigation
+            Log.e("WorkoutPoseAI", "Error navigating to fallback pose activity", e)
+            // Last resort - simple navigation
             startActivity(Intent(requireContext(), PoseActivity::class.java))
         }
     }

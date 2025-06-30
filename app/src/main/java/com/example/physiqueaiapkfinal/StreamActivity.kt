@@ -24,7 +24,6 @@ import com.example.physiqueaiapkfinal.databinding.ActivityStreamBinding
 import com.example.physiqueaiapkfinal.visionutils.GraphicOverlay
 import com.example.physiqueaiapkfinal.visionutils.PoseGraphic
 import com.example.physiqueaiapkfinal.visionutils.classification.PoseClassifierProcessor
-
 import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.pose.Pose
 import com.google.mlkit.vision.pose.PoseDetection
@@ -48,17 +47,17 @@ class StreamActivity : AppCompatActivity() {
     private val TAG = "StreamActivity"
     private var pushupCount = 0
     private val mainHandler = Handler(Looper.getMainLooper())
-    
+
     // Ultra-accurate push-up detection variables
     private var isDown = false
     private var lastPushupTime = 0L
     private val MIN_PUSHUP_INTERVAL = 800L // Increased for maximum accuracy
-    
+
     // Advanced detection variables
     private var downFrameCount = 0
     private var upFrameCount = 0
     private val MIN_STABLE_FRAMES = 6 // Increased for maximum stability
-    
+
     // Multi-dimensional history tracking
     private val shoulderElbowDiffHistory = mutableListOf<Float>()
     private val armAngleHistory = mutableListOf<Float>()
@@ -67,25 +66,25 @@ class StreamActivity : AppCompatActivity() {
     private val velocityHistory = mutableListOf<Float>()
     private val accelerationHistory = mutableListOf<Float>()
     private val HISTORY_SIZE = 10 // Increased for better temporal analysis
-    
+
     // Biomechanical validation
     private var previousElbowY = 0f
     private var previousVelocity = 0f
     private val motionPhases = mutableListOf<String>()
     private val PHASE_HISTORY_SIZE = 5
-    
+
     // Quality metrics
     private var highConfidenceFrames = 0
     private val MIN_CONFIDENCE_FRAMES = 5
     private var lastFrameTime = 0L
-    
+
     // Orientation tracking
     private var lastRotation = Surface.ROTATION_0
-    
+
     // Performance optimization variables
     private var frameSkipCounter = 0
     private val FRAME_SKIP_COUNT = 1 // Reduce skip for better accuracy
-    
+
     // Camera switching variables
     private var isUsingFrontCamera = false
     private var cameraProvider: ProcessCameraProvider? = null
@@ -93,16 +92,11 @@ class StreamActivity : AppCompatActivity() {
     // Ultra-accurate push-up detection with multiple criteria
     private var hasBeenDown = false // Track if person has been in down position first
     private var lastCountedUp = false // Track if we just counted to prevent double counting
-    
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityStreamBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
-        // Log workout data passed from WorkoutPoseAIFragment
-        val workoutId = intent.getStringExtra("workoutId")
-        val workoutName = intent.getStringExtra("workout_name")
-        Log.d(TAG, "StreamActivity started - Workout ID: $workoutId, Workout Name: $workoutName")
 
         if (allPermissionsGranted()) {
             startCamera()
@@ -133,11 +127,11 @@ class StreamActivity : AppCompatActivity() {
         binding.btnBack.setOnClickListener {
             finish()
         }
-        
+
         binding.btnReset.setOnClickListener {
             resetPushupCounter()
         }
-        
+
         binding.btnSwitchCamera.setOnClickListener {
             switchCamera()
         }
@@ -145,80 +139,71 @@ class StreamActivity : AppCompatActivity() {
 
     private fun startCamera() {
         val cameraProviderFuture = ProcessCameraProvider.getInstance(this)
-        
+
         cameraProviderFuture.addListener({
-            try {
-                cameraProvider = cameraProviderFuture.get()
-                
-                val preview = Preview.Builder()
-                    .build()
-                    .also {
-                        it.setSurfaceProvider(binding.viewFinder.surfaceProvider)
-                    }
-                
-                val imageAnalyzer = ImageAnalysis.Builder()
-                    .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
-                    .build()
-                    .also {
-                        it.setAnalyzer(cameraExecutor) { imageProxy ->
-                            processImage(imageProxy)
-                        }
-                    }
-                
-                val cameraSelector = CameraSelector.DEFAULT_FRONT_CAMERA
-                
-                try {
-                    cameraProvider?.unbindAll()
-                    cameraProvider?.bindToLifecycle(
-                        this, cameraSelector, preview, imageAnalyzer
-                    )
-                } catch (e: Exception) {
-                    Log.e("Stream", "Use case binding failed", e)
-                }
-                
-            } catch (e: Exception) {
-                Log.e("Stream", "Camera provider binding failed", e)
-            }
+            cameraProvider = cameraProviderFuture.get()
+            bindCameraUseCases()
         }, ContextCompat.getMainExecutor(this))
     }
-    
-    private fun processImage(imageProxy: ImageProxy) {
-        try {
-            val mediaImage = imageProxy.image
-            if (mediaImage != null) {
-                val image = InputImage.fromMediaImage(mediaImage, imageProxy.imageInfo.rotationDegrees)
-                
-                // Process pose detection
-                poseDetector.process(image)
-                    .addOnSuccessListener { pose ->
-                        // Handle pose detection results
-                        runOnUiThread {
-                            // Update UI with pose results
-                        }
-                    }
-                    .addOnFailureListener { e ->
-                        Log.e("Stream", "Pose detection failed", e)
-                    }
-                    .addOnCompleteListener {
-                        imageProxy.close()
-                    }
-            } else {
-                imageProxy.close()
+
+    private fun bindCameraUseCases() {
+        val cameraProvider = this.cameraProvider ?: return
+
+        val preview = Preview.Builder()
+            .build()
+            .also {
+                it.setSurfaceProvider(binding.viewFinder.surfaceProvider)
             }
-        } catch (e: Exception) {
-            Log.e("Stream", "Error processing image", e)
-            imageProxy.close()
+
+        // Mirror the preview for front camera
+        if (isUsingFrontCamera) {
+            binding.viewFinder.scaleX = -1f // Horizontal flip
+        } else {
+            binding.viewFinder.scaleX = 1f // Normal view
+        }
+
+        val imageAnalyzer = ImageAnalysis.Builder()
+            .setTargetResolution(android.util.Size(640, 480))
+            .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
+            .setImageQueueDepth(1)
+            .build()
+            .also {
+                it.setAnalyzer(cameraExecutor, PoseAnalyzer())
+            }
+
+        val cameraSelector = if (isUsingFrontCamera) {
+            CameraSelector.DEFAULT_FRONT_CAMERA
+        } else {
+            CameraSelector.DEFAULT_BACK_CAMERA
+        }
+
+        try {
+            cameraProvider.unbindAll()
+            cameraProvider.bindToLifecycle(
+                this,
+                cameraSelector,
+                preview,
+                imageAnalyzer
+            )
+
+            // Update camera status indicator
+            binding.tvCameraStatus.text = if (isUsingFrontCamera) "Camera: Front (Mirrored)" else "Camera: Back"
+
+        } catch (exc: Exception) {
+            Log.e(TAG, "Use case binding failed", exc)
+            Toast.makeText(this, "Failed to start camera", Toast.LENGTH_SHORT).show()
         }
     }
-    
+
     private fun switchCamera() {
         isUsingFrontCamera = !isUsingFrontCamera
         Log.d(TAG, "Switching to ${if (isUsingFrontCamera) "front" else "back"} camera")
-        
+        bindCameraUseCases()
+
         // Reset pose detection state when switching cameras
         resetPoseDetectionState()
     }
-    
+
     private fun resetPoseDetectionState() {
         isDown = false
         hasBeenDown = false
@@ -227,7 +212,7 @@ class StreamActivity : AppCompatActivity() {
         upFrameCount = 0
         shoulderElbowDiffHistory.clear()
         armAngleHistory.clear()
-        
+
         Log.d(TAG, "Pose detection state reset for camera switch")
     }
 
@@ -262,7 +247,7 @@ class StreamActivity : AppCompatActivity() {
             return
         }
         frameSkipCounter = 0
-        
+
         // Clear the overlay
         binding.graphicOverlay.clear()
 
@@ -377,10 +362,10 @@ class StreamActivity : AppCompatActivity() {
         val rightElbow = pose.getPoseLandmark(PoseLandmark.RIGHT_ELBOW)
         val leftWrist = pose.getPoseLandmark(PoseLandmark.LEFT_WRIST)
         val rightWrist = pose.getPoseLandmark(PoseLandmark.RIGHT_WRIST)
-        
-        if (leftShoulder != null && rightShoulder != null && leftElbow != null && 
+
+        if (leftShoulder != null && rightShoulder != null && leftElbow != null &&
             rightElbow != null && leftWrist != null && rightWrist != null) {
-            
+
             // Reset detection state if orientation changed
             if (rotation != lastRotation) {
                 Log.d(TAG, "Orientation changed from $lastRotation to $rotation - resetting detection state")
@@ -393,57 +378,57 @@ class StreamActivity : AppCompatActivity() {
                 lastCountedUp = false
                 lastRotation = rotation
             }
-            
+
             // Much stricter detection to prevent false positives
-            
+
             // Higher confidence requirement
             val allLandmarks = listOf(leftShoulder, rightShoulder, leftElbow, rightElbow, leftWrist, rightWrist)
             val avgConfidence = allLandmarks.map { it.inFrameLikelihood }.average().toFloat()
-            
+
             if (avgConfidence < 0.7f) { // Increased from 0.5f to 0.7f for better accuracy
                 Log.d(TAG, "Low confidence: ${(avgConfidence*100).toInt()}%")
                 return
             }
-            
+
             // Calculate elbow angles with stricter validation
             val leftElbowAngle = calculateAngle(leftShoulder.position3D, leftElbow.position3D, leftWrist.position3D)
             val rightElbowAngle = calculateAngle(rightShoulder.position3D, rightElbow.position3D, rightWrist.position3D)
             val avgElbowAngle = (leftElbowAngle + rightElbowAngle) / 2
-            
+
             // Check arm symmetry - both arms should be similar
             val armSymmetry = Math.abs(leftElbowAngle - rightElbowAngle)
             val isSymmetric = armSymmetry < 30f // Both arms should move similarly
-            
+
             // Position-based detection with stricter thresholds
             val avgElbowY = (leftElbow.position.y + rightElbow.position.y) * 0.5f
             val avgShoulderY = (leftShoulder.position.y + rightShoulder.position.y) * 0.5f
             val avgWristY = (leftWrist.position.y + rightWrist.position.y) * 0.5f
             val shoulderElbowDiff = avgElbowY - avgShoulderY
-            
+
             // Additional validation: wrists should be lower than shoulders in down position
             val wristBelowShoulder = avgWristY > avgShoulderY + 0.02f
-            
+
             // Add to history for smoothing (keep longer history for stability)
             shoulderElbowDiffHistory.add(shoulderElbowDiff)
             armAngleHistory.add(avgElbowAngle)
-            
+
             if (shoulderElbowDiffHistory.size > 8) { // Increased from 5 to 8 for better smoothing
                 shoulderElbowDiffHistory.removeAt(0)
                 armAngleHistory.removeAt(0)
             }
-            
+
             val smoothedDiff = shoulderElbowDiffHistory.average().toFloat()
             val smoothedAngle = armAngleHistory.average().toFloat()
-            
+
             // Much stricter detection criteria to prevent false positives
             val isDownPosition = smoothedDiff > 0.05f && // Increased threshold from 0.03f
-                                 smoothedAngle < 110f && smoothedAngle > 40f && // Stricter angle range
-                                 isSymmetric && // Both arms must be symmetric
-                                 wristBelowShoulder && // Wrists must be below shoulders
-                                 avgConfidence > 0.7f // High confidence required
-            
+                    smoothedAngle < 110f && smoothedAngle > 40f && // Stricter angle range
+                    isSymmetric && // Both arms must be symmetric
+                    wristBelowShoulder && // Wrists must be below shoulders
+                    avgConfidence > 0.7f // High confidence required
+
             Log.d(TAG, "Detection - Diff: ${String.format("%.3f", smoothedDiff)}, Angle: ${smoothedAngle.toInt()}°, Down: $isDownPosition, HasBeenDown: $hasBeenDown, Symmetric: $isSymmetric, Confidence: ${(avgConfidence*100).toInt()}%")
-            
+
             // State tracking with higher stability requirements
             if (isDownPosition) {
                 downFrameCount++
@@ -453,9 +438,9 @@ class StreamActivity : AppCompatActivity() {
                 upFrameCount++
                 downFrameCount = 0
             }
-            
+
             var stateChanged = false
-            
+
             // State changes with stricter frame requirements
             if (!isDown && downFrameCount >= 5) { // Increased from 3 to 5 frames
                 isDown = true
@@ -466,21 +451,21 @@ class StreamActivity : AppCompatActivity() {
                 // Only count if person has been down first (complete cycle) AND we haven't just counted
                 if (hasBeenDown) {
                     val currentTime = System.currentTimeMillis()
-                    
+
                     if (currentTime - lastPushupTime >= MIN_PUSHUP_INTERVAL) {
                         pushupCount++
                         lastPushupTime = currentTime
                         lastCountedUp = true // Prevent double counting
                         stateChanged = true
-                        
+
                         Log.d(TAG, "🎉 Push-up #$pushupCount completed! UP motion detected, Angle: ${smoothedAngle.toInt()}°")
-                        
+
                         mainHandler.post {
                             binding.tvPushupCounter.text = getString(R.string.pushup_counter_text, pushupCount)
                             binding.tvPositionStatus.text = "Position: COUNT +1 (UP)!"
                             binding.tvPositionStatus.setTextColor(ContextCompat.getColor(this@StreamActivity, android.R.color.holo_orange_light))
                         }
-                        
+
                         // Audio feedback
                         try {
                             val toneGenerator = ToneGenerator(AudioManager.STREAM_NOTIFICATION, 80)
@@ -493,16 +478,16 @@ class StreamActivity : AppCompatActivity() {
                             // Ignore audio errors
                         }
                     }
-                    
+
                     // Reset cycle tracking for next push-up
                     hasBeenDown = false
                 } else {
                     Log.d(TAG, "⚠️ Going UP but no DOWN detected first - no count")
                 }
-                
+
                 isDown = false
             }
-            
+
             // UI updates with clearer status messages
             if (stateChanged || (frameSkipCounter % 30 == 0)) {
                 mainHandler.post {
@@ -520,7 +505,7 @@ class StreamActivity : AppCompatActivity() {
                     }
                 }
             }
-            
+
         } else {
             // Reset when landmarks are lost
             if (isDown) {
@@ -538,29 +523,29 @@ class StreamActivity : AppCompatActivity() {
             lastCountedUp = false
         }
     }
-    
+
     private fun resetPushupCounter() {
         pushupCount = 0
         isDown = false
         hasBeenDown = false
         lastCountedUp = false
         lastPushupTime = 0L
-        
+
         // Reset simplified detection variables
         downFrameCount = 0
         upFrameCount = 0
         shoulderElbowDiffHistory.clear()
         armAngleHistory.clear()
-        
+
         // Reset the pose classifier processor counter as well
         backgroundExecutor.execute {
             poseClassifierProcessor?.resetCounters()
         }
-        
+
         binding.tvPushupCounter.text = getString(R.string.pushup_counter_text, 0)
         binding.tvPositionStatus.text = "Position: Ready - Go Down First"
         binding.tvPositionStatus.setTextColor(ContextCompat.getColor(this, android.R.color.holo_orange_light))
-        
+
         Log.d(TAG, "Push-up counter and detection state reset to 0")
     }
 
@@ -600,23 +585,23 @@ class StreamActivity : AppCompatActivity() {
     }
 
     // Calculate angle between three points in degrees
-    private fun calculateAngle(p1: com.google.mlkit.vision.common.PointF3D, 
-                              p2: com.google.mlkit.vision.common.PointF3D, 
-                              p3: com.google.mlkit.vision.common.PointF3D): Float {
+    private fun calculateAngle(p1: com.google.mlkit.vision.common.PointF3D,
+                               p2: com.google.mlkit.vision.common.PointF3D,
+                               p3: com.google.mlkit.vision.common.PointF3D): Float {
         val v1x = p1.x - p2.x
         val v1y = p1.y - p2.y
         val v2x = p3.x - p2.x
         val v2y = p3.y - p2.y
-        
+
         val dot = v1x * v2x + v1y * v2y
         val mag1 = sqrt(v1x * v1x + v1y * v1y)
         val mag2 = sqrt(v2x * v2x + v2y * v2y)
-        
+
         if (mag1 == 0f || mag2 == 0f) return 0f
-        
+
         val cosAngle = dot / (mag1 * mag2)
         val clampedCos = cosAngle.coerceIn(-1f, 1f)
-        
+
         return Math.toDegrees(kotlin.math.acos(clampedCos.toDouble())).toFloat()
     }
 }

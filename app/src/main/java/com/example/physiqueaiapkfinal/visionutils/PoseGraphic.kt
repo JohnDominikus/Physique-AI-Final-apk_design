@@ -14,12 +14,11 @@
  * limitations under the License.
  */
 
- package com.example.physiqueaiapkfinal.visionutils
+package com.example.physiqueaiapkfinal.visionutils
 
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
-import com.example.physiqueaiapkfinal.visionutils.GraphicOverlay
 import com.google.mlkit.vision.pose.Pose
 import com.google.mlkit.vision.pose.PoseLandmark
 import java.lang.Math.max
@@ -72,7 +71,7 @@ internal constructor(
     for (i in poseClassification.indices) {
       val classificationY =
         canvas.height -
-          (POSE_CLASSIFICATION_TEXT_SIZE * 1.5f * (poseClassification.size - i).toFloat())
+                (POSE_CLASSIFICATION_TEXT_SIZE * 1.5f * (poseClassification.size - i).toFloat())
       canvas.drawText(
         poseClassification[i],
         classificationX,
@@ -231,3 +230,4 @@ internal constructor(
     private val POSE_CLASSIFICATION_TEXT_SIZE = 60.0f
   }
 }
+

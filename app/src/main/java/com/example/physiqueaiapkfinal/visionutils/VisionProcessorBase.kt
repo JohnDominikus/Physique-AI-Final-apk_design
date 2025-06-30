@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-
 package com.example.physiqueaiapkfinal.visionutils
 
 import android.app.ActivityManager
@@ -24,12 +23,7 @@ import android.os.SystemClock
 import android.util.Log
 import android.widget.Toast
 import androidx.annotation.GuardedBy
-
 import com.example.physiqueaiapkfinal.BitmapUtils
-import com.example.physiqueaiapkfinal.visionutils.FrameMetadata
-import com.example.physiqueaiapkfinal.visionutils.GraphicOverlay
-import com.example.physiqueaiapkfinal.visionutils.ScopedExecutor
-import com.example.physiqueaiapkfinal.visionutils.VisionImageProcessor
 import com.google.android.gms.tasks.OnFailureListener
 import com.google.android.gms.tasks.OnSuccessListener
 import com.google.android.gms.tasks.Task

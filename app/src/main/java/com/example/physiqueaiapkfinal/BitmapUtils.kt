@@ -10,9 +10,6 @@ import android.net.Uri
 import android.os.Build
 import android.provider.MediaStore
 import android.util.Log
-import android.content.Context
-import android.graphics.BitmapFactory
-
 import com.example.physiqueaiapkfinal.visionutils.FrameMetadata
 import java.io.IOException
 import java.nio.ByteBuffer
@@ -48,11 +45,11 @@ object BitmapUtils {
 
     private fun applyOrientationToBitmap(bitmap: Bitmap?, orientation: Int): Bitmap? {
         if (bitmap == null) return null
-        
+
         var rotationDegrees = 0
         var flipX = false
         var flipY = false
-        
+
         when (orientation) {
             ExifInterface.ORIENTATION_FLIP_HORIZONTAL -> flipX = true
             ExifInterface.ORIENTATION_ROTATE_90 -> rotationDegrees = 90
@@ -70,7 +67,7 @@ object BitmapUtils {
             ExifInterface.ORIENTATION_UNDEFINED, ExifInterface.ORIENTATION_NORMAL -> {}
             else -> {}
         }
-        
+
         return rotateBitmap(bitmap, rotationDegrees, flipX, flipY)
     }
 
@@ -125,18 +122,4 @@ object BitmapUtils {
         val imageBytes = out.toByteArray()
         return android.graphics.BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
     }
-
-    fun getBitmapFromUri(context: Context, uri: Uri): Bitmap? {
-        return try {
-            val inputStream = context.contentResolver.openInputStream(uri)
-            inputStream?.use { stream ->
-                BitmapFactory.decodeStream(stream)
-            }
-        } catch (e: Exception) {
-            Log.e("BitmapUtils", "Error getting bitmap from URI", e)
-            null
-        }
-    }
 }
-
-

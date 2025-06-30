@@ -51,8 +51,7 @@ class HipThrustsActivity : AppCompatActivity() {
     // Ultra-accurate hip thrust detection variables
     private var isUp = false
     private var lastHipThrustTime = 0L
-    private val MIN_HIP_THRUST_INTERVAL =
-        1000L // Increased to 1 second to prevent false rapid counting
+    private val MIN_HIP_THRUST_INTERVAL = 1000L // Increased to 1 second to prevent false rapid counting
 
     // Advanced detection variables
     private var upFrameCount = 0
@@ -93,11 +92,6 @@ class HipThrustsActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityHipThrustsBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
-        // Log workout data passed from WorkoutPoseAIFragment
-        val workoutId = intent.getStringExtra("workoutId")
-        val workoutName = intent.getStringExtra("workout_name")
-        Log.d(TAG, "HipThrustsActivity started - Workout ID: $workoutId, Workout Name: $workoutName")
 
         if (allPermissionsGranted()) {
             startCamera()
@@ -140,46 +134,66 @@ class HipThrustsActivity : AppCompatActivity() {
 
     private fun startCamera() {
         val cameraProviderFuture = ProcessCameraProvider.getInstance(this)
-        
+
         cameraProviderFuture.addListener({
-            try {
-                cameraProvider = cameraProviderFuture.get()
-                
-                val preview = Preview.Builder()
-                    .build()
-                    .also {
-                        it.setSurfaceProvider(binding.viewFinder.surfaceProvider)
-                    }
-                
-                val imageAnalyzer = ImageAnalysis.Builder()
-                    .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
-                    .build()
-                    .also {
-                        it.setAnalyzer(cameraExecutor) { imageProxy ->
-                            processImage(imageProxy)
-                        }
-                    }
-                
-                val cameraSelector = CameraSelector.DEFAULT_FRONT_CAMERA
-                
-                try {
-                    cameraProvider?.unbindAll()
-                    cameraProvider?.bindToLifecycle(
-                        this, cameraSelector, preview, imageAnalyzer
-                    )
-                } catch (e: Exception) {
-                    Log.e("HipThrusts", "Use case binding failed", e)
-                }
-                
-            } catch (e: Exception) {
-                Log.e("HipThrusts", "Camera provider binding failed", e)
-            }
+            cameraProvider = cameraProviderFuture.get()
+            bindCameraUseCases()
         }, ContextCompat.getMainExecutor(this))
+    }
+
+    private fun bindCameraUseCases() {
+        val cameraProvider = this.cameraProvider ?: return
+
+        val preview = Preview.Builder()
+            .build()
+            .also {
+                it.setSurfaceProvider(binding.viewFinder.surfaceProvider)
+            }
+
+        // Mirror the preview for front camera
+        if (isUsingFrontCamera) {
+            binding.viewFinder.scaleX = -1f // Horizontal flip
+        } else {
+            binding.viewFinder.scaleX = 1f // Normal view
+        }
+
+        val imageAnalyzer = ImageAnalysis.Builder()
+            .setTargetResolution(android.util.Size(640, 480))
+            .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
+            .setImageQueueDepth(1)
+            .build()
+            .also {
+                it.setAnalyzer(cameraExecutor, PoseAnalyzer())
+            }
+
+        val cameraSelector = if (isUsingFrontCamera) {
+            CameraSelector.DEFAULT_FRONT_CAMERA
+        } else {
+            CameraSelector.DEFAULT_BACK_CAMERA
+        }
+
+        try {
+            cameraProvider.unbindAll()
+            cameraProvider.bindToLifecycle(
+                this,
+                cameraSelector,
+                preview,
+                imageAnalyzer
+            )
+
+            // Update camera status indicator
+            binding.tvCameraStatus.text = if (isUsingFrontCamera) "Camera: Front (Mirrored)" else "Camera: Back"
+
+        } catch (exc: Exception) {
+            Log.e(TAG, "Use case binding failed", exc)
+            Toast.makeText(this, "Failed to start camera", Toast.LENGTH_SHORT).show()
+        }
     }
 
     private fun switchCamera() {
         isUsingFrontCamera = !isUsingFrontCamera
         Log.d(TAG, "Switching to ${if (isUsingFrontCamera) "front" else "back"} camera")
+        bindCameraUseCases()
 
         // Reset pose detection state when switching cameras
         resetPoseDetectionState()
@@ -196,22 +210,20 @@ class HipThrustsActivity : AppCompatActivity() {
         Log.d(TAG, "Pose detection state reset for camera switch")
     }
 
-    private fun processImage(imageProxy: ImageProxy) {
-        try {
+    private inner class PoseAnalyzer : ImageAnalysis.Analyzer {
+        @androidx.camera.core.ExperimentalGetImage
+        override fun analyze(imageProxy: ImageProxy) {
             val mediaImage = imageProxy.image
             if (mediaImage != null) {
                 val image = InputImage.fromMediaImage(mediaImage, imageProxy.imageInfo.rotationDegrees)
-                
-                // Process pose detection
+
                 poseDetector.process(image)
                     .addOnSuccessListener { pose ->
-                        // Handle pose detection results
-                        runOnUiThread {
-                            // Update UI with pose results
-                        }
+                        // Process pose detection results
+                        processPose(pose, imageProxy.width, imageProxy.height)
                     }
                     .addOnFailureListener { e ->
-                        Log.e("HipThrusts", "Pose detection failed", e)
+                        Log.e(TAG, "Pose detection failed: ${e.message}", e)
                     }
                     .addOnCompleteListener {
                         imageProxy.close()
@@ -219,9 +231,6 @@ class HipThrustsActivity : AppCompatActivity() {
             } else {
                 imageProxy.close()
             }
-        } catch (e: Exception) {
-            Log.e("HipThrusts", "Error processing image", e)
-            imageProxy.close()
         }
     }
 
@@ -315,12 +324,7 @@ class HipThrustsActivity : AppCompatActivity() {
                 isUp = false
                 mainHandler.post {
                     binding.tvPositionStatus.text = "DOWN - Push your hips up!"
-                    binding.tvPositionStatus.setTextColor(
-                        ContextCompat.getColor(
-                            this@HipThrustsActivity,
-                            android.R.color.holo_green_light
-                        )
-                    )
+                    binding.tvPositionStatus.setTextColor(ContextCompat.getColor(this@HipThrustsActivity, android.R.color.holo_green_light))
                 }
             } else if (isUpPosition && hasBeenDown && !isUp) {
                 // Transition from DOWN to UP (count rep)
@@ -329,16 +333,9 @@ class HipThrustsActivity : AppCompatActivity() {
                     hipThrustCount++
                     lastHipThrustTime = currentTime
                     mainHandler.post {
-                        binding.tvHipThrustCounter.text =
-                            getString(R.string.hip_thrust_counter_text, hipThrustCount)
-                        binding.tvPositionStatus.text =
-                            "COUNTED! Rep #$hipThrustCount - Go back down."
-                        binding.tvPositionStatus.setTextColor(
-                            ContextCompat.getColor(
-                                this@HipThrustsActivity,
-                                android.R.color.holo_blue_light
-                            )
-                        )
+                        binding.tvHipThrustCounter.text = getString(R.string.hip_thrust_counter_text, hipThrustCount)
+                        binding.tvPositionStatus.text = "COUNTED! Rep #$hipThrustCount - Go back down."
+                        binding.tvPositionStatus.setTextColor(ContextCompat.getColor(this@HipThrustsActivity, android.R.color.holo_blue_light))
                     }
                     // Audio feedback
                     try {
@@ -357,12 +354,7 @@ class HipThrustsActivity : AppCompatActivity() {
                 // Neutral state
                 mainHandler.post {
                     binding.tvPositionStatus.text = "Fix your position: Lie down straight."
-                    binding.tvPositionStatus.setTextColor(
-                        ContextCompat.getColor(
-                            this@HipThrustsActivity,
-                            android.R.color.holo_orange_light
-                        )
-                    )
+                    binding.tvPositionStatus.setTextColor(ContextCompat.getColor(this@HipThrustsActivity, android.R.color.holo_orange_light))
                 }
             } else if (isDownPosition && isUp) {
                 // If bumaba na ulit from UP, reset to DOWN
@@ -382,12 +374,7 @@ class HipThrustsActivity : AppCompatActivity() {
         } else {
             mainHandler.post {
                 binding.tvPositionStatus.text = "Show your full body to the camera."
-                binding.tvPositionStatus.setTextColor(
-                    ContextCompat.getColor(
-                        this@HipThrustsActivity,
-                        android.R.color.holo_red_light
-                    )
-                )
+                binding.tvPositionStatus.setTextColor(ContextCompat.getColor(this@HipThrustsActivity, android.R.color.holo_red_light))
             }
         }
     }
@@ -406,12 +393,7 @@ class HipThrustsActivity : AppCompatActivity() {
 
         binding.tvHipThrustCounter.text = getString(R.string.hip_thrust_counter_text, 0)
         binding.tvPositionStatus.text = "Position: Ready - Lie flat on floor"
-        binding.tvPositionStatus.setTextColor(
-            ContextCompat.getColor(
-                this,
-                android.R.color.holo_orange_light
-            )
-        )
+        binding.tvPositionStatus.setTextColor(ContextCompat.getColor(this, android.R.color.holo_orange_light))
 
         Log.d(TAG, "Floor hip thrust counter and detection state reset to 0")
     }
@@ -452,11 +434,9 @@ class HipThrustsActivity : AppCompatActivity() {
     }
 
     // Calculate angle between three points in degrees
-    private fun calculateAngle(
-        p1: com.google.mlkit.vision.common.PointF3D,
-        p2: com.google.mlkit.vision.common.PointF3D,
-        p3: com.google.mlkit.vision.common.PointF3D
-    ): Float {
+    private fun calculateAngle(p1: com.google.mlkit.vision.common.PointF3D,
+                               p2: com.google.mlkit.vision.common.PointF3D,
+                               p3: com.google.mlkit.vision.common.PointF3D): Float {
         val v1x = p1.x - p2.x
         val v1y = p1.y - p2.y
         val v2x = p3.x - p2.x

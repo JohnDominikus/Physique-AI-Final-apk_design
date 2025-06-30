@@ -19,8 +19,6 @@ package com.example.physiqueaiapkfinal.visionutils;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 
-import com.example.physiqueaiapkfinal.visionutils.GraphicOverlay;
-
 /** Draw camera image to background. */
 public class CameraImageGraphic extends GraphicOverlay.Graphic {
 

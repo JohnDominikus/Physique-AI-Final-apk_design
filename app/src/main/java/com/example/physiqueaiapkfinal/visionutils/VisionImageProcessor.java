@@ -18,8 +18,6 @@ package com.example.physiqueaiapkfinal.visionutils;
 
 import android.graphics.Bitmap;
 
-import com.example.physiqueaiapkfinal.visionutils.GraphicOverlay;
-
 /** An interface to process the images with different vision detectors and custom image models. */
 public interface VisionImageProcessor {
 

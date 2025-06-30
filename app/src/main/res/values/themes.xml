@@ -17,6 +17,7 @@
         <item name="colorSurface">@color/surface_light</item>
         <item name="android:colorBackground">@color/background_light</item>
         <item name="colorSurfaceVariant">@color/background_secondary</item>
+        <item name="backgroundColor">@color/background_primary</item>
         
         <!-- ========== TEXT COLORS (High Contrast) ========== -->
         <item name="colorOnPrimary">@color/text_on_primary_light</item>
@@ -174,6 +175,7 @@
         <item name="colorSurface">@color/surface_dark</item>
         <item name="android:colorBackground">@color/background_dark</item>
         <item name="colorSurfaceVariant">@color/card_dark</item>
+        <item name="backgroundColor">@color/surface_dark</item>
         
         <!-- ========== TEXT COLORS ========== -->
         <item name="colorOnPrimary">@color/text_on_primary_dark</item>

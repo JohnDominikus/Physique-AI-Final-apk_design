@@ -51,11 +51,15 @@ public class PoseClassifierProcessor {
   private static final String SQUATS_CLASS = "squats_down";
   private static final String FRONT_RAISE_CLASS = "front_raise_down";
   private static final String HIP_THRUST_CLASS = "hip_thrust_down";
+  private static final String WINDMILL_LEFT_CLASS = "windmill_left";
+  private static final String WINDMILL_RIGHT_CLASS = "windmill_right";
   private static final String[] POSE_CLASSES = {
           PUSHUPS_CLASS,
           SQUATS_CLASS,
           FRONT_RAISE_CLASS,
-          HIP_THRUST_CLASS
+          HIP_THRUST_CLASS,
+          WINDMILL_LEFT_CLASS,
+          WINDMILL_RIGHT_CLASS
   };
 
   private final boolean isStreamMode;
@@ -155,12 +159,13 @@ public class PoseClassifierProcessor {
         return result;
       }
 
-      // Enhanced pose validation for push-ups, squats, and front raises
+      // Enhanced pose validation for push-ups, squats, front raises, hip thrusts, and windmills
       boolean isPushupPose = validatePushupPose(pose, smoothedResult);
       boolean isSquatPose = validateSquatPose(pose, smoothedResult);
       boolean isFrontRaisePose = validateFrontRaisePose(pose, smoothedResult);
       boolean isHipThrustPose = validateHipThrustPose(pose, smoothedResult);
-      boolean isValidPose = isPushupPose || isSquatPose || isFrontRaisePose || isHipThrustPose;
+      boolean isWindmillPose = validateWindmillPose(pose, smoothedResult);
+      boolean isValidPose = isPushupPose || isSquatPose || isFrontRaisePose || isHipThrustPose || isWindmillPose;
 
       if (isValidPose) {
         validPoseFrameCount++;
@@ -416,6 +421,64 @@ public class PoseClassifierProcessor {
 
     } catch (Exception e) {
       Log.e(TAG, "Error in hip thrust pose validation: " + e.getMessage(), e);
+      return false;
+    }
+  }
+
+  // Enhanced validation method for windmill poses
+  private boolean validateWindmillPose(Pose pose, ClassificationResult classificationResult) {
+    try {
+      // Check if we have the necessary landmarks for windmill validation
+      PoseLandmark leftShoulder = pose.getPoseLandmark(PoseLandmark.LEFT_SHOULDER);
+      PoseLandmark rightShoulder = pose.getPoseLandmark(PoseLandmark.RIGHT_SHOULDER);
+      PoseLandmark leftElbow = pose.getPoseLandmark(PoseLandmark.LEFT_ELBOW);
+      PoseLandmark rightElbow = pose.getPoseLandmark(PoseLandmark.RIGHT_ELBOW);
+      PoseLandmark leftWrist = pose.getPoseLandmark(PoseLandmark.LEFT_WRIST);
+      PoseLandmark rightWrist = pose.getPoseLandmark(PoseLandmark.RIGHT_WRIST);
+      PoseLandmark leftHip = pose.getPoseLandmark(PoseLandmark.LEFT_HIP);
+      PoseLandmark rightHip = pose.getPoseLandmark(PoseLandmark.RIGHT_HIP);
+
+      if (leftShoulder == null || rightShoulder == null || leftElbow == null ||
+              rightElbow == null || leftWrist == null || rightWrist == null ||
+              leftHip == null || rightHip == null) {
+        Log.d(TAG, "Missing required landmarks for windmill validation");
+        return false;
+      }
+
+      // Check if person is standing upright
+      float shoulderY = (leftShoulder.getPosition().y + rightShoulder.getPosition().y) / 2;
+      float hipY = (leftHip.getPosition().y + rightHip.getPosition().y) / 2;
+      boolean isUpright = shoulderY < hipY; // Shoulders above hips for standing position
+
+      // Check for windmill arm position - one arm up, one arm down
+      boolean leftArmUp = leftWrist.getPosition().y < leftShoulder.getPosition().y - 0.1f;
+      boolean rightArmUp = rightWrist.getPosition().y < rightShoulder.getPosition().y - 0.1f;
+      boolean leftArmDown = leftWrist.getPosition().y > leftHip.getPosition().y + 0.1f;
+      boolean rightArmDown = rightWrist.getPosition().y > rightHip.getPosition().y + 0.1f;
+
+      // Windmill position: one arm up, opposite arm down
+      boolean isWindmillPosition = (leftArmUp && rightArmDown) || (rightArmUp && leftArmDown);
+
+      // Check confidence for windmill classification
+      float windmillLeftConfidence = classificationResult.getClassConfidence(WINDMILL_LEFT_CLASS);
+      float windmillRightConfidence = classificationResult.getClassConfidence(WINDMILL_RIGHT_CLASS);
+      float maxWindmillConfidence = Math.max(windmillLeftConfidence, windmillRightConfidence);
+      boolean hasMinConfidence = maxWindmillConfidence > 1.0f; // Minimum confidence threshold
+
+      boolean isValid = isUpright && isWindmillPosition && hasMinConfidence;
+
+      Log.d(TAG, "Windmill pose validation - Upright: " + isUpright +
+              ", Windmill position: " + isWindmillPosition +
+              ", Left arm up: " + leftArmUp + ", Right arm down: " + rightArmDown +
+              ", Right arm up: " + rightArmUp + ", Left arm down: " + leftArmDown +
+              ", Left confidence: " + windmillLeftConfidence +
+              ", Right confidence: " + windmillRightConfidence +
+              ", Valid: " + isValid);
+
+      return isValid;
+
+    } catch (Exception e) {
+      Log.e(TAG, "Error in windmill pose validation: " + e.getMessage(), e);
       return false;
     }
   }
