@@ -128,7 +128,9 @@ class WorkoutPoseAIFragment : Fragment() {
                             Log.d(TAG, "Navigating to SitUpsActivity")
                             SitUpsActivity::class.java
                         }
-                        workoutName.contains("windmill", ignoreCase = true) -> {
+                        workoutName.contains("windmill",  true)  ||   // normal
+                        workoutName.contains("wind-mill", true)  ||   // may gitling
+                        workoutName.contains("wind mill", true)  -> { // may espasyo
                             Log.d(TAG, "Navigating to WindmillActivity")
                             WindmillActivity::class.java
                         }
