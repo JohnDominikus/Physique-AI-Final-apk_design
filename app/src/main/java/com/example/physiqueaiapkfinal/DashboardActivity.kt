@@ -909,25 +909,31 @@ class DashboardActivity : AppCompatActivity() {
         }
     }
 
-    private fun navigateToExerciseActivity(exercise: AddedExercise) {
-        val workoutNameClean = exercise.workoutName.trim().lowercase()
-        Log.d("DashboardActivity", "Navigating to activity for: '$workoutNameClean'")
+    public fun navigateToExerciseActivity(exercise: AddedExercise) {
+        // Normalize the workout name by removing spaces and hyphens, and making it lowercase.
+        val workoutNameClean = exercise.workoutName.trim().replace(Regex("[\\s-]"), "").lowercase()
+        Log.d("DashboardActivity", "Original workout name: '${exercise.workoutName}'")
+        Log.d("DashboardActivity", "Normalized workout name: '$workoutNameClean'")
 
         val activityClass = when (workoutNameClean) {
-            "push-up" -> StreamActivity::class.java
-            "squat" -> SquatActivity::class.java
-            "dumbbell front raise" -> DumbbellFrontRaiseActivity::class.java
-            "dumbbell hammer curl" -> DumbbellHammerCurlActivity::class.java
-            "hip thrusts" -> HipThrustsActivity::class.java
-            "military press" -> MilitaryPressActivity::class.java
-            "sit ups" -> SitUpsActivity::class.java
-            "windmill" -> WindmillActivity::class.java
-            // Add other exercises here, potentially mapping them to StreamActivity if no specific one exists
+            "pushup", "pushups", "push-up", "push-ups" -> StreamActivity::class.java
+            "squat", "squats" -> SquatActivity::class.java
+            "dumbbellfrontraise", "frontraise", "dumbbellraise", "frontdumbbellraise" -> DumbbellFrontRaiseActivity::class.java
+            "dumbbellhammercurl", "hammercurl", "hammerducurls", "dumbbelcurl" -> DumbbellHammerCurlActivity::class.java
+            "hipthrust", "hipthrusts", "hip-thrust", "hip-thrusts" -> HipThrustsActivity::class.java
+            "militarypress", "shoulderpress", "overheadpress", "militarypresses", "shoulderpresses", "overheadpresses",
+            "dumbellsholderpress", "dumbbellmilitarypress", "dumbbellshoulderpress", "dumbbelloverheadpress" -> MilitaryPressActivity::class.java
+            "situps", "situp", "crunch", "crunches", "sit-up", "sit-ups" -> SitUpsActivity::class.java
+            "windmill", "windmillexercise", "wind-mill", "wind-mills", "windmills" -> WindmillActivity::class.java
+            // Add other exercises here
             else -> {
+                Log.w("DashboardActivity", "No specific activity found for '${exercise.workoutName}' (normalized: '$workoutNameClean'). Using default.")
                 Toast.makeText(this, "No specific activity for '${exercise.workoutName}', using default.", Toast.LENGTH_SHORT).show()
                 StreamActivity::class.java // Fallback to StreamActivity
             }
         }
+
+        Log.d("DashboardActivity", "Selected activity class: ${activityClass.simpleName}")
 
         val intent = Intent(this, activityClass).apply {
             // Pass exercise details to the activity
