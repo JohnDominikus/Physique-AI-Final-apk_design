@@ -146,6 +146,9 @@ class DashboardActivity : AppCompatActivity() {
     // ======== idinagdag =========
     private val PROFILE_COLLECTION = "userinfo"
 
+    // New UI components
+    private var btnResetCalories: ImageButton? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         try {
             super.onCreate(savedInstanceState)
@@ -182,6 +185,15 @@ class DashboardActivity : AppCompatActivity() {
             
             // Initialize main handler
             mainHandler = android.os.Handler(android.os.Looper.getMainLooper())
+            
+            // Initialize new UI components
+            btnResetCalories = findViewById(R.id.btnResetCalories)
+            
+            Log.d("DashboardActivity", "UI components initialized successfully")
+            
+            btnResetCalories?.setOnClickListener {
+                resetCalories()
+            }
             
         } catch (e: Exception) {
             Log.e("DashboardActivity", "Critical error in onCreate", e)
@@ -1175,6 +1187,37 @@ class DashboardActivity : AppCompatActivity() {
             }
         } catch (e: Exception) {
             Log.e("DashboardActivity", "Error in onResume", e)
+        }
+    }
+
+    private fun resetCalories() {
+        userId?.let { uid ->
+            val firestore = FirebaseFirestore.getInstance()
+            // Reset aggregate stats
+            val userStatsRef = firestore.collection("userStats").document(uid)
+            userStatsRef.update(mapOf(
+                "totalCaloriesConsumed" to 0,
+                "todayCaloriesConsumed" to 0,
+                "totalMealsCompleted" to 0,
+                "todayMealsCompleted" to 0
+            )).addOnSuccessListener {
+                Log.d("DashboardActivity", "Total calories and meals reset successfully.")
+                Toast.makeText(this, "Calories have been reset.", Toast.LENGTH_SHORT).show()
+            }.addOnFailureListener { e ->
+                Log.e("DashboardActivity", "Error resetting total calories", e)
+            }
+
+            // Also reset daily stats for today
+            val today = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(Date())
+            val dailyStatsRef = userStatsRef.collection("dailyStats").document(today)
+            dailyStatsRef.update(mapOf(
+                "caloriesConsumed" to 0,
+                "mealsCompleted" to 0
+            )).addOnSuccessListener {
+                Log.d("DashboardActivity", "Daily calories and meals reset successfully.")
+            }.addOnFailureListener { e ->
+                Log.e("DashboardActivity", "Error resetting daily calories", e)
+            }
         }
     }
 } 
