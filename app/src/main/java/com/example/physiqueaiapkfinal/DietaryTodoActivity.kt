@@ -155,7 +155,7 @@ class DietaryTodoActivity : AppCompatActivity() {
             
             // Set default date to today
             val calendar = Calendar.getInstance()
-            val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+            val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
             val timeFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
             selectedDate = dateFormat.format(calendar.time)
             selectedTime = timeFormat.format(calendar.time)
@@ -601,7 +601,7 @@ class DietaryTodoActivity : AppCompatActivity() {
                 { _, year, month, dayOfMonth ->
                     try {
                         calendar.set(year, month, dayOfMonth)
-                        val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+                        val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
                         selectedDate = dateFormat.format(calendar.time)
                         btnSelectDate.text = selectedDate
                         // Reload todo list for new date

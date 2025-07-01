@@ -122,7 +122,7 @@ class WorkoutTodoActivity : AppCompatActivity() {
             btnAddWorkout.isEnabled = false
             workoutSpinner.isEnabled = false
             val calendar = Calendar.getInstance()
-            val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+            val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
             selectedDate = dateFormat.format(calendar.time)
             updateDateButtonText()
         } catch (e: Exception) {
@@ -520,7 +520,7 @@ class WorkoutTodoActivity : AppCompatActivity() {
                 { _, year, month, dayOfMonth ->
                     val cal = Calendar.getInstance()
                     cal.set(year, month, dayOfMonth)
-                    val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+                    val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
                     selectedDate = dateFormat.format(cal.time)
                     updateDateButtonText()
                     if (isDataLoaded) {

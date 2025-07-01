@@ -219,7 +219,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Calories Burned"
+                        android:text="Total Calories"
                         android:textSize="18sp"
                         android:textColor="@color/white"
                         android:fontFamily="@font/poppins_bold" />
@@ -452,13 +452,14 @@
                     android:layout_marginBottom="12dp">
 
                     <TextView
-                        android:layout_width="0dp"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:text="Today's Tasks"
                         android:textSize="20sp"
-                        android:textColor="@color/text_primary_light"
-                        android:fontFamily="@font/poppins_bold" />
+                        android:textColor="@color/fitness_primary"
+                        android:fontFamily="@font/poppins_bold"
+                        android:gravity="center" />
 
                     <TextView
                         android:id="@+id/tvTodoCount"
@@ -473,35 +474,65 @@
                         android:paddingVertical="4dp" />
                 </LinearLayout>
 
-                <Button
-                    android:id="@+id/btnViewTodo"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="View All Tasks"
-                    android:textSize="16sp"
-                    android:textColor="@color/white"
-                    android:fontFamily="@font/poppins_bold"
-                    android:background="@drawable/button_primary_modern"
-                    android:padding="16dp"
-                    android:elevation="4dp" />
+                
             </LinearLayout>
 
-            <!-- Recent Activities -->
+            <!-- Added Exercises -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Recent Activities"
-                android:textSize="20sp"
+                android:text="Added Exercises"
+                android:textSize="16sp"
                 android:textColor="@color/text_primary_light"
                 android:fontFamily="@font/poppins_bold"
                 android:layout_marginBottom="12dp" />
 
             <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/rvRecentActivities"
+                android:id="@+id/rvAddedExercises"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:nestedScrollingEnabled="false"
-                tools:listitem="@layout/item_activity_log" />
+                tools:listitem="@layout/item_exercise" />
+
+            <TextView
+                android:id="@+id/tvNoExercisesToday"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="No exercises scheduled for today."
+                android:gravity="center"
+                android:padding="16dp"
+                android:textColor="@color/text_secondary_light"
+                android:fontFamily="@font/poppins_medium"
+                android:visibility="gone" />
+
+            <!-- Added Meals -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Added Meals"
+                android:textSize="16sp"
+                android:textColor="@color/text_primary_light"
+                android:fontFamily="@font/poppins_bold"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="12dp" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvAddedMeals"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:nestedScrollingEnabled="false"
+                tools:listitem="@layout/item_meal" />
+
+            <TextView
+                android:id="@+id/tvNoMealsToday"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="No meals scheduled for today."
+                android:gravity="center"
+                android:padding="16dp"
+                android:textColor="@color/text_secondary_light"
+                android:fontFamily="@font/poppins_medium"
+                android:visibility="gone" />
 
             <!-- Empty State -->
             <LinearLayout
@@ -539,47 +570,9 @@
                     android:gravity="center" />
             </LinearLayout>
 
-            <!-- Meal Activities Section -->
-            <TextView
-                android:id="@+id/tvMealActivitiesLabel"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Meal Activities"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                android:layout_marginTop="16dp"
-                android:layout_marginStart="16dp"
-                android:textColor="@color/text_primary_light" />
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/rvMealActivities"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="8dp"
-                android:layout_marginTop="4dp"
-                android:paddingStart="8dp"
-                android:paddingEnd="8dp"
-                android:visibility="gone" />
+            
 
-            <!-- Workout Activities Section -->
-            <TextView
-                android:id="@+id/tvWorkoutActivitiesLabel"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Workout Activities"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                android:layout_marginTop="16dp"
-                android:layout_marginStart="16dp"
-                android:textColor="@color/text_primary_light" />
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/rvWorkoutActivities"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="8dp"
-                android:layout_marginTop="4dp"
-                android:paddingStart="8dp"
-                android:paddingEnd="8dp"
-                android:visibility="gone" />
+            
 
         </LinearLayout>
     </ScrollView>

@@ -19,13 +19,13 @@
         android:padding="8dp">
 
         <TextView
-            android:id="@+id/tvExerciseName"
+            android:id="@+id/tvMealName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:fontFamily="@font/poppins_bold"
             android:textColor="@color/text_primary_light"
             android:textSize="14sp"
-            tools:text="Push Ups" />
+            tools:text="Chicken Salad" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -34,40 +34,40 @@
             android:gravity="center_vertical"
             android:orientation="horizontal">
 
-            <!-- Sets -->
+            <!-- Meal Type -->
             <ImageView
                 android:layout_width="14dp"
                 android:layout_height="14dp"
-                android:src="@drawable/ic_sets"
+                android:src="@drawable/ic_meal_type"
                 app:tint="@color/fitness_primary" />
 
             <TextView
-                android:id="@+id/tvSets"
+                android:id="@+id/tvMealType"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="2dp"
                 android:fontFamily="@font/poppins_medium"
                 android:textColor="@color/text_secondary_light"
                 android:textSize="12sp"
-                tools:text="3 sets" />
+                tools:text="Breakfast" />
 
-            <!-- Reps -->
+            <!-- Calories -->
             <ImageView
                 android:layout_width="14dp"
                 android:layout_height="14dp"
                 android:layout_marginStart="8dp"
-                android:src="@drawable/ic_reps"
+                android:src="@drawable/ic_calories"
                 app:tint="@color/fitness_secondary" />
 
             <TextView
-                android:id="@+id/tvReps"
+                android:id="@+id/tvCalories"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="2dp"
                 android:fontFamily="@font/poppins_medium"
                 android:textColor="@color/text_secondary_light"
                 android:textSize="12sp"
-                tools:text="12 reps" />
+                tools:text="350 kcal" />
 
             <!-- Time -->
             <ImageView
@@ -85,12 +85,12 @@
                 android:fontFamily="@font/poppins_medium"
                 android:textColor="@color/text_secondary_light"
                 android:textSize="12sp"
-                tools:text="1m 30s" />
+                tools:text="08:00 AM" />
 
         </LinearLayout>
 
         <Button
-            android:id="@+id/btnDoneExercise"
+            android:id="@+id/btnDoneMeal"
             android:layout_width="wrap_content"
             android:layout_height="32dp"
             android:layout_marginTop="6dp"

@@ -39,6 +39,7 @@ import java.util.concurrent.TimeUnit
 import com.example.physiqueaiapkfinal.WorkoutTodo
 import com.example.physiqueaiapkfinal.MealTodo
 import com.example.physiqueaiapkfinal.UserMedicalInfo
+import com.example.physiqueaiapkfinal.AddedMealsAdapter
 import android.text.SpannableString
 import android.text.style.StyleSpan
 import android.text.style.ForegroundColorSpan
@@ -57,60 +58,21 @@ data class DashboardStats(
     val currentBMI: Double = 0.0
 )
 
-data class RecentActivity(
+data class AddedExercise(
     val id: String = "",
-    val title: String = "",
-    val subtitle: String = "",
-    val timestamp: Long = 0L,
-    val type: String = ""
+    val workoutName: String = "",
+    val sets: Int = 0,
+    val reps: Int = 0,
+    val minutes: Int = 0,
+    val seconds: Int = 0,
+    val isCompleted: Boolean = false
 )
 
 // Import the shared data classes
 // import com.example.physiqueaiapkfinal.MealTodo
 // import com.example.physiqueaiapkfinal.WorkoutTodo
 
-// Recent Activities Adapter
-class RecentActivitiesAdapter(private var activities: List<RecentActivity>) : 
-    RecyclerView.Adapter<RecentActivitiesAdapter.ViewHolder>() {
-    
-    class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        val tvTitle: TextView = view.findViewById(R.id.tvActivityName)
-        val tvSubtitle: TextView = view.findViewById(R.id.tvDuration)
-        val tvTime: TextView = view.findViewById(R.id.tvTime)
-    }
-    
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.item_activity_log, parent, false)
-        return ViewHolder(view)
-    }
-    
-    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val activity = activities[position]
-        holder.tvTitle.text = activity.title
-        holder.tvSubtitle.text = activity.subtitle
-        holder.tvTime.text = formatTime(activity.timestamp)
-    }
-    
-    override fun getItemCount() = activities.size
-    
-    fun updateActivities(newActivities: List<RecentActivity>) {
-        activities = newActivities
-        notifyDataSetChanged()
-    }
-    
-    private fun formatTime(timestamp: Long): String {
-        val now = System.currentTimeMillis()
-        val diff = now - timestamp
-        
-        return when {
-            diff < 60000 -> "Just now"
-            diff < 3600000 -> "${diff / 60000}m ago"
-            diff < 86400000 -> "${diff / 3600000}h ago"
-            else -> "${diff / 86400000}d ago"
-        }
-    }
-}
+
 
 class DashboardActivity : AppCompatActivity() {
 
@@ -134,7 +96,10 @@ class DashboardActivity : AppCompatActivity() {
     private var tvWorkoutsProgress: TextView? = null
     private var progressCalories: ProgressBar? = null
     private var progressWorkouts: ProgressBar? = null
-    private var rvRecentActivities: RecyclerView? = null
+    private var rvAddedExercises: RecyclerView? = null
+    private var tvNoExercisesToday: TextView? = null
+    private var rvAddedMeals: RecyclerView? = null
+    private var tvNoMealsToday: TextView? = null
     private var layoutEmptyState: View? = null
     
     // Cards
@@ -156,7 +121,6 @@ class DashboardActivity : AppCompatActivity() {
     private var statsListener: ListenerRegistration? = null
     private var todosListener: ListenerRegistration? = null
     private var mealTodosListener: ListenerRegistration? = null
-    private var activitiesListener: ListenerRegistration? = null
     
     // Legacy listener references (for cleanup)
     private var workoutTodoListener: ListenerRegistration? = null
@@ -267,7 +231,10 @@ class DashboardActivity : AppCompatActivity() {
             tvTodoCount = findViewById(R.id.tvTodoCount)
             progressCalories = findViewById(R.id.progressCalories)
             progressWorkouts = findViewById(R.id.progressWorkouts)
-            rvRecentActivities = findViewById(R.id.rvRecentActivities)
+            rvAddedExercises = findViewById(R.id.rvAddedExercises)
+            tvNoExercisesToday = findViewById(R.id.tvNoExercisesToday)
+            rvAddedMeals = findViewById(R.id.rvAddedMeals)
+            tvNoMealsToday = findViewById(R.id.tvNoMealsToday)
             layoutEmptyState = findViewById(R.id.layoutEmptyState)
             
             // Initialize cards
@@ -280,13 +247,7 @@ class DashboardActivity : AppCompatActivity() {
             
             // Initialize profile menu
             btnProfileMenu = findViewById(R.id.btnProfileMenu)
-            
-            // Initialize todo section
-            btnViewTodo = findViewById(R.id.btnViewTodo)
-            
-            // Initialize new RecyclerView instances
-            rvMealActivities = findViewById(R.id.rvMealActivities)
-            rvWorkoutActivities = findViewById(R.id.rvWorkoutActivities)
+
             
             Log.d("DashboardActivity", "UI components initialized successfully")
             
@@ -454,7 +415,7 @@ class DashboardActivity : AppCompatActivity() {
             statsListener?.remove()
             todosListener?.remove()
             mealTodosListener?.remove()
-            activitiesListener?.remove()
+            
             workoutTodoListener?.remove()
             mealTodoListener?.remove()
             userStatsListener?.remove()
@@ -496,8 +457,11 @@ class DashboardActivity : AppCompatActivity() {
                     // Setup todos listener
                     setupTodosListener()
                     
-                    // Setup recent activities listener
-                    setupRecentActivitiesListener()
+                    // Setup added exercises listener
+                    setupAddedExercisesListener()
+
+                    // Setup added meals listener
+                    setupAddedMealsListener()
                     
                     // Remove timeout
                     timeoutHandler.removeCallbacks(timeoutRunnable)
@@ -656,6 +620,7 @@ class DashboardActivity : AppCompatActivity() {
             todosListener = firestore.collection("userTodoList")
                 .document(userId!!)
                 .collection("workoutPlan")
+                .whereEqualTo("scheduledDate", getCurrentDate())
                 .limit(5) // Reduced from 10 to 5 for better performance
                 .addSnapshotListener { snapshot, error ->
                     backgroundExecutor.execute {
@@ -698,6 +663,7 @@ class DashboardActivity : AppCompatActivity() {
             mealTodosListener = firestore.collection("userTodoList")
                 .document(userId!!)
                 .collection("mealPlan")
+                .whereEqualTo("scheduledDate", getCurrentDate())
                 .limit(5) // Reduced from 10 to 5 for better performance
                 .addSnapshotListener { snapshot, error ->
                     backgroundExecutor.execute {
@@ -748,45 +714,97 @@ class DashboardActivity : AppCompatActivity() {
     private fun today(): String =
         SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(Date())
 
-    private fun setupRecentActivitiesListener() {
+    private fun setupAddedExercisesListener() {
         try {
-            activitiesListener = firestore.collection("userActivities")
+            workoutTodoListener = firestore.collection("userTodoList")
                 .document(userId!!)
-                .collection("recentActivities")
-                .orderBy("timestamp", Query.Direction.DESCENDING)
-                .limit(20)
+                .collection("workoutPlan")
+                .whereEqualTo("scheduledDate", getCurrentDate())
                 .addSnapshotListener { snapshot, error ->
                     backgroundExecutor.execute {
                         try {
                             if (error != null) {
-                                Log.e("DashboardActivity", "Recent activities listener error", error)
+                                Log.e("DashboardActivity", "Added exercises listener error", error)
                                 return@execute
                             }
-                            
-                            val activities = snapshot?.documents?.mapNotNull { doc ->
+
+                            val exercises = snapshot?.documents?.mapNotNull { doc ->
                                 try {
-                                    doc.toObject(RecentActivity::class.java)?.copy(id = doc.id)
+                                    doc.toObject(WorkoutTodo::class.java)?.let { workoutTodo ->
+                                        AddedExercise(
+                                            id = workoutTodo.id,
+                                            workoutName = workoutTodo.workoutName,
+                                            sets = workoutTodo.sets,
+                                            reps = workoutTodo.reps,
+                                            minutes = workoutTodo.minutes,
+                                            seconds = workoutTodo.seconds,
+                                            isCompleted = workoutTodo.isCompleted
+                                        )
+                                    }
                                 } catch (e: Exception) {
-                                    Log.e("DashboardActivity", "Error parsing recent activity", e)
+                                    Log.e("DashboardActivity", "Error parsing added exercise", e)
                                     null
                                 }
                             } ?: emptyList()
-                            
+
+                            Log.d("DashboardActivity", "Fetched exercises: $exercises")
                             // Update UI on main thread
                             mainHandler?.post {
                                 try {
-                                    updateRecentActivities(activities)
+                                    updateAddedExercises(exercises)
                                 } catch (e: Exception) {
-                                    Log.e("DashboardActivity", "Error updating recent activities", e)
+                                    Log.e("DashboardActivity", "Error updating added exercises", e)
                                 }
                             }
                         } catch (e: Exception) {
-                            Log.e("DashboardActivity", "Error processing recent activities", e)
+                            Log.e("DashboardActivity", "Error processing added exercises", e)
                         }
                     }
                 }
         } catch (e: Exception) {
-            Log.e("DashboardActivity", "Error setting up recent activities listener", e)
+            Log.e("DashboardActivity", "Error setting up added exercises listener", e)
+        }
+    }
+
+    private fun setupAddedMealsListener() {
+        try {
+            mealTodosListener = firestore.collection("userTodoList")
+                .document(userId!!)
+                .collection("mealPlan")
+                .whereEqualTo("scheduledDate", getCurrentDate())
+                .addSnapshotListener { snapshot, error ->
+                    backgroundExecutor.execute {
+                        try {
+                            if (error != null) {
+                                Log.e("DashboardActivity", "Added meals listener error", error)
+                                return@execute
+                            }
+
+                            val meals = snapshot?.documents?.mapNotNull { doc ->
+                                try {
+                                    doc.toObject(MealTodo::class.java)?.copy(id = doc.id)
+                                } catch (e: Exception) {
+                                    Log.e("DashboardActivity", "Error parsing added meal", e)
+                                    null
+                                }
+                            } ?: emptyList()
+
+                            Log.d("DashboardActivity", "Fetched meals: $meals")
+                            // Update UI on main thread
+                            mainHandler?.post {
+                                try {
+                                    updateAddedMeals(meals)
+                                } catch (e: Exception) {
+                                    Log.e("DashboardActivity", "Error updating added meals", e)
+                                }
+                            }
+                        } catch (e: Exception) {
+                            Log.e("DashboardActivity", "Error processing added meals", e)
+                        }
+                    }
+                }
+        } catch (e: Exception) {
+            Log.e("DashboardActivity", "Error setting up added meals listener", e)
         }
     }
     
@@ -796,9 +814,9 @@ class DashboardActivity : AppCompatActivity() {
                 try {
                     stats?.let { data ->
                         val totalWorkouts = (data["totalWorkouts"] as? Long)?.toInt() ?: 0
-                        val totalCaloriesBurned = (data["totalCaloriesBurned"] as? Long)?.toInt() ?: 0
+                        val totalCaloriesBurned = (data["totalCaloriesConsumed"] as? Long)?.toInt() ?: 0
                         val todayWorkouts = (data["todayWorkouts"] as? Long)?.toInt() ?: 0
-                        val todayCaloriesBurned = (data["todayCaloriesBurned"] as? Long)?.toInt() ?: 0
+                        val todayCaloriesBurned = (data["todayCaloriesConsumed"] as? Long)?.toInt() ?: 0
                         
                         // Update total stats
                         tvWorkoutCount?.text = totalWorkouts.toString()
@@ -850,42 +868,46 @@ class DashboardActivity : AppCompatActivity() {
         }
     }
     
-    private fun updateRecentActivities(activities: List<RecentActivity>) {
+    private fun updateAddedExercises(exercises: List<AddedExercise>) {
         try {
-            val mealActivities = activities.filter { it.type == "meal" }
-            val workoutActivities = activities.filter { it.type == "workout" }
             runOnUiThread {
                 try {
-                    // Meal Activities
-                    if (mealActivities.isEmpty()) {
-                        rvMealActivities?.visibility = View.GONE
+                    if (exercises.isEmpty()) {
+                        rvAddedExercises?.visibility = View.GONE
+                        tvNoExercisesToday?.visibility = View.VISIBLE
                     } else {
-                        rvMealActivities?.visibility = View.VISIBLE
-                        if (rvMealActivities?.adapter == null) {
-                            rvMealActivities?.layoutManager = LinearLayoutManager(this)
-                            rvMealActivities?.adapter = RecentActivitiesAdapter(mealActivities)
+                        rvAddedExercises?.visibility = View.VISIBLE
+                        tvNoExercisesToday?.visibility = View.GONE
+                        if (rvAddedExercises?.adapter == null) {
+                            rvAddedExercises?.layoutManager = LinearLayoutManager(this)
+                            rvAddedExercises?.adapter = AddedExercisesAdapter(exercises) { exercise ->
+                                toggleWorkoutCompletion(exercise)
+                            }
                         } else {
-                            (rvMealActivities?.adapter as? RecentActivitiesAdapter)?.updateActivities(mealActivities)
-                        }
-                    }
-                    // Workout Activities
-                    if (workoutActivities.isEmpty()) {
-                        rvWorkoutActivities?.visibility = View.GONE
-                    } else {
-                        rvWorkoutActivities?.visibility = View.VISIBLE
-                        if (rvWorkoutActivities?.adapter == null) {
-                            rvWorkoutActivities?.layoutManager = LinearLayoutManager(this)
-                            rvWorkoutActivities?.adapter = RecentActivitiesAdapter(workoutActivities)
-                        } else {
-                            (rvWorkoutActivities?.adapter as? RecentActivitiesAdapter)?.updateActivities(workoutActivities)
+                            (rvAddedExercises?.adapter as? AddedExercisesAdapter)?.updateExercises(exercises)
                         }
                     }
                 } catch (e: Exception) {
-                    Log.e("DashboardActivity", "Error updating separated recent activities", e)
+                    Log.e("DashboardActivity", "Error updating added exercises", e)
                 }
             }
         } catch (e: Exception) {
-            Log.e("DashboardActivity", "Error in updateRecentActivities", e)
+            Log.e("DashboardActivity", "Error in updateAddedExercises", e)
+        }
+    }
+
+    private fun toggleWorkoutCompletion(exercise: AddedExercise) {
+        userId?.let { uid ->
+            firestore.collection("userTodoList").document(uid)
+                .collection("workoutPlan").document(exercise.id)
+                .update("isCompleted", !exercise.isCompleted)
+                .addOnSuccessListener {
+                    Toast.makeText(this, "Workout updated!", Toast.LENGTH_SHORT).show()
+                }
+                .addOnFailureListener { e ->
+                    Log.e("DashboardActivity", "Error updating workout completion", e)
+                    Toast.makeText(this, "Failed to update workout: ${e.message}", Toast.LENGTH_SHORT).show()
+                }
         }
     }
     
@@ -897,7 +919,111 @@ class DashboardActivity : AppCompatActivity() {
             tvMotivation?.text = "Complete your profile to get started!"
         }
     }
-    
+
+    private fun updateAddedMeals(meals: List<MealTodo>) {
+        try {
+            runOnUiThread {
+                try {
+                    if (meals.isEmpty()) {
+                        rvAddedMeals?.visibility = View.GONE
+                        tvNoMealsToday?.visibility = View.VISIBLE
+                    } else {
+                        rvAddedMeals?.visibility = View.VISIBLE
+                        tvNoMealsToday?.visibility = View.GONE
+                        if (rvAddedMeals?.adapter == null) {
+                            rvAddedMeals?.layoutManager = LinearLayoutManager(this)
+                            rvAddedMeals?.adapter = AddedMealsAdapter(meals) { meal ->
+                                toggleMealCompletion(meal)
+                            }
+                        } else {
+                            (rvAddedMeals?.adapter as? AddedMealsAdapter)?.updateMeals(meals)
+                        }
+                    }
+                } catch (e: Exception) {
+                    Log.e("DashboardActivity", "Error updating added meals", e)
+                }
+            }
+        } catch (e: Exception) {
+            Log.e("DashboardActivity", "Error in updateAddedMeals", e)
+        }
+    }
+
+    private fun toggleMealCompletion(meal: MealTodo) {
+        userId?.let { uid ->
+            // 1) Add its calories to the dashboard totals
+            updateCaloriesConsumedAsync(meal.calories)
+
+            // 2) Remove the meal document since it is finished
+            firestore.collection("userTodoList").document(uid)
+                .collection("mealPlan").document(meal.id)
+                .delete()
+                .addOnSuccessListener {
+                    Toast.makeText(this, "Meal completed and removed!", Toast.LENGTH_SHORT).show()
+                }
+                .addOnFailureListener { e ->
+                    Log.e("DashboardActivity", "Error deleting completed meal", e)
+                    Toast.makeText(this, "Failed to complete meal: ${e.message}", Toast.LENGTH_SHORT).show()
+                }
+        }
+    }
+
+    // 🔢 Update calorie stats when a meal is completed from the dashboard
+    private fun updateCaloriesConsumedAsync(calories: Int) {
+        try {
+            val today = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(Date())
+
+            // Update per-day stats document
+            firestore.collection("userStats")
+                .document(userId!!)
+                .collection("dailyStats")
+                .document(today)
+                .get()
+                .addOnSuccessListener { document ->
+                    val currentCalories = document.getLong("caloriesConsumed")?.toInt() ?: 0
+                    val currentMeals = document.getLong("mealsCompleted")?.toInt() ?: 0
+
+                    val updatedCalories = currentCalories + calories
+                    val updatedMeals = currentMeals + 1
+
+                    val statsData = mapOf(
+                        "caloriesConsumed" to updatedCalories,
+                        "mealsCompleted" to updatedMeals,
+                        "lastUpdated" to System.currentTimeMillis(),
+                        "date" to today,
+                        "userId" to userId
+                    )
+
+                    firestore.collection("userStats")
+                        .document(userId!!)
+                        .collection("dailyStats")
+                        .document(today)
+                        .set(statsData, com.google.firebase.firestore.SetOptions.merge())
+                        .addOnSuccessListener {
+                            // Also update the aggregate stats document
+                            firestore.collection("userStats")
+                                .document(userId!!)
+                                .get()
+                                .addOnSuccessListener { mainDoc ->
+                                    val totalCaloriesConsumed = mainDoc.getLong("totalCaloriesConsumed")?.toInt() ?: 0
+                                    val totalMealsCompleted = mainDoc.getLong("totalMealsCompleted")?.toInt() ?: 0
+
+                                    firestore.collection("userStats")
+                                        .document(userId!!)
+                                        .set(mapOf(
+                                            "totalCaloriesConsumed" to (totalCaloriesConsumed + calories),
+                                            "totalMealsCompleted" to (totalMealsCompleted + 1),
+                                            "todayCaloriesConsumed" to updatedCalories,
+                                            "todayMealsCompleted" to updatedMeals,
+                                            "lastUpdated" to System.currentTimeMillis()
+                                        ), com.google.firebase.firestore.SetOptions.merge())
+                                }
+                        }
+                }
+        } catch (e: Exception) {
+            Log.e("DashboardActivity", "Error updating calories consumed", e)
+        }
+    }
+
     private fun showEmptyStatsState() {
         try {
             runOnUiThread {
@@ -912,7 +1038,7 @@ class DashboardActivity : AppCompatActivity() {
             Log.e("DashboardActivity", "Error showing empty stats state", e)
         }
     }
-    
+
     private fun getBMIColor(category: String): Int {
         return try {
             when (category.lowercase()) {
