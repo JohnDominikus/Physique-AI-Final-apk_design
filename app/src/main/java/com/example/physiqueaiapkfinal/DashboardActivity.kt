@@ -263,9 +263,23 @@ class DashboardActivity : AppCompatActivity() {
             
             Log.d("DashboardActivity", "UI components initialized successfully")
             
+            // Initialize workout count display
+            initializeWorkoutCount()
+            
         } catch (e: Exception) {
             Log.e("DashboardActivity", "Error initializing UI components", e)
             ErrorHandler.handleError(this, "Failed to load interface", e)
+        }
+    }
+    
+    private fun initializeWorkoutCount() {
+        try {
+            // Initialize workout count to 0 before exercises are loaded
+            tvWorkoutCount?.text = "0"
+            tvWorkoutsProgress?.text = "0 exercises added today"
+            progressWorkouts?.progress = 0
+        } catch (e: Exception) {
+            Log.e("DashboardActivity", "Error initializing workout count", e)
         }
     }
     
@@ -825,26 +839,27 @@ class DashboardActivity : AppCompatActivity() {
             runOnUiThread {
                 try {
                     stats?.let { data ->
-                        val totalWorkouts = (data["totalWorkouts"] as? Long)?.toInt() ?: 0
                         val totalCaloriesBurned = (data["totalCaloriesConsumed"] as? Long)?.toInt() ?: 0
-                        val todayWorkouts = (data["todayWorkouts"] as? Long)?.toInt() ?: 0
                         val todayCaloriesBurned = (data["todayCaloriesConsumed"] as? Long)?.toInt() ?: 0
                         
-                        // Update total stats
-                        tvWorkoutCount?.text = totalWorkouts.toString()
+                        // Update calorie stats only (workout count is handled by added exercises)
                         tvCaloriesBurned?.text = totalCaloriesBurned.toString()
                         
-                        // Update today progress
-                        tvWorkoutsProgress?.text = "$todayWorkouts today"
+                        // Update today progress for calories
                         tvCaloriesProgress?.text = "$todayCaloriesBurned today"
                         
-                        // Update progress bars
-                        progressWorkouts?.progress = todayWorkouts
+                        // Update progress bars for calories
                         progressCalories?.progress = todayCaloriesBurned
                         
+                        // Note: Workout count and progress are now handled by updateWorkoutCountIndicator()
+                        // when added exercises are loaded, so we don't override them here
+                        
                     } ?: run {
-                        // No stats available
-                        showEmptyStatsState()
+                        // No stats available - only reset calorie stats
+                        tvCaloriesBurned?.text = "0"
+                        tvCaloriesProgress?.text = "0 today"
+                        progressCalories?.progress = 0
+                        // Workout stats will be handled by the added exercises loading
                     }
                     
                 } catch (e: Exception) {
@@ -900,12 +915,39 @@ class DashboardActivity : AppCompatActivity() {
                             (rvAddedExercises?.adapter as? AddedExercisesAdapter)?.updateExercises(exercises)
                         }
                     }
+                    
+                    // Update the workout count indicator on the dashboard
+                    updateWorkoutCountIndicator(exercises.size)
+                    
                 } catch (e: Exception) {
                     Log.e("DashboardActivity", "Error updating added exercises", e)
                 }
             }
         } catch (e: Exception) {
             Log.e("DashboardActivity", "Error in updateAddedExercises", e)
+        }
+    }
+
+    private fun updateWorkoutCountIndicator(exerciseCount: Int) {
+        try {
+            runOnUiThread {
+                try {
+                    // Update the workout count to show today's added exercises
+                    tvWorkoutCount?.text = exerciseCount.toString()
+                    
+                    // Update the progress text to show today's exercises added
+                    tvWorkoutsProgress?.text = "$exerciseCount exercises added today"
+                    
+                    // Set progress bar to show visual indicator
+                    progressWorkouts?.progress = exerciseCount
+                    
+                    Log.d("DashboardActivity", "Updated workout count indicator: $exerciseCount exercises")
+                } catch (e: Exception) {
+                    Log.e("DashboardActivity", "Error updating workout count indicator UI", e)
+                }
+            }
+        } catch (e: Exception) {
+            Log.e("DashboardActivity", "Error in updateWorkoutCountIndicator", e)
         }
     }
 
@@ -1076,7 +1118,7 @@ class DashboardActivity : AppCompatActivity() {
             runOnUiThread {
                 tvWorkoutCount?.text = "0"
                 tvCaloriesBurned?.text = "0"
-                tvWorkoutsProgress?.text = "0 today"
+                tvWorkoutsProgress?.text = "0 exercises added today"
                 tvCaloriesProgress?.text = "0 today"
                 progressWorkouts?.progress = 0
                 progressCalories?.progress = 0

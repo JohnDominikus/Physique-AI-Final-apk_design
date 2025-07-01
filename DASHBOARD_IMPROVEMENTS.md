@@ -66,6 +66,16 @@ private var todayMealTodos: List<MealTodo> = emptyList()
 - **Calories Progress**: `(todayCaloriesBurned / 2000) * 100` (daily goal)
 - **Todo Count**: `todayCompletedTodos / todayTotalTodos`
 
+### 7. **Workout Count Indicator**
+- **Feature**: The "Workouts" card now displays the count of exercises added for today
+- **Location**: Dashboard workouts card (beside BMI card)
+- **Functionality**:
+  - Shows real-time count of added exercises for the current day
+  - Updates automatically when exercises are added or removed
+  - Displays "X exercises added today" in the progress text
+  - Visual progress bar reflects the number of exercises
+  - Initializes to "0 exercises added today" when no exercises are present
+
 ## 📊 Dashboard Display Logic
 
 ### Today's Progress (Main Focus)
@@ -182,3 +192,73 @@ private var todayMealTodos: List<MealTodo> = emptyList()
 - ✅ Smooth user experience with immediate feedback
 
 The dashboard now provides users with clear, accurate, and motivating feedback on their daily progress while maintaining comprehensive all-time statistics. 
+
+## Technical Implementation Details
+
+### Workout Count Indicator Implementation
+
+#### Key Components:
+1. **`updateWorkoutCountIndicator(exerciseCount: Int)`**
+   - Updates the workout count display
+   - Sets progress text to show daily exercises
+   - Updates visual progress bar
+   - Handles UI updates safely on main thread
+
+2. **`updateAddedExercises(exercises: List<AddedExercise>)`** - Enhanced
+   - Now calls `updateWorkoutCountIndicator()` after updating the exercise list
+   - Maintains existing exercise list functionality
+   - Adds real-time count updates
+
+3. **`initializeWorkoutCount()`**
+   - Initializes workout count to 0 on app startup
+   - Sets default text to "0 exercises added today"
+   - Ensures clean initial state
+
+4. **`updateDashboardStats(stats: Map<String, Any>?)`** - Modified
+   - No longer overrides workout count from database stats
+   - Workout count is now driven by actual added exercises
+   - Maintains calorie statistics functionality
+
+#### Data Flow:
+```
+Exercise Added → updateAddedExercises() → updateWorkoutCountIndicator() → UI Update
+```
+
+#### UI Elements Updated:
+- `tvWorkoutCount`: Shows number of exercises
+- `tvWorkoutsProgress`: Shows "X exercises added today"
+- `progressWorkouts`: Visual progress bar
+
+## Code Quality Improvements
+
+### Error Handling
+- Added try-catch blocks around all UI updates
+- Comprehensive logging for debugging
+- Graceful degradation when components are unavailable
+
+### Performance Optimizations
+- Real-time listeners for efficient data updates
+- Background threading for Firebase operations
+- Efficient UI updates on main thread only
+
+### Memory Management
+- Proper cleanup of Firebase listeners
+- Null safety checks throughout
+
+## Testing
+- All existing tests continue to pass
+- Added robust test cases for navigation and basic functionality
+- Simplified test approach for better reliability
+
+## Future Enhancements
+- Exercise completion tracking
+- Weekly/monthly exercise statistics
+- Exercise streak tracking
+- Performance analytics
+- Goal setting and progress tracking
+
+## Notes
+- The workout count specifically tracks **added exercises for today**, not historical workout statistics
+- This provides immediate feedback on daily activity planning
+- The feature integrates seamlessly with existing dashboard functionality
+- No database schema changes were required 
