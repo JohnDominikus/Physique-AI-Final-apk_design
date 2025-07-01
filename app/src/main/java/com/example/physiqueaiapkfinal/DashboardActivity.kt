@@ -745,13 +745,16 @@ class DashboardActivity : AppCompatActivity() {
         return SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
     }
     
+    private fun today(): String =
+        SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(Date())
+
     private fun setupRecentActivitiesListener() {
         try {
             activitiesListener = firestore.collection("userActivities")
                 .document(userId!!)
                 .collection("recentActivities")
                 .orderBy("timestamp", Query.Direction.DESCENDING)
-                .limit(20) // Taasan ang limit para makita lahat
+                .limit(20)
                 .addSnapshotListener { snapshot, error ->
                     backgroundExecutor.execute {
                         try {

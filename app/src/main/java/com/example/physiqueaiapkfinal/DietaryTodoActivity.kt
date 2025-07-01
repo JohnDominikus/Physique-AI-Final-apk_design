@@ -22,6 +22,7 @@ import java.util.concurrent.TimeUnit
 import androidx.activity.OnBackPressedCallback
 import com.example.physiqueaiapkfinal.MealTodo
 import com.example.physiqueaiapkfinal.UserMedicalInfo
+import kotlin.math.roundToInt
 
 // Data Models for Dietary
 data class MealItem(
@@ -75,97 +76,21 @@ class DietaryTodoActivity : AppCompatActivity() {
     
     private val mealTypes = listOf("Select Meal Type", "Breakfast", "Lunch", "Dinner", "Snack")
     
-    // Sample Meal Data
-    private val sampleMeals = listOf(
-        MealItem(
-            id = "1",
-            mealName = "Oatmeal with Berries",
-            mealType = "Breakfast",
-            prepTime = 10,
-            calories = 350,
-            allergies = listOf("Gluten"),
-            ingredients = listOf("Oats", "Blueberries", "Strawberries", "Honey", "Milk"),
-            dietaryRestrictions = listOf("Vegetarian"),
-            nutritionFacts = mapOf("Protein" to "8g", "Carbs" to "60g", "Fat" to "6g")
-        ),
-        MealItem(
-            id = "2", 
-            mealName = "Grilled Chicken Salad",
-            mealType = "Lunch",
-            prepTime = 20,
-            calories = 450,
-            allergies = listOf(),
-            ingredients = listOf("Chicken Breast", "Mixed Greens", "Tomatoes", "Cucumber", "Olive Oil"),
-            dietaryRestrictions = listOf("High Protein", "Low Carb"),
-            nutritionFacts = mapOf("Protein" to "35g", "Carbs" to "12g", "Fat" to "18g")
-        ),
-        MealItem(
-            id = "3",
-            mealName = "Salmon with Rice",
-            mealType = "Dinner", 
-            prepTime = 25,
-            calories = 520,
-            allergies = listOf("Fish"),
-            ingredients = listOf("Salmon Fillet", "Brown Rice", "Broccoli", "Lemon", "Garlic"),
-            dietaryRestrictions = listOf("High Protein", "Omega-3 Rich"),
-            nutritionFacts = mapOf("Protein" to "40g", "Carbs" to "35g", "Fat" to "20g")
-        ),
-        MealItem(
-            id = "4",
-            mealName = "Greek Yogurt Parfait",
-            mealType = "Snack",
-            prepTime = 5,
-            calories = 220,
-            allergies = listOf("Dairy"),
-            ingredients = listOf("Greek Yogurt", "Granola", "Honey", "Banana"),
-            dietaryRestrictions = listOf("Vegetarian", "High Protein"),
-            nutritionFacts = mapOf("Protein" to "15g", "Carbs" to "25g", "Fat" to "8g")
-        ),
-        MealItem(
-            id = "5",
-            mealName = "Avocado Toast",
-            mealType = "Breakfast",
-            prepTime = 8,
-            calories = 310,
-            allergies = listOf("Gluten"),
-            ingredients = listOf("Whole Grain Bread", "Avocado", "Tomato", "Lime", "Salt"),
-            dietaryRestrictions = listOf("Vegan", "High Fiber"),
-            nutritionFacts = mapOf("Protein" to "8g", "Carbs" to "30g", "Fat" to "18g")
-        ),
-        MealItem(
-            id = "6",
-            mealName = "Vegetable Stir Fry",
-            mealType = "Lunch",
-            prepTime = 15,
-            calories = 280,
-            allergies = listOf("Soy"),
-            ingredients = listOf("Mixed Vegetables", "Tofu", "Soy Sauce", "Ginger", "Garlic"),
-            dietaryRestrictions = listOf("Vegan", "Low Calorie"),
-            nutritionFacts = mapOf("Protein" to "12g", "Carbs" to "25g", "Fat" to "12g")
-        ),
-        MealItem(
-            id = "7",
-            mealName = "Protein Smoothie",
-            mealType = "Snack",
-            prepTime = 5,
-            calories = 180,
-            allergies = listOf("Dairy"),
-            ingredients = listOf("Protein Powder", "Banana", "Milk", "Peanut Butter"),
-            dietaryRestrictions = listOf("High Protein"),
-            nutritionFacts = mapOf("Protein" to "25g", "Carbs" to "15g", "Fat" to "6g")
-        ),
-        MealItem(
-            id = "8",
-            mealName = "Quinoa Bowl",
-            mealType = "Dinner",
-            prepTime = 30,
-            calories = 420,
-            allergies = listOf(),
-            ingredients = listOf("Quinoa", "Black Beans", "Sweet Potato", "Spinach", "Lime"),
-            dietaryRestrictions = listOf("Vegan", "Gluten-Free", "High Fiber"),
-            nutritionFacts = mapOf("Protein" to "16g", "Carbs" to "65g", "Fat" to "8g")
-        )
-    )
+    // Sample Meal Data is now fetched from Firestore.
+    private val sampleMeals = emptyList<MealItem>()
+    
+    /* ╔═══════ HELPER FUNCTIONS ═══════╗ */
+    private fun Any?.toIntSafe(): Int = when (this) {
+        is Number -> this.toDouble().roundToInt()
+        is String -> this.toDoubleOrNull()?.roundToInt() ?: 0
+        else      -> 0
+    }
+    private fun Any?.toStringList(): List<String> = when (this) {
+        is List<*> -> this.filterIsInstance<String>()
+        is String  -> this.split(",").map { it.trim() }.filter { it.isNotEmpty() }
+        else       -> listOf()
+    }
+    /* ╚═══════════════════════════════╝ */
     
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -428,43 +353,75 @@ class DietaryTodoActivity : AppCompatActivity() {
     
     private fun loadMealDataAsync(onComplete: () -> Unit) {
         backgroundExecutor.execute {
-            try {
-                // Use sample data instead of Firebase for now
-                mainHandler.post {
-                    mealList.clear()
-                    mealList.addAll(sampleMeals)
-                    setupMealSpinner()
-                    incrementLoadedComponents()
-                    onComplete()
+            firestore.collection("dietarylist")
+                .get()
+                .addOnSuccessListener { documents ->
+                    mainHandler.post {
+                        mealList.clear()
+                        if (documents != null && !documents.isEmpty) {
+                            Log.d("DietaryTodoActivity", "Fetched ${documents.size()} documents from Firestore.")
+                            val fetchedMeals = documents.map { doc ->
+                                MealItem(
+                                    id = doc.id,
+                                    mealName = doc.getString("mealName") ?: "",
+                                    mealType = doc.getString("mealType") ?: "",
+                                    prepTime = doc.get("prepTime").toIntSafe(),
+                                    imageUrl = doc.getString("imageUrl") ?: "",
+                                    allergies = doc.get("allergies").toStringList(),
+                                    calories = doc.get("calories").toIntSafe(),
+                                    ingredients = doc.get("ingredients").toStringList(),
+                                    dietaryRestrictions = doc.get("dietaryRestrictions").toStringList(),
+                                    nutritionFacts = doc.get("nutritionFacts") as? Map<String, String> ?: emptyMap()
+                                )
+                            }
+                            mealList.addAll(fetchedMeals)
+                            Log.d("DietaryTodoActivity", "Parsed ${mealList.size} meals into mealList.")
+                        } else {
+                            Log.d("DietaryTodoActivity", "Firestore collection 'dietarylist' is empty or null.")
+                        }
+                        setupMealSpinner()
+                        incrementLoadedComponents()
+                        onComplete()
+                    }
                 }
-            } catch (e: Exception) {
-                handleError("Meal data loading error", e)
-                onComplete()
-            }
+                .addOnFailureListener { e ->
+                    handleError("Failed to load meals", e)
+                    mainHandler.post {
+                        setupMealSpinner()
+                        incrementLoadedComponents()
+                        onComplete()
+                    }
+                }
         }
     }
     
     private fun setupMealSpinner() {
         try {
+            val mealNames: MutableList<String>
             if (mealList.isEmpty()) {
-                showError("No meals available")
-                // Add fallback sample data
-                mealList.addAll(sampleMeals)
+                mealNames = mutableListOf("No Meals Available")
+                mainHandler.post { mealSpinner.isEnabled = false }
+            } else {
+                mealNames = mutableListOf("Select a Meal")
+                mealNames.addAll(mealList.map { "${it.mealName} (${it.calories} cal, ${it.prepTime}min)" })
+                mainHandler.post { mealSpinner.isEnabled = true }
             }
-            val mealNames = mutableListOf("Select a Meal")
-            mealNames.addAll(mealList.map { "${it.mealName} (${it.calories} cal, ${it.prepTime}min)" })
+
             val spinnerAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, mealNames)
             spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
             mainHandler.post {
                 mealSpinner.adapter = spinnerAdapter
-                mealSpinner.isEnabled = true
             }
+
             // Filtration logic
             etMealSearch.addTextChangedListener(object : android.text.TextWatcher {
                 override fun afterTextChanged(s: android.text.Editable?) {
                     val filtered = mealList.filter { it.mealName.contains(s.toString(), ignoreCase = true) }
                     val filteredNames = mutableListOf("Select a Meal")
-                    filteredNames.addAll(filtered.map { "${it.mealName} (${it.calories} cal, ${it.prepTime}min)" })
+                    if (filtered.isNotEmpty()) {
+                        filteredNames.addAll(filtered.map { "${it.mealName} (${it.calories} cal, ${it.prepTime}min)" })
+                    }
+
                     val filterAdapter = ArrayAdapter(this@DietaryTodoActivity, android.R.layout.simple_spinner_item, filteredNames)
                     filterAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
                     mainHandler.post {
@@ -707,6 +664,11 @@ class DietaryTodoActivity : AppCompatActivity() {
             
             if (selectedMealTypePosition <= 0) {
                 showError("Please select a meal type first")
+                return
+            }
+
+            if (mealSpinner.selectedItem.toString() == "No results found") {
+                showError("Invalid meal selection.")
                 return
             }
             
