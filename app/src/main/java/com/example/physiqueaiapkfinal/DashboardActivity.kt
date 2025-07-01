@@ -892,9 +892,10 @@ class DashboardActivity : AppCompatActivity() {
                         tvNoExercisesToday?.visibility = View.GONE
                         if (rvAddedExercises?.adapter == null) {
                             rvAddedExercises?.layoutManager = LinearLayoutManager(this)
-                            rvAddedExercises?.adapter = AddedExercisesAdapter(exercises) { exercise ->
-                                toggleWorkoutCompletion(exercise)
-                            }
+                            rvAddedExercises?.adapter = AddedExercisesAdapter(exercises, 
+                                { exercise -> toggleWorkoutCompletion(exercise) },
+                                { exercise -> navigateToExerciseActivity(exercise) }
+                            )
                         } else {
                             (rvAddedExercises?.adapter as? AddedExercisesAdapter)?.updateExercises(exercises)
                         }
@@ -906,6 +907,34 @@ class DashboardActivity : AppCompatActivity() {
         } catch (e: Exception) {
             Log.e("DashboardActivity", "Error in updateAddedExercises", e)
         }
+    }
+
+    private fun navigateToExerciseActivity(exercise: AddedExercise) {
+        val workoutNameClean = exercise.workoutName.trim().lowercase()
+        Log.d("DashboardActivity", "Navigating to activity for: '$workoutNameClean'")
+
+        val activityClass = when (workoutNameClean) {
+            "push-up" -> StreamActivity::class.java
+            "squat" -> SquatActivity::class.java
+            "dumbbell front raise" -> DumbbellFrontRaiseActivity::class.java
+            "dumbbell hammer curl" -> DumbbellHammerCurlActivity::class.java
+            "hip thrusts" -> HipThrustsActivity::class.java
+            "military press" -> MilitaryPressActivity::class.java
+            "sit ups" -> SitUpsActivity::class.java
+            "windmill" -> WindmillActivity::class.java
+            // Add other exercises here, potentially mapping them to StreamActivity if no specific one exists
+            else -> {
+                Toast.makeText(this, "No specific activity for '${exercise.workoutName}', using default.", Toast.LENGTH_SHORT).show()
+                StreamActivity::class.java // Fallback to StreamActivity
+            }
+        }
+
+        val intent = Intent(this, activityClass).apply {
+            // Pass exercise details to the activity
+            putExtra("WORKOUT_NAME", exercise.workoutName)
+            putExtra("WORKOUT_ID", exercise.id)
+        }
+        startActivity(intent)
     }
 
     private fun toggleWorkoutCompletion(exercise: AddedExercise) {

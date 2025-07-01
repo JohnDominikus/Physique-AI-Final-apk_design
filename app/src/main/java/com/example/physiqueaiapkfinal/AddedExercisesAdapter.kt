@@ -7,8 +7,11 @@ import android.widget.Button
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 
-class AddedExercisesAdapter(private var exercises: List<AddedExercise>, private val onDoneClick: (AddedExercise) -> Unit) :
-    RecyclerView.Adapter<AddedExercisesAdapter.ViewHolder>() {
+class AddedExercisesAdapter(
+    private var exercises: List<AddedExercise>,
+    private val onDoneClick: (AddedExercise) -> Unit,
+    private val onItemClick: (AddedExercise) -> Unit
+) : RecyclerView.Adapter<AddedExercisesAdapter.ViewHolder>() {
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val tvExerciseName: TextView = view.findViewById(R.id.tvExerciseName)
@@ -33,6 +36,11 @@ class AddedExercisesAdapter(private var exercises: List<AddedExercise>, private 
 
         holder.btnDoneExercise.setOnClickListener {
             onDoneClick(exercise)
+        }
+
+        // Set the new item click listener
+        holder.itemView.setOnClickListener {
+            onItemClick(exercise)
         }
 
         // Update button state based on completion
