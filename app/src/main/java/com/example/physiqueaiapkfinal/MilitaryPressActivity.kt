@@ -10,6 +10,7 @@ import android.media.ToneGenerator
 import android.os.Vibrator
 import android.os.Build
 import android.os.Bundle
+import android.os.CountDownTimer
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
@@ -95,6 +96,15 @@ class MilitaryPressActivity : AppCompatActivity() {
     private var stableDownFrames = 0 // Track stable frames in down position
     private var hasResetAfterCount = false // Track if properly reset after counting
 
+    // Timer functionality
+    private var countDownTimer: CountDownTimer? = null
+    private var totalTimeInMillis: Long = 0
+    private var timeRemaining: Long = 0
+    private var totalSets: Int = 0
+    private var currentSet: Int = 1
+    private var isRestPeriod: Boolean = false
+    private val REST_TIME_SECONDS = 30
+
     // Required permissions
     private val REQUIRED_PERMISSIONS = arrayOf(
         Manifest.permission.CAMERA
@@ -105,6 +115,33 @@ class MilitaryPressActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityMilitaryPressBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        // Read values from intent and display them
+        val sets = intent.getIntExtra("sets", 0)
+        val reps = intent.getIntExtra("reps", 0)
+        val minutes = intent.getIntExtra("minutes", 0)
+        val seconds = intent.getIntExtra("seconds", 0)
+
+        // Store set information
+        totalSets = sets
+        currentSet = 1
+
+        // Calculate total time in milliseconds
+        totalTimeInMillis = ((minutes * 60) + seconds) * 1000L
+        timeRemaining = totalTimeInMillis
+
+        // Update the UI with the exercise information
+        try {
+            updateSetDisplay()
+            // Start the timer if time is specified
+            if (totalTimeInMillis > 0 && totalSets > 0) {
+                startCountdownTimer()
+            } else {
+                binding.tvTimeLabel.text = "Time: 0m 0s"
+            }
+        } catch (e: Exception) {
+            Log.w(TAG, "Could not update time/set labels: ${e.message}")
+        }
 
         if (allPermissionsGranted()) {
             startCamera()
@@ -520,7 +557,7 @@ class MilitaryPressActivity : AppCompatActivity() {
         val cosAngle = dotProduct / (magnitude1 * magnitude2)
         val clampedCos = cosAngle.coerceIn(-1f, 1f)
 
-        return Math.toDegrees(acos(clampedCos).toDouble()).toFloat()
+        return Math.toDegrees(kotlin.math.acos(clampedCos.toDouble())).toFloat()
     }
 
     private fun handleMilitaryPressStateMachine(isUpPosition: Boolean, isReadyPosition: Boolean, isValidMilitaryPress: Boolean, singleArmDetected: Boolean, isTooHighPosition: Boolean, currentTime: Long) {
@@ -752,8 +789,108 @@ class MilitaryPressActivity : AppCompatActivity() {
         }
     }
 
+    private fun startCountdownTimer() {
+        countDownTimer?.cancel() // Cancel any existing timer
+        
+        countDownTimer = object : CountDownTimer(timeRemaining, 1000) {
+            override fun onTick(millisUntilFinished: Long) {
+                timeRemaining = millisUntilFinished
+                updateTimeDisplay(millisUntilFinished)
+            }
+
+            override fun onFinish() {
+                if (isRestPeriod) {
+                    onRestComplete()
+                } else {
+                    onSetComplete()
+                }
+            }
+        }.start()
+    }
+
+    private fun onSetComplete() {
+        // Play completion sound
+        try {
+            val toneGenerator = ToneGenerator(AudioManager.STREAM_NOTIFICATION, 100)
+            toneGenerator.startTone(ToneGenerator.TONE_PROP_BEEP, 300)
+            backgroundExecutor.execute {
+                Thread.sleep(350)
+                toneGenerator.release()
+            }
+        } catch (e: Exception) {
+            Log.w(TAG, "Audio feedback failed: ${e.message}")
+        }
+
+        if (currentSet < totalSets) {
+            // More sets remaining, start rest period
+            Toast.makeText(this, "✅ Set $currentSet completed! Rest for ${REST_TIME_SECONDS}s", Toast.LENGTH_SHORT).show()
+            startRestPeriod()
+        } else {
+            // All sets completed
+            binding.tvTimeLabel.text = "ALL SETS DONE!"
+            binding.tvTimeLabel.setTextColor(ContextCompat.getColor(this, android.R.color.holo_green_light))
+            binding.tvSetLabel.text = "🎉 Workout Complete!"
+            binding.tvSetLabel.setTextColor(ContextCompat.getColor(this, android.R.color.holo_green_light))
+            Toast.makeText(this, "🎉 All sets completed! Great workout!", Toast.LENGTH_LONG).show()
+        }
+    }
+
+    private fun startRestPeriod() {
+        isRestPeriod = true
+        currentSet++ // Increment set counter when starting rest
+        timeRemaining = REST_TIME_SECONDS * 1000L
+        updateSetDisplay()
+        startCountdownTimer()
+    }
+
+    private fun onRestComplete() {
+        // Rest finished, start next set
+        isRestPeriod = false
+        timeRemaining = totalTimeInMillis
+        updateSetDisplay()
+        
+        Toast.makeText(this, "🔥 Starting Set $currentSet!", Toast.LENGTH_SHORT).show()
+        startCountdownTimer()
+    }
+
+    private fun updateSetDisplay() {
+        val reps = intent.getIntExtra("reps", 0)
+        if (isRestPeriod) {
+            binding.tvSetLabel.text = "💤 Rest (Next: Set $currentSet)"
+            binding.tvSetLabel.setTextColor(ContextCompat.getColor(this, android.R.color.holo_orange_light))
+        } else {
+            binding.tvSetLabel.text = "Set: $currentSet/$totalSets x $reps"
+            binding.tvSetLabel.setTextColor(ContextCompat.getColor(this, android.R.color.holo_red_light))
+        }
+    }
+
+    private fun updateTimeDisplay(millisUntilFinished: Long) {
+        val minutes = (millisUntilFinished / 1000) / 60
+        val seconds = (millisUntilFinished / 1000) % 60
+        
+        if (isRestPeriod) {
+            binding.tvTimeLabel.text = "Rest: ${seconds}s"
+            binding.tvTimeLabel.setTextColor(ContextCompat.getColor(this, android.R.color.holo_orange_light))
+        } else {
+            binding.tvTimeLabel.text = "Time: ${minutes}m ${seconds}s"
+            // Change color as time runs out
+            when {
+                millisUntilFinished <= 30000 -> { // Last 30 seconds - red
+                    binding.tvTimeLabel.setTextColor(ContextCompat.getColor(this, android.R.color.holo_red_light))
+                }
+                millisUntilFinished <= 60000 -> { // Last minute - orange
+                    binding.tvTimeLabel.setTextColor(ContextCompat.getColor(this, android.R.color.holo_orange_light))
+                }
+                else -> { // Normal - red
+                    binding.tvTimeLabel.setTextColor(ContextCompat.getColor(this, android.R.color.holo_red_light))
+                }
+            }
+        }
+    }
+
     override fun onDestroy() {
         super.onDestroy()
+        countDownTimer?.cancel()
         cameraExecutor.shutdown()
         backgroundExecutor.shutdown()
         poseDetector.close()

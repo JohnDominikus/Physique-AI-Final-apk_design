@@ -983,6 +983,11 @@ class DashboardActivity : AppCompatActivity() {
             // Pass exercise details to the activity
             putExtra("WORKOUT_NAME", exercise.workoutName)
             putExtra("WORKOUT_ID", exercise.id)
+            // Pass the exercise data (sets, reps, time) to display in the activity
+            putExtra("sets", exercise.sets)
+            putExtra("reps", exercise.reps)
+            putExtra("minutes", exercise.minutes)
+            putExtra("seconds", exercise.seconds)
         }
         startActivity(intent)
     }
