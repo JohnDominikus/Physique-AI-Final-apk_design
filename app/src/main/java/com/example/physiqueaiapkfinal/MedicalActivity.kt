@@ -89,7 +89,14 @@ class MedicalActivity : AppCompatActivity() {
             SpinnerItem("Other", "other", "Other unspecified medical conditions")
         ))
 
-        btnBack.setOnClickListener { finish() }
+        btnBack.setOnClickListener {
+            // Navigate back to PhysicalActivity so user can review/edit physical info
+            val intent = Intent(this@MedicalActivity, PhysicalActivity::class.java).apply {
+                // Bring existing instance to front if it exists to avoid duplicates
+                addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT or Intent.FLAG_ACTIVITY_CLEAR_TOP)
+            }
+            startActivity(intent)
+        }
 
         btnSubmit.setOnClickListener {
             val condition = spinnerCondition.selectedItem.toString().trim()
