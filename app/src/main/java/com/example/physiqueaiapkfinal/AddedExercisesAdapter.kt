@@ -42,18 +42,6 @@ class AddedExercisesAdapter(
         holder.itemView.setOnClickListener {
             onItemClick(exercise)
         }
-
-        // Update button state based on completion
-        if (exercise.isCompleted) {
-            holder.btnDoneExercise.text = "Completed"
-            holder.btnDoneExercise.isEnabled = false
-            // Optionally, change text color or add a strikethrough
-            holder.tvExerciseName.paintFlags = holder.tvExerciseName.paintFlags or android.graphics.Paint.STRIKE_THRU_TEXT_FLAG
-        } else {
-            holder.btnDoneExercise.text = "Done"
-            holder.btnDoneExercise.isEnabled = true
-            holder.tvExerciseName.paintFlags = holder.tvExerciseName.paintFlags and android.graphics.Paint.STRIKE_THRU_TEXT_FLAG.inv()
-        }
     }
 
     override fun getItemCount() = exercises.size

@@ -756,9 +756,11 @@ class DashboardActivity : AppCompatActivity() {
 
                             val exercises = snapshot?.documents?.mapNotNull { doc ->
                                 try {
+                                    // Correctly get the document ID
+                                    val exerciseId = doc.id
                                     doc.toObject(WorkoutTodo::class.java)?.let { workoutTodo ->
                                         AddedExercise(
-                                            id = workoutTodo.id,
+                                            id = exerciseId, // Use the document ID here
                                             workoutName = workoutTodo.workoutName,
                                             sets = workoutTodo.sets,
                                             reps = workoutTodo.reps,
@@ -987,15 +989,17 @@ class DashboardActivity : AppCompatActivity() {
 
     private fun toggleWorkoutCompletion(exercise: AddedExercise) {
         userId?.let { uid ->
+            // When an exercise is "Done", we remove it from the list
             firestore.collection("userTodoList").document(uid)
                 .collection("workoutPlan").document(exercise.id)
-                .update("isCompleted", !exercise.isCompleted)
+                .delete()
                 .addOnSuccessListener {
-                    Toast.makeText(this, "Workout updated!", Toast.LENGTH_SHORT).show()
+                    // Show a simple "Done!" message
+                    Toast.makeText(this, "Done!", Toast.LENGTH_SHORT).show()
                 }
                 .addOnFailureListener { e ->
-                    Log.e("DashboardActivity", "Error updating workout completion", e)
-                    Toast.makeText(this, "Failed to update workout: ${e.message}", Toast.LENGTH_SHORT).show()
+                    Log.e("DashboardActivity", "Error removing workout", e)
+                    Toast.makeText(this, "Failed to remove workout: ${e.message}", Toast.LENGTH_SHORT).show()
                 }
         }
     }
