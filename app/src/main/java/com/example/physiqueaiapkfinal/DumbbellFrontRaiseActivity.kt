@@ -85,7 +85,7 @@ class DumbbellFrontRaiseActivity : AppCompatActivity() {
     private var totalSets: Int = 0
     private var currentSet: Int = 1
     private var isRestPeriod: Boolean = false
-    private val REST_TIME_SECONDS = 30
+    private val REST_TIME_SECONDS = 20
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -475,11 +475,13 @@ class DumbbellFrontRaiseActivity : AppCompatActivity() {
                     val currentTime = System.currentTimeMillis()
 
                     if (currentTime - lastFrontRaiseTime >= MIN_FRONT_RAISE_INTERVAL) {
-                        frontRaiseCount++
-                        lastFrontRaiseTime = currentTime
-                        lastCountedRaise = true
+                        // Don't count reps during rest period
+                        if (!isRestPeriod) {
+                            frontRaiseCount++
+                            lastFrontRaiseTime = currentTime
+                            lastCountedRaise = true
 
-                        Log.d(TAG, "🎉 FRONT RAISE #$frontRaiseCount COUNTED! Lowered → Shoulder Level")
+                            Log.d(TAG, "🎉 FRONT RAISE #$frontRaiseCount COUNTED! Lowered → Shoulder Level")
 
                         mainHandler.post {
                             updateFrontRaiseCounter()
@@ -497,6 +499,7 @@ class DumbbellFrontRaiseActivity : AppCompatActivity() {
                             }
                         } catch (e: Exception) {
                             Log.w(TAG, "Audio feedback failed: ${e.message}")
+                        }
                         }
                     }
                     hasBeenLowered = false // Reset for next cycle
@@ -701,7 +704,10 @@ class DumbbellFrontRaiseActivity : AppCompatActivity() {
             binding.tvTimeLabel.setTextColor(ContextCompat.getColor(this, android.R.color.holo_green_light))
             binding.tvSetLabel.text = "🎉 Workout Complete!"
             binding.tvSetLabel.setTextColor(ContextCompat.getColor(this, android.R.color.holo_green_light))
-            Toast.makeText(this, "🎉 All sets completed! Great workout!", Toast.LENGTH_LONG).show()
+            Toast.makeText(this, "Done!", Toast.LENGTH_LONG).show()
+            
+            // Remove exercise from dashboard and return
+            removeExerciseAndFinish()
         }
     }
 
@@ -788,7 +794,34 @@ class DumbbellFrontRaiseActivity : AppCompatActivity() {
         super.onDestroy()
         countDownTimer?.cancel()
         cameraExecutor.shutdown()
-        backgroundExecutor.shutdown()
+    }
+
+    private fun removeExerciseAndFinish() {
+        val workoutId = intent.getStringExtra("WORKOUT_ID")
+        if (workoutId != null) {
+            // Get Firebase instances
+            val auth = com.google.firebase.auth.FirebaseAuth.getInstance()
+            val firestore = com.google.firebase.firestore.FirebaseFirestore.getInstance()
+            val userId = auth.currentUser?.uid
+            
+            if (userId != null) {
+                firestore.collection("userTodoList").document(userId)
+                    .collection("workoutPlan").document(workoutId)
+                    .delete()
+                    .addOnSuccessListener {
+                        Log.d(TAG, "Exercise removed from dashboard")
+                        finish() // Return to dashboard
+                    }
+                    .addOnFailureListener { e ->
+                        Log.e(TAG, "Failed to remove exercise: ${e.message}")
+                        finish() // Return anyway
+                    }
+            } else {
+                finish() // Return to dashboard even if user not found
+            }
+        } else {
+            finish() // Return to dashboard if no workout ID
+        }
     }
 
     companion object {

@@ -76,7 +76,7 @@ class SitUpsActivity : AppCompatActivity() {
     private var totalSets: Int = 0
     private var currentSet: Int = 1
     private var isRestPeriod: Boolean = false
-    private val REST_TIME_SECONDS = 30
+    private val REST_TIME_SECONDS = 20
 
     companion object {
         private const val TAG = "SitUpsActivity"
@@ -412,9 +412,12 @@ class SitUpsActivity : AppCompatActivity() {
     }
 
     private fun incrementSitUpCount() {
-        sitUpCount++
-        updateSitUpCounter()
-        Log.d(TAG, "Sit-up count: $sitUpCount")
+        // Don't count reps during rest period
+        if (!isRestPeriod) {
+            sitUpCount++
+            updateSitUpCounter()
+            Log.d(TAG, "Sit-up count: $sitUpCount")
+        }
     }
 
     private fun resetSitUpCounter() {
@@ -498,7 +501,10 @@ class SitUpsActivity : AppCompatActivity() {
             binding.tvTimeLabel.setTextColor(ContextCompat.getColor(this, android.R.color.holo_green_light))
             binding.tvSetLabel.text = "🎉 Workout Complete!"
             binding.tvSetLabel.setTextColor(ContextCompat.getColor(this, android.R.color.holo_green_light))
-            Toast.makeText(this, "🎉 All sets completed! Great workout!", Toast.LENGTH_LONG).show()
+            Toast.makeText(this, "Done!", Toast.LENGTH_LONG).show()
+            
+            // Remove exercise from dashboard and return
+            removeExerciseAndFinish()
         }
     }
 
@@ -574,7 +580,6 @@ class SitUpsActivity : AppCompatActivity() {
         super.onDestroy()
         countDownTimer?.cancel()
         cameraExecutor.shutdown()
-        backgroundExecutor.shutdown()
         poseDetector.close()
     }
 
@@ -587,6 +592,34 @@ class SitUpsActivity : AppCompatActivity() {
         super.onResume()
         if (timeRemaining > 0 && totalTimeInMillis > 0) {
             resumeTimer()
+        }
+    }
+
+    private fun removeExerciseAndFinish() {
+        val workoutId = intent.getStringExtra("WORKOUT_ID")
+        if (workoutId != null) {
+            // Get Firebase instances
+            val auth = com.google.firebase.auth.FirebaseAuth.getInstance()
+            val firestore = com.google.firebase.firestore.FirebaseFirestore.getInstance()
+            val userId = auth.currentUser?.uid
+            
+            if (userId != null) {
+                firestore.collection("userTodoList").document(userId)
+                    .collection("workoutPlan").document(workoutId)
+                    .delete()
+                    .addOnSuccessListener {
+                        Log.d(TAG, "Exercise removed from dashboard")
+                        finish() // Return to dashboard
+                    }
+                    .addOnFailureListener { e ->
+                        Log.e(TAG, "Failed to remove exercise: ${e.message}")
+                        finish() // Return anyway
+                    }
+            } else {
+                finish() // Return to dashboard even if user not found
+            }
+        } else {
+            finish() // Return to dashboard if no workout ID
         }
     }
 }

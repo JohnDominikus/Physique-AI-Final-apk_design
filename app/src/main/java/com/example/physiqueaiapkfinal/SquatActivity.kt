@@ -100,7 +100,7 @@ class SquatActivity : AppCompatActivity() {
     private var totalSets: Int = 0
     private var currentSet: Int = 1
     private var isRestPeriod: Boolean = false
-    private val REST_TIME_SECONDS = 30 // 30 seconds rest between sets
+    private val REST_TIME_SECONDS = 20 // 20 seconds rest between sets
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -498,30 +498,36 @@ class SquatActivity : AppCompatActivity() {
                     val currentTime = System.currentTimeMillis()
 
                     if (currentTime - lastSquatTime >= MIN_SQUAT_INTERVAL) {
-                        squatCount++
-                        lastSquatTime = currentTime
-                        lastCountedUp = true // Prevent double counting
-                        stateChanged = true
+                        // Don't count reps during rest period
+                        if (!isRestPeriod) {
+                            squatCount++
+                            lastSquatTime = currentTime
+                            lastCountedUp = true // Prevent double counting
+                            stateChanged = true
 
-                        Log.d(TAG, "🎉 Squat #$squatCount completed! UP motion detected, Knee Angle: ${smoothedKneeAngle.toInt()}°")
+                            Log.d(TAG, "🎉 Squat #$squatCount completed! UP motion detected, Knee Angle: ${smoothedKneeAngle.toInt()}°")
 
-                        mainHandler.post {
-                            updateSquatCounter()
-                            binding.tvPositionStatus.text = "Position: COUNT +1 (UP)!"
-                            binding.tvPositionStatus.setTextColor(ContextCompat.getColor(this@SquatActivity, android.R.color.holo_orange_light))
-                        }
-
-                        // Audio feedback
-                        try {
-                            val toneGenerator = ToneGenerator(AudioManager.STREAM_NOTIFICATION, 80)
-                            toneGenerator.startTone(ToneGenerator.TONE_PROP_BEEP, 200)
-                            backgroundExecutor.execute {
-                                Thread.sleep(250)
-                                toneGenerator.release()
+                            mainHandler.post {
+                                updateSquatCounter()
+                                binding.tvPositionStatus.text = "Position: COUNT +1 (UP)!"
+                                binding.tvPositionStatus.setTextColor(ContextCompat.getColor(this@SquatActivity, android.R.color.holo_orange_light))
                             }
-                        } catch (e: Exception) {
-                            // Ignore audio errors
+
+                            // Audio feedback
+                            try {
+                                val toneGenerator = ToneGenerator(AudioManager.STREAM_NOTIFICATION, 80)
+                                toneGenerator.startTone(ToneGenerator.TONE_PROP_BEEP, 200)
+                                backgroundExecutor.execute {
+                                    Thread.sleep(250)
+                                    toneGenerator.release()
+                                }
+                            } catch (e: Exception) {
+                                // Ignore audio errors
+                            }
                         }
+
+                        // Reset cycle tracking for next squat
+                        hasBeenDown = false
                     }
 
                     // Reset cycle tracking for next squat
@@ -615,7 +621,6 @@ class SquatActivity : AppCompatActivity() {
     override fun onDestroy() {
         super.onDestroy()
         cameraExecutor.shutdown()
-        backgroundExecutor.shutdown()
     }
 
     companion object {
@@ -688,7 +693,10 @@ class SquatActivity : AppCompatActivity() {
             binding.tvTimeLabel.setTextColor(ContextCompat.getColor(this, android.R.color.holo_green_light))
             binding.tvSetLabel.text = "🎉 Workout Complete!"
             binding.tvSetLabel.setTextColor(ContextCompat.getColor(this, android.R.color.holo_green_light))
-            Toast.makeText(this, "🎉 All sets completed! Great workout!", Toast.LENGTH_LONG).show()
+            Toast.makeText(this, "Done!", Toast.LENGTH_LONG).show()
+            
+            // Remove exercise from dashboard and return
+            removeExerciseAndFinish()
         }
     }
 
@@ -772,5 +780,33 @@ class SquatActivity : AppCompatActivity() {
 
     private fun updateSquatCounter() {
         binding.tvSquatCounter.text = "Squats: ${squatCount}/${targetReps}"
+    }
+
+    private fun removeExerciseAndFinish() {
+        val workoutId = intent.getStringExtra("WORKOUT_ID")
+        if (workoutId != null) {
+            // Get Firebase instances
+            val auth = com.google.firebase.auth.FirebaseAuth.getInstance()
+            val firestore = com.google.firebase.firestore.FirebaseFirestore.getInstance()
+            val userId = auth.currentUser?.uid
+            
+            if (userId != null) {
+                firestore.collection("userTodoList").document(userId)
+                    .collection("workoutPlan").document(workoutId)
+                    .delete()
+                    .addOnSuccessListener {
+                        Log.d(TAG, "Exercise removed from dashboard")
+                        finish() // Return to dashboard
+                    }
+                    .addOnFailureListener { e ->
+                        Log.e(TAG, "Failed to remove exercise: ${e.message}")
+                        finish() // Return anyway
+                    }
+            } else {
+                finish() // Return to dashboard even if user not found
+            }
+        } else {
+            finish() // Return to dashboard if no workout ID
+        }
     }
 }

@@ -97,7 +97,7 @@ class HipThrustsActivity : AppCompatActivity() {
     private var totalSets: Int = 0
     private var currentSet: Int = 1
     private var isRestPeriod: Boolean = false
-    private val REST_TIME_SECONDS = 30
+    private val REST_TIME_SECONDS = 20
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -370,7 +370,9 @@ class HipThrustsActivity : AppCompatActivity() {
                 // Transition from DOWN to UP (count rep)
                 val currentTime = System.currentTimeMillis()
                 if (currentTime - lastHipThrustTime > 1000L) { // 1 second debounce
-                    hipThrustCount++
+                                            // Don't count reps during rest period
+                        if (!isRestPeriod) {
+                            hipThrustCount++
                     lastHipThrustTime = currentTime
                     mainHandler.post {
                         updateHipThrustCounter()
@@ -387,6 +389,7 @@ class HipThrustsActivity : AppCompatActivity() {
                         }
                     } catch (e: Exception) {
                         Log.w(TAG, "Audio failed: ${e.message}")
+                    }
                     }
                 }
                 isUp = true
@@ -478,7 +481,6 @@ class HipThrustsActivity : AppCompatActivity() {
         super.onDestroy()
         countDownTimer?.cancel()
         cameraExecutor.shutdown()
-        backgroundExecutor.shutdown()
     }
 
     companion object {
@@ -551,7 +553,10 @@ class HipThrustsActivity : AppCompatActivity() {
             binding.tvTimeLabel.setTextColor(ContextCompat.getColor(this, android.R.color.holo_green_light))
             binding.tvSetLabel.text = "🎉 Workout Complete!"
             binding.tvSetLabel.setTextColor(ContextCompat.getColor(this, android.R.color.holo_green_light))
-            Toast.makeText(this, "🎉 All sets completed! Great workout!", Toast.LENGTH_LONG).show()
+            Toast.makeText(this, "Done!", Toast.LENGTH_LONG).show()
+            
+            // Remove exercise from dashboard and return
+            removeExerciseAndFinish()
         }
     }
 
@@ -621,5 +626,33 @@ class HipThrustsActivity : AppCompatActivity() {
 
     private fun updateHipThrustCounter() {
         binding.tvHipThrustCounter.text = "Hip Thrusts: ${hipThrustCount}/${targetReps}"
+    }
+
+    private fun removeExerciseAndFinish() {
+        val workoutId = intent.getStringExtra("WORKOUT_ID")
+        if (workoutId != null) {
+            // Get Firebase instances
+            val auth = com.google.firebase.auth.FirebaseAuth.getInstance()
+            val firestore = com.google.firebase.firestore.FirebaseFirestore.getInstance()
+            val userId = auth.currentUser?.uid
+            
+            if (userId != null) {
+                firestore.collection("userTodoList").document(userId)
+                    .collection("workoutPlan").document(workoutId)
+                    .delete()
+                    .addOnSuccessListener {
+                        Log.d(TAG, "Exercise removed from dashboard")
+                        finish() // Return to dashboard
+                    }
+                    .addOnFailureListener { e ->
+                        Log.e(TAG, "Failed to remove exercise: ${e.message}")
+                        finish() // Return anyway
+                    }
+            } else {
+                finish() // Return to dashboard even if user not found
+            }
+        } else {
+            finish() // Return to dashboard if no workout ID
+        }
     }
 }

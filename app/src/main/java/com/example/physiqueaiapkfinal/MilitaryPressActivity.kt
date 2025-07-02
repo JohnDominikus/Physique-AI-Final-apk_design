@@ -104,7 +104,7 @@ class MilitaryPressActivity : AppCompatActivity() {
     private var totalSets: Int = 0
     private var currentSet: Int = 1
     private var isRestPeriod: Boolean = false
-    private val REST_TIME_SECONDS = 30
+    private val REST_TIME_SECONDS = 20
 
     // Required permissions
     private val REQUIRED_PERMISSIONS = arrayOf(
@@ -617,7 +617,9 @@ class MilitaryPressActivity : AppCompatActivity() {
                     val timeSinceLastPress = currentTime - lastPressTime
 
                     if (timeSinceLastPress > MIN_PRESS_INTERVAL) {
-                        militaryPressCount++
+                        // Don't count reps during rest period
+                        if (!isRestPeriod) {
+                            militaryPressCount++
                         lastCountedUp = true // Mark as counted - will stay true until they go down
                         lastPressTime = currentTime
 
@@ -640,6 +642,7 @@ class MilitaryPressActivity : AppCompatActivity() {
                             binding.tvPositionStatus.text = "Perfect"
                             binding.tvPoseStatus.text = "Great rep! Lower arms to start position for next"
                             binding.tvPositionStatus.setTextColor(ContextCompat.getColor(this@MilitaryPressActivity, android.R.color.holo_green_light))
+                        }
                         }
                     } else {
                         Log.d(TAG, "⏰ Count blocked by time interval (${timeSinceLastPress}ms < ${MIN_PRESS_INTERVAL}ms)")
@@ -834,7 +837,10 @@ class MilitaryPressActivity : AppCompatActivity() {
             binding.tvTimeLabel.setTextColor(ContextCompat.getColor(this, android.R.color.holo_green_light))
             binding.tvSetLabel.text = "🎉 Workout Complete!"
             binding.tvSetLabel.setTextColor(ContextCompat.getColor(this, android.R.color.holo_green_light))
-            Toast.makeText(this, "🎉 All sets completed! Great workout!", Toast.LENGTH_LONG).show()
+            Toast.makeText(this, "Done!", Toast.LENGTH_LONG).show()
+            
+            // Remove exercise from dashboard and return
+            removeExerciseAndFinish()
         }
     }
 
@@ -902,11 +908,38 @@ class MilitaryPressActivity : AppCompatActivity() {
         resetDetectionState()
     }
 
+    private fun removeExerciseAndFinish() {
+        val workoutId = intent.getStringExtra("WORKOUT_ID")
+        if (workoutId != null) {
+            // Get Firebase instances
+            val auth = com.google.firebase.auth.FirebaseAuth.getInstance()
+            val firestore = com.google.firebase.firestore.FirebaseFirestore.getInstance()
+            val userId = auth.currentUser?.uid
+            
+            if (userId != null) {
+                firestore.collection("userTodoList").document(userId)
+                    .collection("workoutPlan").document(workoutId)
+                    .delete()
+                    .addOnSuccessListener {
+                        Log.d(TAG, "Exercise removed from dashboard")
+                        finish() // Return to dashboard
+                    }
+                    .addOnFailureListener { e ->
+                        Log.e(TAG, "Failed to remove exercise: ${e.message}")
+                        finish() // Return anyway
+                    }
+            } else {
+                finish() // Return to dashboard even if user not found
+            }
+        } else {
+            finish() // Return to dashboard if no workout ID
+        }
+    }
+
     override fun onDestroy() {
         super.onDestroy()
         countDownTimer?.cancel()
         cameraExecutor.shutdown()
-        backgroundExecutor.shutdown()
         poseDetector.close()
     }
 }

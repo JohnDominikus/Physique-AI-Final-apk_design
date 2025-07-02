@@ -102,7 +102,7 @@ class StreamActivity : AppCompatActivity() {
     private var totalSets: Int = 0
     private var currentSet: Int = 1
     private var isRestPeriod: Boolean = false
-    private val REST_TIME_SECONDS = 30
+    private val REST_TIME_SECONDS = 20
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -493,29 +493,32 @@ class StreamActivity : AppCompatActivity() {
                     val currentTime = System.currentTimeMillis()
 
                     if (currentTime - lastPushupTime >= MIN_PUSHUP_INTERVAL) {
-                        pushupCount++
+                        // Don't count reps during rest period
+                        if (!isRestPeriod) {
+                            pushupCount++
                         lastPushupTime = currentTime
                         lastCountedUp = true // Prevent double counting
                         stateChanged = true
 
-                        Log.d(TAG, "🎉 Push-up #$pushupCount completed! UP motion detected, Angle: ${smoothedAngle.toInt()}°")
+                            Log.d(TAG, "🎉 Push-up #$pushupCount completed! UP motion detected, Angle: ${smoothedAngle.toInt()}°")
 
-                        mainHandler.post {
-                            updatePushupCounter()
-                            binding.tvPositionStatus.text = "Position: COUNT +1 (UP)!"
-                            binding.tvPositionStatus.setTextColor(ContextCompat.getColor(this@StreamActivity, android.R.color.holo_orange_light))
-                        }
-
-                        // Audio feedback
-                        try {
-                            val toneGenerator = ToneGenerator(AudioManager.STREAM_NOTIFICATION, 80)
-                            toneGenerator.startTone(ToneGenerator.TONE_PROP_BEEP, 200)
-                            backgroundExecutor.execute {
-                                Thread.sleep(250)
-                                toneGenerator.release()
+                            mainHandler.post {
+                                updatePushupCounter()
+                                binding.tvPositionStatus.text = "Position: COUNT +1 (UP)!"
+                                binding.tvPositionStatus.setTextColor(ContextCompat.getColor(this@StreamActivity, android.R.color.holo_orange_light))
                             }
-                        } catch (e: Exception) {
-                            // Ignore audio errors
+
+                            // Audio feedback
+                            try {
+                                val toneGenerator = ToneGenerator(AudioManager.STREAM_NOTIFICATION, 80)
+                                toneGenerator.startTone(ToneGenerator.TONE_PROP_BEEP, 200)
+                                backgroundExecutor.execute {
+                                    Thread.sleep(250)
+                                    toneGenerator.release()
+                                }
+                            } catch (e: Exception) {
+                                // Ignore audio errors
+                            }
                         }
                     }
 
@@ -662,7 +665,10 @@ class StreamActivity : AppCompatActivity() {
             binding.tvTimeLabel.setTextColor(ContextCompat.getColor(this, android.R.color.holo_green_light))
             binding.tvSetLabel.text = "🎉 Workout Complete!"
             binding.tvSetLabel.setTextColor(ContextCompat.getColor(this, android.R.color.holo_green_light))
-            Toast.makeText(this, "🎉 All sets completed! Great workout!", Toast.LENGTH_LONG).show()
+            Toast.makeText(this, "Done!", Toast.LENGTH_LONG).show()
+            
+            // Remove exercise from dashboard and return
+            removeExerciseAndFinish()
         }
     }
 
@@ -746,7 +752,34 @@ class StreamActivity : AppCompatActivity() {
         super.onDestroy()
         countDownTimer?.cancel()
         cameraExecutor.shutdown()
-        backgroundExecutor.shutdown()
+    }
+
+    private fun removeExerciseAndFinish() {
+        val workoutId = intent.getStringExtra("WORKOUT_ID")
+        if (workoutId != null) {
+            // Get Firebase instances
+            val auth = com.google.firebase.auth.FirebaseAuth.getInstance()
+            val firestore = com.google.firebase.firestore.FirebaseFirestore.getInstance()
+            val userId = auth.currentUser?.uid
+            
+            if (userId != null) {
+                firestore.collection("userTodoList").document(userId)
+                    .collection("workoutPlan").document(workoutId)
+                    .delete()
+                    .addOnSuccessListener {
+                        Log.d(TAG, "Exercise removed from dashboard")
+                        finish() // Return to dashboard
+                    }
+                    .addOnFailureListener { e ->
+                        Log.e(TAG, "Failed to remove exercise: ${e.message}")
+                        finish() // Return anyway
+                    }
+            } else {
+                finish() // Return to dashboard even if user not found
+            }
+        } else {
+            finish() // Return to dashboard if no workout ID
+        }
     }
 
     companion object {
