@@ -51,7 +51,6 @@
             android:textColor="@android:color/black"
             android:fontFamily="sans-serif-medium" />
 
-        <!-- Medication Label and Spinner -->
         <Spinner
             android:id="@+id/spinnerCondition"
             android:layout_width="match_parent"
@@ -62,6 +61,7 @@
             android:spinnerMode="dropdown"
             android:textColor="@android:color/black" />
 
+        <!-- Medication Label and Spinner -->
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -80,15 +80,24 @@
             android:elevation="4dp"
             android:spinnerMode="dropdown" />
 
-        <!-- Allergies Label and Spinner -->
-        <TextView
+        <!-- Allergies Section with Info Icon -->
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Allergies"
-            android:textSize="20sp"
-            android:layout_marginBottom="8dp"
-            android:textColor="@android:color/black"
-            android:fontFamily="sans-serif-medium" />
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="8dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Allergies"
+                android:textSize="20sp"
+                android:textColor="@android:color/black"
+                android:fontFamily="sans-serif-medium" />
+
+            />
+        </LinearLayout>
 
         <Spinner
             android:id="@+id/spinnerAllergies"
@@ -99,15 +108,24 @@
             android:elevation="4dp"
             android:spinnerMode="dropdown" />
 
-        <!-- Fractures Label and Spinner -->
-        <TextView
+        <!-- Fractures Section with Info Icon -->
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Fractures"
-            android:textSize="20sp"
-            android:layout_marginBottom="8dp"
-            android:textColor="@android:color/black"
-            android:fontFamily="sans-serif-medium" />
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="8dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Fractures"
+                android:textSize="20sp"
+                android:textColor="@android:color/black"
+                android:fontFamily="sans-serif-medium" />
+
+            >
+        </LinearLayout>
 
         <Spinner
             android:id="@+id/spinnerFractures"
@@ -118,15 +136,24 @@
             android:elevation="4dp"
             android:spinnerMode="dropdown" />
 
-        <!-- Other Conditions Label and Spinner -->
-        <TextView
+        <!-- Other Conditions Section with Info Icon -->
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Other Conditions"
-            android:textSize="20sp"
-            android:layout_marginBottom="8dp"
-            android:textColor="@android:color/black"
-            android:fontFamily="sans-serif-medium" />
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="8dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Other Conditions"
+                android:textSize="20sp"
+                android:textColor="@android:color/black"
+                android:fontFamily="sans-serif-medium" />
+
+            />
+        </LinearLayout>
 
         <Spinner
             android:id="@+id/spinnerOtherConditions"
