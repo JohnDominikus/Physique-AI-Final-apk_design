@@ -909,10 +909,9 @@ class DashboardActivity : AppCompatActivity() {
                         tvNoExercisesToday?.visibility = View.GONE
                         if (rvAddedExercises?.adapter == null) {
                             rvAddedExercises?.layoutManager = LinearLayoutManager(this)
-                            rvAddedExercises?.adapter = AddedExercisesAdapter(exercises, 
-                                { exercise -> toggleWorkoutCompletion(exercise) },
-                                { exercise -> navigateToExerciseActivity(exercise) }
-                            )
+                            rvAddedExercises?.adapter = AddedExercisesAdapter(exercises) { exercise ->
+                                navigateToExerciseActivity(exercise)
+                            }
                         } else {
                             (rvAddedExercises?.adapter as? AddedExercisesAdapter)?.updateExercises(exercises)
                         }

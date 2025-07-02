@@ -9,8 +9,7 @@ import androidx.recyclerview.widget.RecyclerView
 
 class AddedExercisesAdapter(
     private var exercises: List<AddedExercise>,
-    private val onDoneClick: (AddedExercise) -> Unit,
-    private val onItemClick: (AddedExercise) -> Unit
+    private val onStartClick: (AddedExercise) -> Unit
 ) : RecyclerView.Adapter<AddedExercisesAdapter.ViewHolder>() {
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
@@ -18,7 +17,7 @@ class AddedExercisesAdapter(
         val tvSets: TextView = view.findViewById(R.id.tvSets)
         val tvReps: TextView = view.findViewById(R.id.tvReps)
         val tvTime: TextView = view.findViewById(R.id.tvTime)
-        val btnDoneExercise: Button = view.findViewById(R.id.btnDoneExercise)
+        val btnStartExercise: Button = view.findViewById(R.id.btnStartExercise)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -34,13 +33,8 @@ class AddedExercisesAdapter(
         holder.tvReps.text = "${exercise.reps} reps"
         holder.tvTime.text = "${exercise.minutes}m ${exercise.seconds}s"
 
-        holder.btnDoneExercise.setOnClickListener {
-            onDoneClick(exercise)
-        }
-
-        // Set the new item click listener
-        holder.itemView.setOnClickListener {
-            onItemClick(exercise)
+        holder.btnStartExercise.setOnClickListener {
+            onStartClick(exercise)
         }
     }
 
