@@ -48,6 +48,7 @@ class MilitaryPressActivity : AppCompatActivity() {
     private var poseClassifierProcessor: PoseClassifierProcessor? = null
     private val TAG = "MilitaryPressActivity"
     private var militaryPressCount = 0
+    private var targetReps: Int = 0
     private val mainHandler = Handler(Looper.getMainLooper())
 
     // Military press detection variables
@@ -122,6 +123,8 @@ class MilitaryPressActivity : AppCompatActivity() {
         val minutes = intent.getIntExtra("minutes", 0)
         val seconds = intent.getIntExtra("seconds", 0)
 
+        targetReps = reps
+
         // Store set information
         totalSets = sets
         currentSet = 1
@@ -167,7 +170,7 @@ class MilitaryPressActivity : AppCompatActivity() {
         }
 
         // Update UI
-        binding.tvMilitaryPressCounter.text = getString(R.string.military_press_counter_text, 0)
+        updateMilitaryPressCounter()
 
         binding.btnBack.setOnClickListener {
             finish()
@@ -268,7 +271,7 @@ class MilitaryPressActivity : AppCompatActivity() {
 
     private fun resetPressCounter() {
         militaryPressCount = 0
-        binding.tvMilitaryPressCounter.text = getString(R.string.military_press_counter_text, militaryPressCount)
+        updateMilitaryPressCounter()
         resetDetectionState()
 
         // Play reset sound
@@ -632,7 +635,7 @@ class MilitaryPressActivity : AppCompatActivity() {
                         Log.d(TAG, "🎉 MILITARY PRESS COUNTED! Total: $militaryPressCount - NOW GO DOWN TO RESET")
 
                         mainHandler.post {
-                            binding.tvMilitaryPressCounter.text = getString(R.string.military_press_counter_text, militaryPressCount)
+                            updateMilitaryPressCounter()
                             // Immediately show "Perfect" in GREEN when counted
                             binding.tvPositionStatus.text = "Perfect"
                             binding.tvPoseStatus.text = "Great rep! Lower arms to start position for next"
@@ -837,7 +840,8 @@ class MilitaryPressActivity : AppCompatActivity() {
 
     private fun startRestPeriod() {
         isRestPeriod = true
-        currentSet++ // Increment set counter when starting rest
+        currentSet++ // New set
+        resetMilitaryPressCounter()
         timeRemaining = REST_TIME_SECONDS * 1000L
         updateSetDisplay()
         startCountdownTimer()
@@ -886,6 +890,16 @@ class MilitaryPressActivity : AppCompatActivity() {
                 }
             }
         }
+    }
+
+    private fun updateMilitaryPressCounter() {
+        binding.tvMilitaryPressCounter.text = "Military Press: ${militaryPressCount}/${targetReps}"
+    }
+
+    private fun resetMilitaryPressCounter() {
+        militaryPressCount = 0
+        updateMilitaryPressCounter()
+        resetDetectionState()
     }
 
     override fun onDestroy() {

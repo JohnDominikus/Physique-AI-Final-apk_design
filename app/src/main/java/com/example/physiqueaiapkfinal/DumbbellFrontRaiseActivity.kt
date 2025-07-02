@@ -47,6 +47,7 @@ class DumbbellFrontRaiseActivity : AppCompatActivity() {
     private var poseClassifierProcessor: PoseClassifierProcessor? = null
     private val TAG = "DumbbellFrontRaiseActivity"
     private var frontRaiseCount = 0
+    private var targetReps: Int = 0
     private val mainHandler = Handler(Looper.getMainLooper())
 
     // Ultra-accurate front raise detection variables
@@ -101,6 +102,9 @@ class DumbbellFrontRaiseActivity : AppCompatActivity() {
         totalSets = sets
         currentSet = 1
 
+        // Store target reps
+        targetReps = reps
+
         // Calculate total time in milliseconds
         totalTimeInMillis = ((minutes * 60) + seconds) * 1000L
         timeRemaining = totalTimeInMillis
@@ -142,7 +146,7 @@ class DumbbellFrontRaiseActivity : AppCompatActivity() {
         }
 
         // Update UI
-        binding.tvFrontRaiseCounter.text = getString(R.string.front_raise_counter_text, 0)
+        updateFrontRaiseCounter()
 
         binding.btnBack.setOnClickListener {
             finish()
@@ -478,7 +482,7 @@ class DumbbellFrontRaiseActivity : AppCompatActivity() {
                         Log.d(TAG, "🎉 FRONT RAISE #$frontRaiseCount COUNTED! Lowered → Shoulder Level")
 
                         mainHandler.post {
-                            binding.tvFrontRaiseCounter.text = getString(R.string.front_raise_counter_text, frontRaiseCount)
+                            updateFrontRaiseCounter()
                             binding.tvPositionStatus.text = "Position: COUNTED +1! Perfect Form ✓"
                             binding.tvPositionStatus.setTextColor(ContextCompat.getColor(this@DumbbellFrontRaiseActivity, android.R.color.holo_orange_light))
                         }
@@ -617,11 +621,16 @@ class DumbbellFrontRaiseActivity : AppCompatActivity() {
         loweredFrameCount = 0
         shoulderAngleHistory.clear()
 
-        binding.tvFrontRaiseCounter.text = getString(R.string.front_raise_counter_text, 0)
+        updateFrontRaiseCounter()
+
         binding.tvPositionStatus.text = "Position: Ready - Lower Arms First"
         binding.tvPositionStatus.setTextColor(ContextCompat.getColor(this, android.R.color.holo_orange_light))
 
         Log.d(TAG, "Front raise counter and detection state reset to 0")
+    }
+
+    private fun updateFrontRaiseCounter() {
+        binding.tvFrontRaiseCounter.text = "Front Raises: $frontRaiseCount/$targetReps"
     }
 
     private fun allPermissionsGranted() = REQUIRED_PERMISSIONS.all {
@@ -699,6 +708,10 @@ class DumbbellFrontRaiseActivity : AppCompatActivity() {
     private fun startRestPeriod() {
         isRestPeriod = true
         currentSet++ // Increment set counter when starting rest
+
+        // Reset rep counter for next set
+        resetFrontRaiseCounter()
+
         timeRemaining = REST_TIME_SECONDS * 1000L
         updateSetDisplay()
         startCountdownTimer()

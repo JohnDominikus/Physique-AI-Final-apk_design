@@ -49,6 +49,7 @@ class WindmillActivity : AppCompatActivity() {
     private var poseClassifierProcessor: PoseClassifierProcessor? = null
     private val TAG = "WindmillActivity"
     private var windmillCount = 0
+    private var targetReps: Int = 0
     private val mainHandler = Handler(Looper.getMainLooper())
 
     // Direct windmill detection variables (hybrid approach)
@@ -99,6 +100,8 @@ class WindmillActivity : AppCompatActivity() {
         // Store set information
         totalSets = sets
         currentSet = 1
+
+        targetReps = reps
 
         // Calculate total time in milliseconds
         totalTimeInMillis = ((minutes * 60) + seconds) * 1000L
@@ -503,7 +506,7 @@ class WindmillActivity : AppCompatActivity() {
     }
 
     private fun updateCountDisplay() {
-        binding.countText.text = getString(R.string.windmill_count, windmillCount)
+        binding.countText.text = "Windmills: ${windmillCount}/${targetReps}"
     }
 
     private fun switchCamera() {
@@ -571,7 +574,8 @@ class WindmillActivity : AppCompatActivity() {
 
     private fun startRestPeriod() {
         isRestPeriod = true
-        currentSet++ // Increment set counter when starting rest
+        currentSet++
+        resetCount()
         timeRemaining = REST_TIME_SECONDS * 1000L
         updateSetDisplay()
         startCountdownTimer()

@@ -47,6 +47,7 @@ class StreamActivity : AppCompatActivity() {
     private var poseClassifierProcessor: PoseClassifierProcessor? = null
     private val TAG = "StreamActivity"
     private var pushupCount = 0
+    private var targetReps: Int = 0
     private val mainHandler = Handler(Looper.getMainLooper())
 
     // Ultra-accurate push-up detection variables
@@ -114,6 +115,8 @@ class StreamActivity : AppCompatActivity() {
         val minutes = intent.getIntExtra("minutes", 0)
         val seconds = intent.getIntExtra("seconds", 0)
 
+        targetReps = reps
+
         // Store set information
         totalSets = sets
         currentSet = 1
@@ -159,7 +162,7 @@ class StreamActivity : AppCompatActivity() {
         }
 
         // Update UI
-        binding.tvPushupCounter.text = getString(R.string.pushup_counter_text, 0)
+        updatePushupCounter()
 
         binding.btnBack.setOnClickListener {
             finish()
@@ -498,7 +501,7 @@ class StreamActivity : AppCompatActivity() {
                         Log.d(TAG, "🎉 Push-up #$pushupCount completed! UP motion detected, Angle: ${smoothedAngle.toInt()}°")
 
                         mainHandler.post {
-                            binding.tvPushupCounter.text = getString(R.string.pushup_counter_text, pushupCount)
+                            updatePushupCounter()
                             binding.tvPositionStatus.text = "Position: COUNT +1 (UP)!"
                             binding.tvPositionStatus.setTextColor(ContextCompat.getColor(this@StreamActivity, android.R.color.holo_orange_light))
                         }
@@ -579,11 +582,16 @@ class StreamActivity : AppCompatActivity() {
             poseClassifierProcessor?.resetCounters()
         }
 
-        binding.tvPushupCounter.text = getString(R.string.pushup_counter_text, 0)
+        updatePushupCounter()
+
         binding.tvPositionStatus.text = "Position: Ready - Go Down First"
         binding.tvPositionStatus.setTextColor(ContextCompat.getColor(this, android.R.color.holo_orange_light))
 
         Log.d(TAG, "Push-up counter and detection state reset to 0")
+    }
+
+    private fun updatePushupCounter() {
+        binding.tvPushupCounter.text = "Push-ups: ${pushupCount}/${targetReps}"
     }
 
     private fun allPermissionsGranted() = REQUIRED_PERMISSIONS.all {
@@ -660,7 +668,8 @@ class StreamActivity : AppCompatActivity() {
 
     private fun startRestPeriod() {
         isRestPeriod = true
-        currentSet++ // Increment set counter when starting rest
+        currentSet++
+        resetPushupCounter()
         timeRemaining = REST_TIME_SECONDS * 1000L
         updateSetDisplay()
         startCountdownTimer()

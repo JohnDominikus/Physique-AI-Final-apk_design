@@ -40,6 +40,7 @@ class SitUpsActivity : AppCompatActivity() {
     private var poseClassifierProcessor: PoseClassifierProcessor? = null
     private val TAG = "SitUpsActivity"
     private var sitUpCount = 0
+    private var targetReps: Int = 0
     private val mainHandler = Handler(Looper.getMainLooper())
 
     // Sit-up detection variables
@@ -94,6 +95,8 @@ class SitUpsActivity : AppCompatActivity() {
         val minutes = intent.getIntExtra("minutes", 0)
         val seconds = intent.getIntExtra("seconds", 0)
 
+        targetReps = reps
+
         // Store set information
         totalSets = sets
         currentSet = 1
@@ -139,7 +142,7 @@ class SitUpsActivity : AppCompatActivity() {
         }
 
         // Update UI
-        binding.tvSitUpCounter.text = getString(R.string.sit_up_counter_text, 0)
+        updateSitUpCounter()
 
         binding.btnBack.setOnClickListener {
             finish()
@@ -410,14 +413,14 @@ class SitUpsActivity : AppCompatActivity() {
 
     private fun incrementSitUpCount() {
         sitUpCount++
-        binding.tvSitUpCounter.text = getString(R.string.sit_up_counter_text, sitUpCount)
+        updateSitUpCounter()
         Log.d(TAG, "Sit-up count: $sitUpCount")
     }
 
     private fun resetSitUpCounter() {
         sitUpCount = 0
         resetPoseDetectionState()
-        binding.tvSitUpCounter.text = getString(R.string.sit_up_counter_text, 0)
+        updateSitUpCounter()
         binding.tvPositionStatus.text = "Position: Ready"
         binding.tvPositionStatus.setTextColor(ContextCompat.getColor(this, android.R.color.holo_blue_light))
         binding.tvPoseStatus.text = "Lie down and start doing sit-ups"
@@ -501,7 +504,8 @@ class SitUpsActivity : AppCompatActivity() {
 
     private fun startRestPeriod() {
         isRestPeriod = true
-        currentSet++ // Increment set counter when starting rest
+        currentSet++
+        resetSitUpCounter()
         timeRemaining = REST_TIME_SECONDS * 1000L
         updateSetDisplay()
         startCountdownTimer()
@@ -560,6 +564,10 @@ class SitUpsActivity : AppCompatActivity() {
         if (timeRemaining > 0) {
             startCountdownTimer()
         }
+    }
+
+    private fun updateSitUpCounter() {
+        binding.tvSitUpCounter.text = "Sit-ups: ${sitUpCount}/${targetReps}"
     }
 
     override fun onDestroy() {

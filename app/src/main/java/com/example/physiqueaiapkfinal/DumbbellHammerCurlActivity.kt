@@ -48,6 +48,7 @@ class DumbbellHammerCurlActivity : AppCompatActivity() {
     private var poseClassifierProcessor: PoseClassifierProcessor? = null
     private val TAG = "DumbbellHammerCurlActivity"
     private var hammerCurlCount = 0
+    private var targetReps: Int = 0
     private val mainHandler = Handler(Looper.getMainLooper())
 
     // Ultra-accurate hammer curl detection variables
@@ -104,6 +105,8 @@ class DumbbellHammerCurlActivity : AppCompatActivity() {
         val minutes = intent.getIntExtra("minutes", 0)
         val seconds = intent.getIntExtra("seconds", 0)
 
+        targetReps = reps
+
         // Store set information
         totalSets = sets
         currentSet = 1
@@ -149,7 +152,7 @@ class DumbbellHammerCurlActivity : AppCompatActivity() {
         }
 
         // Update UI
-        binding.tvHammerCurlCounter.text = getString(R.string.hammer_curl_counter_text, 0)
+        updateHammerCurlCounter()
 
         binding.btnBack.setOnClickListener {
             finish()
@@ -633,9 +636,7 @@ class DumbbellHammerCurlActivity : AppCompatActivity() {
                                 val countType = if (isValidHammerCurlMovement) "validated" else "basic (not elbow raise)"
                                 Log.d(TAG, "🎉 HAMMER CURL COUNTED! Total: $hammerCurlCount ($countType)")
 
-                                mainHandler.post {
-                                    binding.tvHammerCurlCounter.text = getString(R.string.hammer_curl_counter_text, hammerCurlCount)
-                                }
+                                updateHammerCurlCounter()
                             } else {
                                 Log.d(TAG, "⏰ Count blocked by time interval (${currentTime - lastHammerCurlTime}ms < ${MIN_HAMMER_CURL_INTERVAL}ms)")
                             }
@@ -800,6 +801,10 @@ class DumbbellHammerCurlActivity : AppCompatActivity() {
         Log.d(TAG, "Hammer curl counter reset")
     }
 
+    private fun updateHammerCurlCounter() {
+        binding.tvHammerCurlCounter.text = "Hammer Curls: ${hammerCurlCount}/${targetReps}"
+    }
+
     private fun allPermissionsGranted() = REQUIRED_PERMISSIONS.all {
         ContextCompat.checkSelfPermission(baseContext, it) == PackageManager.PERMISSION_GRANTED
     }
@@ -867,6 +872,7 @@ class DumbbellHammerCurlActivity : AppCompatActivity() {
         currentSet++ // Increment set counter when starting rest
         timeRemaining = REST_TIME_SECONDS * 1000L
         updateSetDisplay()
+        resetHammerCurlCounter()
         startCountdownTimer()
     }
 

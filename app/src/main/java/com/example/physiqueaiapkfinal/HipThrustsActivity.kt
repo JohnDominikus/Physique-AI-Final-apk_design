@@ -47,6 +47,7 @@ class HipThrustsActivity : AppCompatActivity() {
     private var poseClassifierProcessor: PoseClassifierProcessor? = null
     private val TAG = "HipThrustsActivity"
     private var hipThrustCount = 0
+    private var targetReps: Int = 0
     private val mainHandler = Handler(Looper.getMainLooper())
 
     // Ultra-accurate hip thrust detection variables
@@ -109,6 +110,8 @@ class HipThrustsActivity : AppCompatActivity() {
         val minutes = intent.getIntExtra("minutes", 0)
         val seconds = intent.getIntExtra("seconds", 0)
 
+        targetReps = reps
+
         // Store set information
         totalSets = sets
         currentSet = 1
@@ -154,7 +157,7 @@ class HipThrustsActivity : AppCompatActivity() {
         }
 
         // Update UI
-        binding.tvHipThrustCounter.text = getString(R.string.hip_thrust_counter_text, 0)
+        updateHipThrustCounter()
 
         binding.btnBack.setOnClickListener {
             finish()
@@ -370,7 +373,7 @@ class HipThrustsActivity : AppCompatActivity() {
                     hipThrustCount++
                     lastHipThrustTime = currentTime
                     mainHandler.post {
-                        binding.tvHipThrustCounter.text = getString(R.string.hip_thrust_counter_text, hipThrustCount)
+                        updateHipThrustCounter()
                         binding.tvPositionStatus.text = "COUNTED! Rep #$hipThrustCount - Go back down."
                         binding.tvPositionStatus.setTextColor(ContextCompat.getColor(this@HipThrustsActivity, android.R.color.holo_blue_light))
                     }
@@ -428,7 +431,7 @@ class HipThrustsActivity : AppCompatActivity() {
         downFrameCount = 0
         hipAngleHistory.clear()
 
-        binding.tvHipThrustCounter.text = getString(R.string.hip_thrust_counter_text, 0)
+        updateHipThrustCounter()
         binding.tvPositionStatus.text = "Position: Ready - Lie flat on floor"
         binding.tvPositionStatus.setTextColor(ContextCompat.getColor(this, android.R.color.holo_orange_light))
 
@@ -554,7 +557,8 @@ class HipThrustsActivity : AppCompatActivity() {
 
     private fun startRestPeriod() {
         isRestPeriod = true
-        currentSet++ // Increment set counter when starting rest
+        currentSet++
+        resetHipThrustCounter()
         timeRemaining = REST_TIME_SECONDS * 1000L
         updateSetDisplay()
         startCountdownTimer()
@@ -613,5 +617,9 @@ class HipThrustsActivity : AppCompatActivity() {
         if (timeRemaining > 0) {
             startCountdownTimer()
         }
+    }
+
+    private fun updateHipThrustCounter() {
+        binding.tvHipThrustCounter.text = "Hip Thrusts: ${hipThrustCount}/${targetReps}"
     }
 }

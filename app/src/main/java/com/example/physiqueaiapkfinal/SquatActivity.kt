@@ -47,6 +47,7 @@ class SquatActivity : AppCompatActivity() {
     private var poseClassifierProcessor: PoseClassifierProcessor? = null
     private val TAG = "SquatActivity"
     private var squatCount = 0
+    private var targetReps: Int = 0
     private val mainHandler = Handler(Looper.getMainLooper())
 
     // Ultra-accurate squat detection variables
@@ -116,6 +117,9 @@ class SquatActivity : AppCompatActivity() {
         totalSets = sets
         currentSet = 1
 
+        // Store target reps
+        targetReps = reps
+
         // Calculate total time in milliseconds
         totalTimeInMillis = ((minutes * 60) + seconds) * 1000L
         timeRemaining = totalTimeInMillis
@@ -157,7 +161,7 @@ class SquatActivity : AppCompatActivity() {
         }
 
         // Update UI
-        binding.tvSquatCounter.text = getString(R.string.squat_counter_text, 0)
+        updateSquatCounter()
 
         binding.btnBack.setOnClickListener {
             finish()
@@ -367,7 +371,7 @@ class SquatActivity : AppCompatActivity() {
                                     val mlCount = it.toInt()
                                     if (mlCount > squatCount) {
                                         squatCount = mlCount
-                                        binding.tvSquatCounter.text = getString(R.string.squat_counter_text, squatCount)
+                                        updateSquatCounter()
                                         Log.d(TAG, "🎉 ML detected squat! Count updated to: $squatCount")
                                     }
                                 }
@@ -502,7 +506,7 @@ class SquatActivity : AppCompatActivity() {
                         Log.d(TAG, "🎉 Squat #$squatCount completed! UP motion detected, Knee Angle: ${smoothedKneeAngle.toInt()}°")
 
                         mainHandler.post {
-                            binding.tvSquatCounter.text = getString(R.string.squat_counter_text, squatCount)
+                            updateSquatCounter()
                             binding.tvPositionStatus.text = "Position: COUNT +1 (UP)!"
                             binding.tvPositionStatus.setTextColor(ContextCompat.getColor(this@SquatActivity, android.R.color.holo_orange_light))
                         }
@@ -577,7 +581,7 @@ class SquatActivity : AppCompatActivity() {
         kneeAngleHistory.clear()
         hipAngleHistory.clear()
 
-        binding.tvSquatCounter.text = getString(R.string.squat_counter_text, 0)
+        updateSquatCounter()
         binding.tvPositionStatus.text = "Position: Ready - Go Down First"
         binding.tvPositionStatus.setTextColor(ContextCompat.getColor(this, android.R.color.holo_orange_light))
 
@@ -694,6 +698,9 @@ class SquatActivity : AppCompatActivity() {
         timeRemaining = REST_TIME_SECONDS * 1000L
         updateSetDisplay()
         startCountdownTimer()
+
+        // Reset rep counter for next set
+        resetSquatCounter()
     }
 
     private fun onRestComplete() {
@@ -761,5 +768,9 @@ class SquatActivity : AppCompatActivity() {
         if (timeRemaining > 0 && totalTimeInMillis > 0) {
             resumeTimer()
         }
+    }
+
+    private fun updateSquatCounter() {
+        binding.tvSquatCounter.text = "Squats: ${squatCount}/${targetReps}"
     }
 }
