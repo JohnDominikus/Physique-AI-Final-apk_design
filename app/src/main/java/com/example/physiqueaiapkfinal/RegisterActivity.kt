@@ -29,6 +29,7 @@ class RegisterActivity : AppCompatActivity() {
     private lateinit var etPassword: TextInputEditText
     private lateinit var btnRegister: MaterialButton
     private lateinit var btnBack: ImageButton
+    private lateinit var tvAge: TextInputEditText
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -70,6 +71,7 @@ class RegisterActivity : AppCompatActivity() {
         etEmail = findViewById(R.id.etEmail)
         etPassword = findViewById(R.id.etPassword)
         btnRegister = findViewById(R.id.btnRegister)
+        tvAge = findViewById(R.id.tvAge)
     }
 
     private fun navigateToLandingActivity() {
@@ -94,6 +96,16 @@ class RegisterActivity : AppCompatActivity() {
                 format(cal.time)
             }
             tvBirthdate.setText(formattedDate)
+
+            // Calculate age and display
+            val today = Calendar.getInstance()
+            var age = year - selectedYear
+            val thisDayOfYear = today.get(Calendar.DAY_OF_YEAR)
+            val dobCal = Calendar.getInstance().apply { set(selectedYear, selectedMonth, selectedDay) }
+            if (thisDayOfYear < dobCal.get(Calendar.DAY_OF_YEAR)) {
+                age--
+            }
+            tvAge.setText(age.toString())
         }, year, month, day)
 
         datePicker.datePicker.maxDate = System.currentTimeMillis()
@@ -146,6 +158,9 @@ class RegisterActivity : AppCompatActivity() {
         email: String,
         password: String
     ): Boolean {
+        val ageText = tvAge.text.toString().trim()
+        val age = ageText.toIntOrNull() ?: -1
+
         return when {
             firstName.isEmpty() -> {
                 etFirstName.error = "Please enter first name"
@@ -175,6 +190,10 @@ class RegisterActivity : AppCompatActivity() {
                 etPassword.error = "Password must be at least 6 characters long"
                 false
             }
+            age < 13 -> {
+                Toast.makeText(this, "You must be at least 13 years old to create an account", Toast.LENGTH_SHORT).show()
+                false
+            }
             else -> true
         }
     }
@@ -190,13 +209,15 @@ class RegisterActivity : AppCompatActivity() {
         val formatter = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
         val birthdateObj = formatter.parse(birthdate)
 
+        val ageInt = tvAge.text.toString().toIntOrNull() ?: 0
         val userData = hashMapOf(
             "personalInfo" to hashMapOf(
                 "firstName" to firstName,
                 "lastName" to lastName,
                 "birthdate" to birthdateObj,
                 "phone" to phone,
-                "email" to email
+                "email" to email,
+                "age" to ageInt
             )
         )
 

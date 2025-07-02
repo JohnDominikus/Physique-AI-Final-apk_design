@@ -121,55 +121,8 @@
                 android:onClick="onCreateAccountClicked" />
 
             <!-- Divider Section -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginVertical="24dp"
-                android:gravity="center_vertical"
-                android:orientation="horizontal">
-
-                <View
-                    android:layout_width="0dp"
-                    android:layout_height="2dp"
-                    android:layout_weight="1"
-                    android:background="#60FFFFFF" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Or continue with"
-                    android:textColor="#B0FFFFFF"
-                    android:textSize="14sp"
-                    android:fontFamily="@font/poppins_medium"
-                    android:paddingHorizontal="20dp" />
-
-                <View
-                    android:layout_width="0dp"
-                    android:layout_height="2dp"
-                    android:layout_weight="1"
-                    android:background="#60FFFFFF" />
-
-            </LinearLayout>
 
             <!-- Google Sign In Button -->
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnGoogleSignIn"
-                android:layout_width="match_parent"
-                android:layout_height="64dp"
-                android:layout_marginBottom="32dp"
-                android:text="Continue with Google"
-                android:textColor="@color/text_primary_light"
-                android:textSize="18sp"
-                android:textStyle="bold"
-                android:fontFamily="@font/poppins_semibold"
-                android:letterSpacing="0.02"
-                app:backgroundTint="@color/absolute_white"
-                app:cornerRadius="32dp"
-                app:elevation="12dp"
-                app:icon="@drawable/google"
-                app:iconGravity="textStart"
-                app:iconPadding="12dp"
-                app:iconTint="@null" />
 
             <!-- Feature Preview Section -->
             <LinearLayout

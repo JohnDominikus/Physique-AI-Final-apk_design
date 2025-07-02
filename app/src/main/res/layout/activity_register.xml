@@ -202,6 +202,37 @@
                             android:padding="16dp" />
                     </com.google.android.material.textfield.TextInputLayout>
 
+                    <!-- Age (auto-calculated) -->
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="@dimen/spacing_md"
+                        android:hint="Age"
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                        app:boxStrokeColor="@color/theme_secondary"
+                        app:boxStrokeWidth="2dp"
+                        app:hintTextColor="@color/text_secondary_light"
+                        app:boxBackgroundMode="outline"
+                        app:boxCornerRadiusTopStart="12dp"
+                        app:boxCornerRadiusTopEnd="12dp"
+                        app:boxCornerRadiusBottomStart="12dp"
+                        app:boxCornerRadiusBottomEnd="12dp"
+                        app:startIconDrawable="@drawable/ic_info">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/tvAge"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:textColor="@color/text_primary_light"
+                            android:textColorHint="@color/text_hint_light"
+                            android:textSize="16sp"
+                            android:focusable="false"
+                            android:clickable="false"
+                            android:inputType="number"
+                            android:background="@android:color/transparent"
+                            android:padding="16dp" />
+                    </com.google.android.material.textfield.TextInputLayout>
+
                     <!-- Phone Number -->
                     <com.google.android.material.textfield.TextInputLayout
                         android:layout_width="match_parent"
