@@ -292,4 +292,18 @@ class LoginActivity : AppCompatActivity() {
         tvForgotPassword = null
         tvRegister = null
     }
+
+    override fun onStart() {
+        super.onStart()
+        // If user is already authenticated, skip login screen
+        try {
+            val currentUser = FirebaseAuth.getInstance().currentUser
+            if (currentUser != null) {
+                Log.d(TAG, "User already authenticated. Redirecting to dashboard.")
+                navigateToDashboard()
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Error checking existing auth in onStart", e)
+        }
+    }
 }

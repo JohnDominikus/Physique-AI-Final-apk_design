@@ -113,4 +113,21 @@ class LandingActivity : AppCompatActivity() {
             return false
         }
     }
+
+    override fun onStart() {
+        super.onStart()
+        try {
+            if (isUserLoggedIn()) {
+                Log.d(TAG, "User already logged in - navigating directly to Dashboard")
+                val intent = Intent(this, DashboardActivity::class.java)
+                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                startActivity(intent)
+                finish()
+            } else {
+                Log.d(TAG, "User not logged in - staying on landing screen")
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Error in onStart auto-login check", e)
+        }
+    }
 }
