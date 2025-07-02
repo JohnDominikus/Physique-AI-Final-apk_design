@@ -61,7 +61,7 @@ class SitUpsActivity : AppCompatActivity() {
     private val FRAME_SKIP_COUNT = 1 // Reduce skip for better accuracy
 
     // Camera switching variables
-    private var isUsingFrontCamera = false
+    private var isUsingFrontCamera = true
     private var cameraProvider: ProcessCameraProvider? = null
 
     // Accurate sit-up detection with multiple criteria

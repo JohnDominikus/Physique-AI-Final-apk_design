@@ -71,7 +71,7 @@ class DumbbellHammerCurlActivity : AppCompatActivity() {
     private val FRAME_SKIP_COUNT = 3 // Increase skip to improve performance
 
     // Camera switching variables
-    private var isUsingFrontCamera = false
+    private var isUsingFrontCamera = true
     private var cameraProvider: ProcessCameraProvider? = null
 
     // Ultra-accurate hammer curl detection with multiple criteria
