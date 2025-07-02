@@ -214,6 +214,161 @@
                         android:inputType="none" />
                 </com.google.android.material.textfield.TextInputLayout>
 
+                <!-- Physical Information Card -->
+                <androidx.cardview.widget.CardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="@dimen/spacing_md"
+                    app:cardCornerRadius="16dp"
+                    app:cardElevation="4dp"
+                    app:cardBackgroundColor="@color/surface_light">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="@dimen/spacing_lg">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Physical Details"
+                            android:textStyle="bold"
+                            android:textSize="18sp"
+                            android:textColor="@android:color/black"
+                            android:layout_marginBottom="@dimen/spacing_md" />
+
+                        <TextView
+                            android:id="@+id/tvBodyLevel"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Body Level: -"
+                            android:textSize="14sp"
+                            android:textColor="@android:color/black" />
+
+                        <TextView
+                            android:id="@+id/tvBodyClassification"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Body Type: -"
+                            android:textSize="14sp"
+                            android:textColor="@android:color/black" />
+
+                        <TextView
+                            android:id="@+id/tvExerciseRoutine"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Routine: -"
+                            android:textSize="14sp"
+                            android:textColor="@android:color/black" />
+
+                        <TextView
+                            android:id="@+id/tvOtherInfo"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Other Info: -"
+                            android:textSize="14sp"
+                            android:textColor="@android:color/black" />
+
+                        <TextView
+                            android:id="@+id/tvGymMode"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Diet Mode: -"
+                            android:textSize="14sp"
+                            android:textColor="@android:color/black" />
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btnEditPhysical"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/spacing_md"
+                            android:text="Edit Physical"
+                            android:textSize="14sp"
+                            app:icon="@drawable/ic_edit"
+                            app:iconPadding="@dimen/spacing_sm"
+                            app:iconGravity="textStart"/>
+
+                    </LinearLayout>
+                </androidx.cardview.widget.CardView>
+
+                <!-- Medical Information Card -->
+                <androidx.cardview.widget.CardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="@dimen/spacing_xl"
+                    app:cardCornerRadius="16dp"
+                    app:cardElevation="4dp"
+                    app:cardBackgroundColor="@color/surface_light">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="@dimen/spacing_lg">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Medical Details"
+                            android:textStyle="bold"
+                            android:textSize="18sp"
+                            android:textColor="@android:color/black"
+                            android:layout_marginBottom="@dimen/spacing_md" />
+
+                        <TextView
+                            android:id="@+id/tvCondition"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Condition: -"
+                            android:textSize="14sp"
+                            android:textColor="@android:color/black" />
+
+                        <TextView
+                            android:id="@+id/tvMedication"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Medication: -"
+                            android:textSize="14sp"
+                            android:textColor="@android:color/black" />
+
+                        <TextView
+                            android:id="@+id/tvAllergies"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Allergies: -"
+                            android:textSize="14sp"
+                            android:textColor="@android:color/black" />
+
+                        <TextView
+                            android:id="@+id/tvFractures"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Fractures: -"
+                            android:textSize="14sp"
+                            android:textColor="@android:color/black" />
+
+                        <TextView
+                            android:id="@+id/tvOtherConditions"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Other Conditions: -"
+                            android:textSize="14sp"
+                            android:textColor="@android:color/black" />
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btnEditMedical"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/spacing_md"
+                            android:text="Edit Medical"
+                            android:textSize="14sp"
+                            app:icon="@drawable/ic_edit"
+                            app:iconPadding="@dimen/spacing_sm"
+                            app:iconGravity="textStart"/>
+                    </LinearLayout>
+                </androidx.cardview.widget.CardView>
+
                 <!-- Action Buttons -->
                 <LinearLayout
                     android:id="@+id/layoutActionButtons"

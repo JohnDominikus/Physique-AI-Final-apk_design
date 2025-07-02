@@ -11,6 +11,7 @@ import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.LinearLayout
+import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
@@ -44,6 +45,22 @@ class ProfileActivity : AppCompatActivity() {
     private var btnSave: MaterialButton? = null
     private var btnCancel: MaterialButton? = null
     private var layoutActionButtons: LinearLayout? = null
+
+    // Physical & Medical Views
+    private var tvBodyLevel: TextView? = null
+    private var tvBodyClassification: TextView? = null
+    private var tvExerciseRoutine: TextView? = null
+    private var tvOtherInfo: TextView? = null
+    private var tvGymMode: TextView? = null
+
+    private var tvCondition: TextView? = null
+    private var tvMedication: TextView? = null
+    private var tvAllergies: TextView? = null
+    private var tvFractures: TextView? = null
+    private var tvOtherConditions: TextView? = null
+
+    private var btnEditPhysical: MaterialButton? = null
+    private var btnEditMedical: MaterialButton? = null
 
     // Idinagdag – para i-centralize ang koleksiyong gagamitin
     private val USERS_COLLECTION = "userinfo"
@@ -113,6 +130,23 @@ class ProfileActivity : AppCompatActivity() {
             btnCancel = findViewById(R.id.btnCancel)
             layoutActionButtons = findViewById(R.id.layoutActionButtons)
             
+            // Physical
+            tvBodyLevel = findViewById(R.id.tvBodyLevel)
+            tvBodyClassification = findViewById(R.id.tvBodyClassification)
+            tvExerciseRoutine = findViewById(R.id.tvExerciseRoutine)
+            tvOtherInfo = findViewById(R.id.tvOtherInfo)
+            tvGymMode = findViewById(R.id.tvGymMode)
+
+            // Medical
+            tvCondition = findViewById(R.id.tvCondition)
+            tvMedication = findViewById(R.id.tvMedication)
+            tvAllergies = findViewById(R.id.tvAllergies)
+            tvFractures = findViewById(R.id.tvFractures)
+            tvOtherConditions = findViewById(R.id.tvOtherConditions)
+
+            btnEditPhysical = findViewById(R.id.btnEditPhysical)
+            btnEditMedical = findViewById(R.id.btnEditMedical)
+            
             Log.d("ProfileActivity", "All views initialized successfully")
             
         } catch (e: Exception) {
@@ -159,6 +193,19 @@ class ProfileActivity : AppCompatActivity() {
                     }
                 } catch (e: Exception) {
                     Log.e("ProfileActivity", "Error in birthdate click", e)
+                }
+            }
+            
+            btnEditPhysical?.setOnClickListener {
+                startActivity(Intent(this, PhysicalActivity::class.java))
+            }
+
+            btnEditMedical?.setOnClickListener {
+                uid?.let { id ->
+                    val intent = Intent(this, MedicalActivity::class.java).apply {
+                        putExtra("userId", id)
+                    }
+                    startActivity(intent)
                 }
             }
             
@@ -240,6 +287,22 @@ class ProfileActivity : AppCompatActivity() {
                                     Log.e("ProfileActivity", "Error loading profile photo", e)
                                 }
                             }
+                            
+                            // Physical Info
+                            val physical = document.get("physicalInfo") as? Map<*, *>
+                            tvBodyLevel?.text = "Body Level: ${physical?.get("bodyLevel") ?: "-"}"
+                            tvBodyClassification?.text = "Body Type: ${physical?.get("bodyClassification") ?: "-"}"
+                            tvExerciseRoutine?.text = "Routine: ${physical?.get("exerciseRoutine") ?: "-"}"
+                            tvOtherInfo?.text = "Other Info: ${physical?.get("otherInfo") ?: "-"}"
+                            tvGymMode?.text = "Diet Mode: ${physical?.get("gymMode") ?: "-"}"
+
+                            // Medical Info
+                            val medical = document.get("medicalInfo") as? Map<*, *>
+                            tvCondition?.text = "Condition: ${medical?.get("condition") ?: "-"}"
+                            tvMedication?.text = "Medication: ${medical?.get("medication") ?: "-"}"
+                            tvAllergies?.text = "Allergies: ${medical?.get("allergies") ?: "-"}"
+                            tvFractures?.text = "Fractures: ${medical?.get("fractures") ?: "-"}"
+                            tvOtherConditions?.text = "Other Conditions: ${medical?.get("otherConditions") ?: "-"}"
                             
                             Log.d("ProfileActivity", "User info loaded successfully")
                         } else {

@@ -12,8 +12,8 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:gravity="center_vertical"
-        android:padding="20dp"
-        android:background="@drawable/fitness_dashboard_background">
+        android:padding="12dp"
+        android:background="@android:color/transparent">
 
         <ImageButton
             android:id="@+id/btnBack"
@@ -25,16 +25,16 @@
             android:contentDescription="Back"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            android:tint="@color/absolute_white" />
+            android:tint="@android:color/black" />
 
         <TextView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="About Physique AI"
-            android:textSize="24sp"
+            android:textSize="20sp"
             android:textStyle="bold"
-            android:textColor="@color/absolute_white"
+            android:textColor="@android:color/black"
             android:fontFamily="@font/poppins_bold"
             android:gravity="center"
             android:layout_marginEnd="48dp" />
@@ -66,25 +66,26 @@
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
                     android:gravity="center"
-                    android:padding="32dp">
+                    android:padding="16dp">
 
                     <!-- App Logo -->
                     <ImageView
-                        android:layout_width="120dp"
-                        android:layout_height="120dp"
+                        android:layout_width="80dp"
+                        android:layout_height="80dp"
                         android:src="@drawable/physiqueailogo"
                         android:scaleType="centerCrop"
                         android:layout_marginBottom="16dp" />
 
                     <!-- App Name -->
+                    android:textColor="@android:color/black"
                     <TextView
                         android:id="@+id/tvAppName"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Physique AI"
-                        android:textSize="32sp"
+                        android:textSize="24sp"
                         android:textStyle="bold"
-                        android:textColor="@color/theme_primary"
+                        android:textColor="@android:color/black"
                         android:fontFamily="@font/poppins_bold"
                         android:layout_marginBottom="8dp" />
 
@@ -94,8 +95,8 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Version 1.0"
-                        android:textSize="16sp"
-                        android:textColor="@color/text_secondary_light"
+                        android:textSize="14sp"
+                        android:textColor="@android:color/black"
                         android:fontFamily="@font/poppins_medium"
                         android:layout_marginBottom="16dp" />
 
@@ -105,8 +106,8 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="Your personal fitness companion powered by artificial intelligence."
-                        android:textSize="16sp"
-                        android:textColor="@color/text_primary_light"
+                        android:textSize="14sp"
+                        android:textColor="@android:color/black"
                         android:fontFamily="@font/poppins_medium"
                         android:gravity="center"
                         android:lineSpacingExtra="4dp" />
@@ -134,7 +135,7 @@
                         android:text="🎓 Development Team"
                         android:textSize="20sp"
                         android:textStyle="bold"
-                        android:textColor="@color/theme_primary"
+                        android:textColor="@android:color/black"
                         android:fontFamily="@font/poppins_bold"
                         android:layout_marginBottom="16dp" />
 
@@ -143,8 +144,8 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="Created by BSCS 4-3"
-                        android:textSize="16sp"
-                        android:textColor="@color/text_primary_light"
+                        android:textSize="14sp"
+                        android:textColor="@android:color/black"
                         android:fontFamily="@font/poppins_medium"
                         android:lineSpacingExtra="6dp" />
                 </LinearLayout>
@@ -171,7 +172,7 @@
                         android:text="✨ Key Features"
                         android:textSize="20sp"
                         android:textStyle="bold"
-                        android:textColor="@color/theme_primary"
+                        android:textColor="@android:color/black"
                         android:fontFamily="@font/poppins_bold"
                         android:layout_marginBottom="16dp" />
 
@@ -180,8 +181,8 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="AI-Powered features"
-                        android:textSize="16sp"
-                        android:textColor="@color/text_primary_light"
+                        android:textSize="14sp"
+                        android:textColor="@android:color/black"
                         android:fontFamily="@font/poppins_medium"
                         android:lineSpacingExtra="8dp" />
                 </LinearLayout>
@@ -207,7 +208,7 @@
                         android:text="📧 Contact Information"
                         android:textSize="20sp"
                         android:textStyle="bold"
-                        android:textColor="@color/theme_primary"
+                        android:textColor="@android:color/black"
                         android:fontFamily="@font/poppins_bold"
                         android:layout_marginBottom="16dp" />
 
@@ -215,8 +216,8 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="For support, feedback, or collaboration opportunities, please reach out to our development team."
-                        android:textSize="16sp"
-                        android:textColor="@color/text_primary_light"
+                        android:textSize="14sp"
+                        android:textColor="@android:color/black"
                         android:fontFamily="@font/poppins_medium"
                         android:lineSpacingExtra="6dp"
                         android:layout_marginBottom="16dp" />
@@ -226,7 +227,7 @@
                         android:layout_height="wrap_content"
                         android:text="© 2024 BSCS 4-3. All rights reserved."
                         android:textSize="14sp"
-                        android:textColor="@color/text_secondary_light"
+                        android:textColor="@android:color/black"
                         android:fontFamily="@font/poppins_medium"
                         android:gravity="center" />
                 </LinearLayout>
