@@ -9,6 +9,7 @@ import android.util.Patterns
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 import java.util.concurrent.TimeUnit
 
 class LoginActivity : AppCompatActivity() {
@@ -220,7 +221,7 @@ class LoginActivity : AppCompatActivity() {
                         val user = auth.currentUser
                         if (user != null) {
                             saveUserSession(user.uid, email)
-                            navigateToDashboard()
+                            checkProfileCompletion(user.uid, email)
                         }
                     } else {
                         Log.e(TAG, "Login failed: ${task.exception?.message}")
@@ -252,6 +253,44 @@ class LoginActivity : AppCompatActivity() {
         } catch (e: Exception) {
             Log.e(TAG, "Error saving user session", e)
         }
+    }
+
+    private fun checkProfileCompletion(userId: String, email: String?) {
+        val db = FirebaseFirestore.getInstance()
+        db.collection("userinfo").document(userId).get()
+            .addOnSuccessListener { document ->
+                val physicalInfo = document.get("physicalInfo") as? Map<*, *>
+                val medicalInfo = document.get("medicalInfo") as? Map<*, *>
+
+                when {
+                    physicalInfo == null || physicalInfo.isEmpty() -> {
+                        Log.d(TAG, "Physical info missing – redirecting user to PhysicalActivity")
+                        val intent = Intent(this, PhysicalActivity::class.java).apply {
+                            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                        }
+                        startActivity(intent)
+                        finish()
+                    }
+                    medicalInfo == null || medicalInfo.isEmpty() -> {
+                        Log.d(TAG, "Medical info missing – redirecting user to MedicalActivity")
+                        val intent = Intent(this, MedicalActivity::class.java).apply {
+                            putExtra("userId", userId)
+                            email?.let { putExtra("email", it) }
+                            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                        }
+                        startActivity(intent)
+                        finish()
+                    }
+                    else -> {
+                        Log.d(TAG, "All profile info complete – navigating to Dashboard")
+                        navigateToDashboard()
+                    }
+                }
+            }
+            .addOnFailureListener { error ->
+                Log.e(TAG, "Failed to fetch profile info: ${error.message}")
+                navigateToDashboard()
+            }
     }
 
     private fun navigateToDashboard() {
@@ -299,8 +338,9 @@ class LoginActivity : AppCompatActivity() {
         try {
             val currentUser = FirebaseAuth.getInstance().currentUser
             if (currentUser != null) {
-                Log.d(TAG, "User already authenticated. Redirecting to dashboard.")
-                navigateToDashboard()
+                Log.d(TAG, "User already authenticated. Checking profile completion.")
+                val savedEmail = sharedPreferences.getString(USER_EMAIL_KEY, "") ?: ""
+                checkProfileCompletion(currentUser.uid, savedEmail)
             }
         } catch (e: Exception) {
             Log.e(TAG, "Error checking existing auth in onStart", e)

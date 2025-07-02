@@ -9,6 +9,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.physiqueaiapkfinal.databinding.ActivityLandingBinding
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 
 class LandingActivity : AppCompatActivity() {
 
@@ -118,16 +119,59 @@ class LandingActivity : AppCompatActivity() {
         super.onStart()
         try {
             if (isUserLoggedIn()) {
-                Log.d(TAG, "User already logged in - navigating directly to Dashboard")
-                val intent = Intent(this, DashboardActivity::class.java)
-                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                startActivity(intent)
-                finish()
+                Log.d(TAG, "User already logged in - checking profile completion")
+                val currentUser = auth.currentUser
+                currentUser?.let {
+                    routeUserBasedOnProfile(it.uid)
+                } ?: run {
+                    Log.e(TAG, "auth currentUser null despite login indicator")
+                }
             } else {
                 Log.d(TAG, "User not logged in - staying on landing screen")
             }
         } catch (e: Exception) {
             Log.e(TAG, "Error in onStart auto-login check", e)
         }
+    }
+
+    private fun routeUserBasedOnProfile(userId: String) {
+        val db = FirebaseFirestore.getInstance()
+        db.collection("userinfo").document(userId).get()
+            .addOnSuccessListener { document ->
+                val physicalInfo = document.get("physicalInfo") as? Map<*, *>
+                val medicalInfo = document.get("medicalInfo") as? Map<*, *>
+
+                when {
+                    physicalInfo == null || physicalInfo.isEmpty() -> {
+                        Log.d(TAG, "Physical info missing – redirecting to PhysicalActivity")
+                        startActivity(Intent(this, PhysicalActivity::class.java).apply {
+                            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                        })
+                        finish()
+                    }
+                    medicalInfo == null || medicalInfo.isEmpty() -> {
+                        Log.d(TAG, "Medical info missing – redirecting to MedicalActivity")
+                        startActivity(Intent(this, MedicalActivity::class.java).apply {
+                            putExtra("userId", userId)
+                            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                        })
+                        finish()
+                    }
+                    else -> {
+                        Log.d(TAG, "All info present – going to Dashboard")
+                        startActivity(Intent(this, DashboardActivity::class.java).apply {
+                            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                        })
+                        finish()
+                    }
+                }
+            }
+            .addOnFailureListener { error ->
+                Log.e(TAG, "Failed to fetch user profile: ${error.message}")
+                startActivity(Intent(this, DashboardActivity::class.java).apply {
+                    flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                })
+                finish()
+            }
     }
 }
