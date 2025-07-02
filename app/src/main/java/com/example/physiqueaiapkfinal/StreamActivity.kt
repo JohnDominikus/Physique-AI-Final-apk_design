@@ -595,6 +595,11 @@ class StreamActivity : AppCompatActivity() {
 
     private fun updatePushupCounter() {
         binding.tvPushupCounter.text = "Push-ups: ${pushupCount}/${targetReps}"
+        // Early set completion check
+        if (!isRestPeriod && pushupCount >= targetReps) {
+            countDownTimer?.cancel()
+            onSetComplete()
+        }
     }
 
     private fun allPermissionsGranted() = REQUIRED_PERMISSIONS.all {

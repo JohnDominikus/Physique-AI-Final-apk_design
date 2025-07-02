@@ -159,6 +159,12 @@ class DumbbellFrontRaiseActivity : AppCompatActivity() {
         binding.btnSwitchCamera.setOnClickListener {
             switchCamera()
         }
+
+        // Early set completion check
+        if (!isRestPeriod && frontRaiseCount >= targetReps) {
+            countDownTimer?.cancel()
+            onSetComplete()
+        }
     }
 
     private fun startCamera() {
@@ -634,6 +640,11 @@ class DumbbellFrontRaiseActivity : AppCompatActivity() {
 
     private fun updateFrontRaiseCounter() {
         binding.tvFrontRaiseCounter.text = "Front Raises: $frontRaiseCount/$targetReps"
+        // Early set completion check
+        if (!isRestPeriod && frontRaiseCount >= targetReps) {
+            countDownTimer?.cancel()
+            onSetComplete()
+        }
     }
 
     private fun allPermissionsGranted() = REQUIRED_PERMISSIONS.all {

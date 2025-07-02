@@ -155,6 +155,12 @@ class SitUpsActivity : AppCompatActivity() {
         binding.btnSwitchCamera.setOnClickListener {
             switchCamera()
         }
+
+        // Early set completion check
+        if (!isRestPeriod && sitUpCount >= targetReps) {
+            countDownTimer?.cancel()
+            onSetComplete()
+        }
     }
 
     private fun startCamera() {
@@ -574,6 +580,11 @@ class SitUpsActivity : AppCompatActivity() {
 
     private fun updateSitUpCounter() {
         binding.tvSitUpCounter.text = "Sit-ups: ${sitUpCount}/${targetReps}"
+        // Early set completion check
+        if (!isRestPeriod && sitUpCount >= targetReps) {
+            countDownTimer?.cancel()
+            onSetComplete()
+        }
     }
 
     override fun onDestroy() {

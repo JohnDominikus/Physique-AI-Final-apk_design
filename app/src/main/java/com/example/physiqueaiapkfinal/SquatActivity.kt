@@ -780,6 +780,11 @@ class SquatActivity : AppCompatActivity() {
 
     private fun updateSquatCounter() {
         binding.tvSquatCounter.text = "Squats: ${squatCount}/${targetReps}"
+        // Early set completion check
+        if (!isRestPeriod && squatCount >= targetReps) {
+            countDownTimer?.cancel()
+            onSetComplete()
+        }
     }
 
     private fun removeExerciseAndFinish() {

@@ -154,6 +154,12 @@ class DumbbellHammerCurlActivity : AppCompatActivity() {
         // Update UI
         updateHammerCurlCounter()
 
+        // Early set completion check
+        if (!isRestPeriod && hammerCurlCount >= targetReps) {
+            countDownTimer?.cancel()
+            onSetComplete()
+        }
+
         binding.btnBack.setOnClickListener {
             finish()
         }
@@ -806,6 +812,11 @@ class DumbbellHammerCurlActivity : AppCompatActivity() {
 
     private fun updateHammerCurlCounter() {
         binding.tvHammerCurlCounter.text = "Hammer Curls: ${hammerCurlCount}/${targetReps}"
+        // Early set completion check
+        if (!isRestPeriod && hammerCurlCount >= targetReps) {
+            countDownTimer?.cancel()
+            onSetComplete()
+        }
     }
 
     private fun allPermissionsGranted() = REQUIRED_PERMISSIONS.all {

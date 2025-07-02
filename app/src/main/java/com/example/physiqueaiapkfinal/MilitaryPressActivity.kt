@@ -183,6 +183,12 @@ class MilitaryPressActivity : AppCompatActivity() {
         binding.btnSwitchCamera.setOnClickListener {
             switchCamera()
         }
+
+        // Early set completion check
+        if (!isRestPeriod && militaryPressCount >= targetReps) {
+            countDownTimer?.cancel()
+            onSetComplete()
+        }
     }
 
     private fun startCamera() {
@@ -900,6 +906,11 @@ class MilitaryPressActivity : AppCompatActivity() {
 
     private fun updateMilitaryPressCounter() {
         binding.tvMilitaryPressCounter.text = "Military Press: ${militaryPressCount}/${targetReps}"
+        // Early set completion check
+        if (!isRestPeriod && militaryPressCount >= targetReps) {
+            countDownTimer?.cancel()
+            onSetComplete()
+        }
     }
 
     private fun resetMilitaryPressCounter() {

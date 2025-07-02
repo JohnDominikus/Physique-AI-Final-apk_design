@@ -626,6 +626,11 @@ class HipThrustsActivity : AppCompatActivity() {
 
     private fun updateHipThrustCounter() {
         binding.tvHipThrustCounter.text = "Hip Thrusts: ${hipThrustCount}/${targetReps}"
+        // Early set completion check
+        if (!isRestPeriod && hipThrustCount >= targetReps) {
+            countDownTimer?.cancel()
+            onSetComplete()
+        }
     }
 
     private fun removeExerciseAndFinish() {

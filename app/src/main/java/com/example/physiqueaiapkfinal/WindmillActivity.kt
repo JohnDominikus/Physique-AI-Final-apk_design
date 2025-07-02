@@ -510,6 +510,11 @@ class WindmillActivity : AppCompatActivity() {
 
     private fun updateCountDisplay() {
         binding.countText.text = "Windmills: ${windmillCount}/${targetReps}"
+        // Early set completion check
+        if (!isRestPeriod && windmillCount >= targetReps) {
+            countDownTimer?.cancel()
+            onSetComplete()
+        }
     }
 
     private fun switchCamera() {
