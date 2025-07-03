@@ -38,6 +38,16 @@ data class WorkoutItem(
     val calories_per_minute: Int = 0
 )
 
+// Enhanced medical info data class to combine both basic and detailed medical info
+data class CompleteMedicalInfo(
+    val basicInfo: UserMedicalInfo? = null,
+    val condition: String = "",
+    val medication: String = "",
+    val allergies: String = "",
+    val fractures: String = "",
+    val otherConditions: String = ""
+)
+
 class WorkoutTodoActivity : AppCompatActivity() {
     
     private lateinit var workoutSpinner: Spinner
@@ -47,6 +57,7 @@ class WorkoutTodoActivity : AppCompatActivity() {
     private lateinit var etSeconds: EditText
     private lateinit var btnSelectDate: Button
     private lateinit var btnAddWorkout: Button
+    private lateinit var btnAutoGenerateWorkout: Button
     private lateinit var recyclerView: RecyclerView
     private lateinit var tvWarning: TextView
     private lateinit var progressBar: ProgressBar
@@ -69,6 +80,7 @@ class WorkoutTodoActivity : AppCompatActivity() {
     private lateinit var adapter: WorkoutTodoAdapter
     private var selectedDate: String = ""
     private var userMedicalInfo: UserMedicalInfo? = null
+    private var completeMedicalInfo: CompleteMedicalInfo? = null
     private var todoListener: ListenerRegistration? = null
     
     // Async handling
@@ -91,6 +103,9 @@ class WorkoutTodoActivity : AppCompatActivity() {
             
             // Load data asynchronously
             loadDataAsync()
+
+            val today = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
+            autoGenerateIfNeeded(today)
         } catch (e: Exception) {
             handleError("Initialization error", e)
         }
@@ -105,6 +120,7 @@ class WorkoutTodoActivity : AppCompatActivity() {
             etSeconds = findViewById(R.id.etSeconds)
             btnSelectDate = findViewById(R.id.btnSelectDate)
             btnAddWorkout = findViewById(R.id.btnAddWorkout)
+            btnAutoGenerateWorkout = findViewById(R.id.btnAutoGenerateWorkout)
             recyclerView = findViewById(R.id.recyclerWorkoutTodos)
             tvWarning = findViewById(R.id.tvWarning)
             btnPlusReps = findViewById(R.id.btnPlusReps)
@@ -120,6 +136,7 @@ class WorkoutTodoActivity : AppCompatActivity() {
             try { progressBar = findViewById(R.id.progressBar) } catch (_: Exception) {}
             try { cardLoading = findViewById(R.id.cardLoading) } catch (_: Exception) {}
             btnAddWorkout.isEnabled = false
+            btnAutoGenerateWorkout.isEnabled = false
             workoutSpinner.isEnabled = false
             val calendar = Calendar.getInstance()
             val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
@@ -250,6 +267,11 @@ class WorkoutTodoActivity : AppCompatActivity() {
                 addWorkoutTodo()
             }
             
+            // Auto generate workout button
+            btnAutoGenerateWorkout?.setOnClickListener {
+                autoGenerateWorkout()
+            }
+            
         } catch (e: Exception) {
             Log.e("WorkoutTodo", "Error setting up click listeners", e)
             handleError("Failed to setup interactions", e)
@@ -272,23 +294,45 @@ class WorkoutTodoActivity : AppCompatActivity() {
     private fun loadUserMedicalInfoAsync(onComplete: () -> Unit) {
         backgroundExecutor.execute {
             try {
-                firestore.collection("userMedicalInfo")
-                    .document(userId)
-                    .get()
-                    .addOnSuccessListener { document ->
+                // Load both basic and detailed medical information
+                val basicInfoTask = firestore.collection("userMedicalInfo").document(userId).get()
+                val detailedInfoTask = firestore.collection("userinfo").document(userId).get()
+                
+                basicInfoTask.addOnSuccessListener { basicDoc ->
+                    detailedInfoTask.addOnSuccessListener { detailedDoc ->
                         try {
-                            if (document.exists()) {
-                                userMedicalInfo = document.toObject(UserMedicalInfo::class.java)
+                            // Parse basic medical info
+                            if (basicDoc.exists()) {
+                                userMedicalInfo = basicDoc.toObject(UserMedicalInfo::class.java)
                             }
+                            
+                            // Parse detailed medical info
+                            val medicalInfo = detailedDoc.get("medicalInfo") as? Map<*, *>
+                            completeMedicalInfo = CompleteMedicalInfo(
+                                basicInfo = userMedicalInfo,
+                                condition = medicalInfo?.get("condition") as? String ?: "",
+                                medication = medicalInfo?.get("medication") as? String ?: "",
+                                allergies = medicalInfo?.get("allergies") as? String ?: "",
+                                fractures = medicalInfo?.get("fractures") as? String ?: "",
+                                otherConditions = medicalInfo?.get("otherConditions") as? String ?: ""
+                            )
+                            
+                            Log.d("WorkoutTodo", "Medical info loaded: ${completeMedicalInfo}")
                             incrementLoadedComponents()
                             onComplete()
                         } catch (e: Exception) {
                             handleError("Error parsing medical info", e)
                             onComplete()
                         }
+                    }.addOnFailureListener { e ->
+                        // If detailed info fails, still proceed with basic info only
+                        completeMedicalInfo = CompleteMedicalInfo(basicInfo = userMedicalInfo)
+                        Log.w("WorkoutTodo", "Failed to load detailed medical info", e)
+                        incrementLoadedComponents()
+                        onComplete()
                     }
-                    .addOnFailureListener { e ->
-                        handleError("Failed to load medical info", e)
+                }.addOnFailureListener { e ->
+                    handleError("Failed to load basic medical info", e)
                         onComplete()
                     }
             } catch (e: Exception) {
@@ -448,6 +492,7 @@ class WorkoutTodoActivity : AppCompatActivity() {
         mainHandler.post {
             showLoading(false)
             btnAddWorkout.isEnabled = true
+            btnAutoGenerateWorkout.isEnabled = true
             Toast.makeText(this, "Ready to plan your workouts!", Toast.LENGTH_SHORT).show()
         }
     }
@@ -471,6 +516,7 @@ class WorkoutTodoActivity : AppCompatActivity() {
             showLoading(false)
             showError("$message. Please try again.")
             btnAddWorkout.isEnabled = false
+            btnAutoGenerateWorkout.isEnabled = false
         }
     }
     
@@ -485,16 +531,30 @@ class WorkoutTodoActivity : AppCompatActivity() {
                 msg += "⚠️ Safety Warning: ${workout.safety_warning}\n"
 
             val groups = workout.muscle_groups.toGroupList()
-            userMedicalInfo?.let { med ->
-                val relevant = med.injuries.filter { inj ->
+            completeMedicalInfo?.let { medInfo ->
+                // Check fracture warnings
+                if (medInfo.fractures.isNotEmpty() && medInfo.fractures != "none") {
+                    msg += "🦴 Fracture History: You have reported ${medInfo.fractures} fractures. " +
+                           "This exercise targets: ${groups.joinToString(", ")}. Please use caution.\n"
+                }
+                
+                // Check condition warnings
+                if (medInfo.condition.isNotEmpty() && medInfo.condition != "None") {
+                    msg += "🏥 Medical Condition: ${medInfo.condition}. Consult your doctor if you experience discomfort.\n"
+                }
+                
+                // Check basic injury warnings
+                medInfo.basicInfo?.let { basic ->
+                    val relevant = basic.injuries.filter { inj ->
                     groups.any { mus -> inj.contains(mus, true) || mus.contains(inj, true) }
                 }
                 if (relevant.isNotEmpty())
-                    msg += "🚨 Medical Alert: You have reported injuries in: ${relevant.joinToString(", ")}. " +
+                        msg += "🚨 Injury Alert: You have reported injuries in: ${relevant.joinToString(", ")}. " +
                            "This workout targets: ${groups.joinToString(", ")}.\n"
 
-                if (med.fitnessLevel == "Beginner" && groups.contains("Core"))
+                    if (basic.fitnessLevel == "Beginner" && groups.any { it.contains("core", true) })
                     msg += "💡 Beginner Tip: Start with lower intensity and gradually increase.\n"
+                }
             }
 
             mainHandler.post {
@@ -617,6 +677,347 @@ class WorkoutTodoActivity : AppCompatActivity() {
                     }
             } catch (e: Exception) {
                 handleError("Error creating workout todo", e)
+            }
+        }
+    }
+    
+    private fun autoGenerateWorkout() {
+        try {
+            if (!isDataLoaded || workoutList.isEmpty()) {
+                showError("Please wait for workouts to load")
+                return
+            }
+            // Directly generate without Material3 dialog to avoid InflateException issues on some devices
+            generateRandomWorkout()
+        } catch (e: Exception) {
+            handleError("Error generating workouts", e)
+        }
+    }
+    
+    private fun generateRandomWorkout() {
+        backgroundExecutor.execute {
+            try {
+                // Filter exercises based on user's medical info if available
+                val availableExercises = filterExercisesByMedicalInfo()
+                
+                if (availableExercises.isEmpty()) {
+                    mainHandler.post {
+                        showError("No suitable exercises found")
+                    }
+                    return@execute
+                }
+                
+                // Random number of exercises (3-4)
+                val exerciseCount = (3..4).random()
+                
+                // Randomly select exercises (no duplicates)
+                val selectedExercises = availableExercises.shuffled().take(exerciseCount)
+                
+                // Generate workout todos for each selected exercise
+                val workoutTodos = mutableListOf<WorkoutTodo>()
+                var totalEstimatedCalories = 0
+                
+                selectedExercises.forEach { workout ->
+                    // Random sets (2-4), reps (10-15), rest time (1:30-2:00)
+                    val sets = (2..4).random()
+                    val reps = (10..15).random()
+                    val restMinutes = (1..2).random()
+                    val restSeconds = if (restMinutes == 1) (30..59).random() else 0
+                    
+                    val totalMinutes = restMinutes + (restSeconds / 60.0)
+                    val estimatedCalories = (workout.calories_per_minute * totalMinutes).toInt()
+                    totalEstimatedCalories += estimatedCalories
+                    
+                    val workoutTodo = WorkoutTodo(
+                        id = "",
+                        workoutName = workout.name,
+                        sets = sets,
+                        reps = reps,
+                        minutes = restMinutes,
+                        seconds = restSeconds,
+                        scheduledDate = selectedDate,
+                        userId = userId,
+                        muscleGroups = workout.muscle_groups.toGroupList(),
+                        estimatedCalories = estimatedCalories,
+                        isCompleted = false,
+                        durationMinutes = if (restMinutes > 0 || restSeconds > 0) restMinutes + (restSeconds / 60) else 0
+                    )
+                    
+                    workoutTodos.add(workoutTodo)
+                }
+                
+                // Add all workouts to Firestore
+                addMultipleWorkoutsToFirestore(workoutTodos, totalEstimatedCalories)
+                
+            } catch (e: Exception) {
+                handleError("Error generating workout", e)
+                mainHandler.post {
+                    btnAutoGenerateWorkout.isEnabled = true
+                }
+            }
+        }
+    }
+    
+    private fun filterExercisesByMedicalInfo(): List<WorkoutItem> {
+        return try {
+            if (completeMedicalInfo == null) {
+                // If no medical info, return all exercises
+                workoutList.toList()
+            } else {
+                workoutList.filter { workout ->
+                    isExerciseSafeForUser(workout, completeMedicalInfo!!)
+                }
+            }
+        } catch (e: Exception) {
+            Log.e("WorkoutTodo", "Error filtering exercises", e)
+            workoutList.toList()
+        }
+    }
+    
+    private fun isExerciseSafeForUser(workout: WorkoutItem, medicalInfo: CompleteMedicalInfo): Boolean {
+        try {
+            val workoutMuscles = workout.muscle_groups.toGroupList()
+            val safetyWarning = workout.safety_warning.lowercase()
+            val workoutName = workout.name.lowercase()
+            
+            // Check fracture history and avoid related exercises
+            if (medicalInfo.fractures.isNotEmpty() && medicalInfo.fractures != "none") {
+                when (medicalInfo.fractures.lowercase()) {
+                    "shoulder" -> {
+                        // Avoid shoulder-intensive exercises
+                        if (workoutMuscles.any { it.contains("shoulder", true) || it.contains("deltoid", true) } ||
+                            workoutName.contains("shoulder", true) || workoutName.contains("press", true) ||
+                            workoutName.contains("raise", true) || workoutName.contains("fly", true) ||
+                            safetyWarning.contains("shoulder", true)) {
+                            Log.d("WorkoutTodo", "Filtered out ${workout.name} due to shoulder fracture history")
+                            return false
+                        }
+                    }
+                    "arm" -> {
+                        // Avoid arm/upper body exercises
+                        if (workoutMuscles.any { it.contains("arm", true) || it.contains("bicep", true) || 
+                                                it.contains("tricep", true) || it.contains("forearm", true) } ||
+                            workoutName.contains("curl", true) || workoutName.contains("press", true) ||
+                            safetyWarning.contains("arm", true) || safetyWarning.contains("elbow", true)) {
+                            Log.d("WorkoutTodo", "Filtered out ${workout.name} due to arm fracture history")
+                            return false
+                        }
+                    }
+                    "back" -> {
+                        // Avoid back-intensive exercises
+                        if (workoutMuscles.any { it.contains("back", true) || it.contains("spine", true) ||
+                                                it.contains("lat", true) || it.contains("trap", true) } ||
+                            workoutName.contains("deadlift", true) || workoutName.contains("row", true) ||
+                            workoutName.contains("pull", true) || safetyWarning.contains("back", true) ||
+                            safetyWarning.contains("spine", true)) {
+                            Log.d("WorkoutTodo", "Filtered out ${workout.name} due to back fracture history")
+                            return false
+                        }
+                    }
+                    "leg" -> {
+                        // Avoid leg-intensive exercises
+                        if (workoutMuscles.any { it.contains("leg", true) || it.contains("quad", true) ||
+                                                it.contains("hamstring", true) || it.contains("calf", true) ||
+                                                it.contains("glute", true) } ||
+                            workoutName.contains("squat", true) || workoutName.contains("lunge", true) ||
+                            workoutName.contains("leg", true) || safetyWarning.contains("knee", true) ||
+                            safetyWarning.contains("ankle", true)) {
+                            Log.d("WorkoutTodo", "Filtered out ${workout.name} due to leg fracture history")
+                            return false
+                        }
+                    }
+                    "wrist" -> {
+                        // Avoid wrist-intensive exercises
+                        if (workoutName.contains("push", true) || workoutName.contains("plank", true) ||
+                            workoutName.contains("press", true) || safetyWarning.contains("wrist", true) ||
+                            safetyWarning.contains("hand", true)) {
+                            Log.d("WorkoutTodo", "Filtered out ${workout.name} due to wrist fracture history")
+                            return false
+                        }
+                    }
+                    "ankle" -> {
+                        // Avoid ankle-intensive exercises
+                        if (workoutName.contains("jump", true) || workoutName.contains("run", true) ||
+                            workoutName.contains("calf", true) || workoutName.contains("hop", true) ||
+                            safetyWarning.contains("ankle", true) || safetyWarning.contains("foot", true)) {
+                            Log.d("WorkoutTodo", "Filtered out ${workout.name} due to ankle fracture history")
+                            return false
+                        }
+                    }
+                }
+            }
+            
+            // Check medical conditions
+            if (medicalInfo.condition.isNotEmpty() && medicalInfo.condition != "None") {
+                when (medicalInfo.condition.lowercase()) {
+                    "shoulder pain" -> {
+                        if (workoutMuscles.any { it.contains("shoulder", true) || it.contains("deltoid", true) } ||
+                            workoutName.contains("shoulder", true) || workoutName.contains("press", true) ||
+                            safetyWarning.contains("shoulder", true)) {
+                            Log.d("WorkoutTodo", "Filtered out ${workout.name} due to shoulder pain condition")
+                            return false
+                        }
+                    }
+                    "back pain" -> {
+                        if (workoutMuscles.any { it.contains("back", true) || it.contains("spine", true) } ||
+                            workoutName.contains("deadlift", true) || workoutName.contains("row", true) ||
+                            safetyWarning.contains("back", true) || safetyWarning.contains("spine", true)) {
+                            Log.d("WorkoutTodo", "Filtered out ${workout.name} due to back pain condition")
+                            return false
+                        }
+                    }
+                    "knee pain" -> {
+                        if (workoutMuscles.any { it.contains("leg", true) || it.contains("quad", true) ||
+                                                it.contains("hamstring", true) } ||
+                            workoutName.contains("squat", true) || workoutName.contains("lunge", true) ||
+                            safetyWarning.contains("knee", true)) {
+                            Log.d("WorkoutTodo", "Filtered out ${workout.name} due to knee pain condition")
+                            return false
+                        }
+                    }
+                    "joint pain" -> {
+                        if (safetyWarning.contains("joint", true) || safetyWarning.contains("impact", true) ||
+                            workoutName.contains("jump", true) || workoutName.contains("plyometric", true)) {
+                            Log.d("WorkoutTodo", "Filtered out ${workout.name} due to joint pain condition")
+                            return false
+                        }
+                    }
+                    "arthritis" -> {
+                        if (safetyWarning.contains("joint", true) || safetyWarning.contains("impact", true) ||
+                            safetyWarning.contains("arthritis", true) || workoutName.contains("high impact", true)) {
+                            Log.d("WorkoutTodo", "Filtered out ${workout.name} due to arthritis condition")
+                            return false
+                        }
+                    }
+                    "heart problem" -> {
+                        if (safetyWarning.contains("heart", true) || safetyWarning.contains("cardiac", true) ||
+                            safetyWarning.contains("intense", true) || workoutName.contains("cardio", true) ||
+                            workoutName.contains("hiit", true)) {
+                            Log.d("WorkoutTodo", "Filtered out ${workout.name} due to heart condition")
+                            return false
+                        }
+                    }
+                    "high blood pressure" -> {
+                        if (safetyWarning.contains("blood pressure", true) || safetyWarning.contains("hypertension", true) ||
+                            safetyWarning.contains("inverted", true) || workoutName.contains("inverted", true)) {
+                            Log.d("WorkoutTodo", "Filtered out ${workout.name} due to high blood pressure")
+                            return false
+                        }
+                    }
+                }
+            }
+            
+            // Check other conditions
+            if (medicalInfo.otherConditions.isNotEmpty() && medicalInfo.otherConditions != "none") {
+                when (medicalInfo.otherConditions.lowercase()) {
+                    "post_surgery" -> {
+                        if (safetyWarning.contains("surgery", true) || safetyWarning.contains("recovery", true) ||
+                            safetyWarning.contains("intense", true)) {
+                            Log.d("WorkoutTodo", "Filtered out ${workout.name} due to post-surgery condition")
+                            return false
+                        }
+                    }
+                    "dizziness" -> {
+                        if (safetyWarning.contains("balance", true) || safetyWarning.contains("inverted", true) ||
+                            workoutName.contains("inverted", true) || workoutName.contains("balance", true)) {
+                            Log.d("WorkoutTodo", "Filtered out ${workout.name} due to dizziness condition")
+                            return false
+                        }
+                    }
+                    "fatigue" -> {
+                        if (safetyWarning.contains("intense", true) || safetyWarning.contains("endurance", true) ||
+                            workoutName.contains("intense", true) || workoutName.contains("endurance", true)) {
+                            Log.d("WorkoutTodo", "Filtered out ${workout.name} due to chronic fatigue")
+                            return false
+                        }
+                    }
+                }
+            }
+            
+            // Check basic injuries from UserMedicalInfo if available
+            medicalInfo.basicInfo?.injuries?.forEach { injury ->
+                if (workoutMuscles.any { muscle -> 
+                        injury.contains(muscle, true) || muscle.contains(injury, true)
+                    }) {
+                    Log.d("WorkoutTodo", "Filtered out ${workout.name} due to injury: $injury")
+                    return false
+                }
+            }
+            
+            // Check if fitness level is beginner and exercise might be too advanced
+            medicalInfo.basicInfo?.let { basicInfo ->
+                if (basicInfo.fitnessLevel.equals("Beginner", true)) {
+                    if (safetyWarning.contains("advanced", true) || safetyWarning.contains("expert", true) ||
+                        workout.name.contains("advanced", true)) {
+                        Log.d("WorkoutTodo", "Filtered out ${workout.name} due to beginner fitness level")
+                        return false
+                    }
+                }
+            }
+            
+            Log.d("WorkoutTodo", "Exercise ${workout.name} is safe for user")
+            return true
+            
+        } catch (e: Exception) {
+            Log.e("WorkoutTodo", "Error checking exercise safety for ${workout.name}", e)
+            // Default to safe if error occurs
+            return true
+        }
+    }
+    
+    private fun addMultipleWorkoutsToFirestore(workoutTodos: List<WorkoutTodo>, totalCalories: Int) {
+        try {
+            val batch = firestore.batch()
+            val workoutCollection = firestore.collection("userTodoList")
+                .document(userId)
+                .collection("workoutPlan")
+            
+            // Add each workout to the batch
+            workoutTodos.forEach { workoutTodo ->
+                val docRef = workoutCollection.document()
+                batch.set(docRef, workoutTodo)
+            }
+            
+            // Commit the batch
+            batch.commit()
+                .addOnSuccessListener {
+                    // Add activity log for the generated workout
+                    val activity = mapOf(
+                        "title" to "Auto-Generated Workout",
+                        "subtitle" to "${workoutTodos.size} exercises planned - $totalCalories cal estimated",
+                        "timestamp" to System.currentTimeMillis(),
+                        "type" to "workout",
+                        "caloriesBurned" to totalCalories,
+                        "date" to selectedDate,
+                        "userId" to userId
+                    )
+                    
+                    firestore.collection("userActivities")
+                        .document(userId)
+                        .collection("recentActivities")
+                        .add(activity)
+                    
+                    mainHandler.post {
+                        Toast.makeText(
+                            this@WorkoutTodoActivity, 
+                            "🎯 Auto-generated ${workoutTodos.size} exercises added to your plan!", 
+                            Toast.LENGTH_LONG
+                        ).show()
+                        clearInputs()
+                        updateProgressCards()
+                        btnAutoGenerateWorkout.isEnabled = true
+                    }
+                }
+                .addOnFailureListener { e ->
+                    handleError("Failed to add generated workouts", e)
+                    mainHandler.post {
+                        btnAutoGenerateWorkout.isEnabled = true
+                    }
+                }
+        } catch (e: Exception) {
+            handleError("Error adding multiple workouts", e)
+            mainHandler.post {
+                btnAutoGenerateWorkout.isEnabled = true
             }
         }
     }
@@ -859,6 +1260,52 @@ class WorkoutTodoActivity : AppCompatActivity() {
             }
         } catch (e: Exception) {
             android.util.Log.e("WorkoutTodoActivity", "Error resuming", e)
+        }
+    }
+
+    private fun autoGenerateIfNeeded(date: String) {
+        val db = FirebaseFirestore.getInstance()
+        val planRef = db.collection("userTodoList")
+            .document(userId!!)
+            .collection("workoutPlan")
+            .whereEqualTo("scheduledDate", date)
+
+        planRef.get().addOnSuccessListener { snap ->
+            if (!snap.isEmpty) return@addOnSuccessListener          // already have workouts for today
+
+            db.collection("workoutcollection").get().addOnSuccessListener { all ->
+                if (all.isEmpty) return@addOnSuccessListener
+
+                // 3-4 random, unique exercises out of the database
+                val picks = all.documents.shuffled().take((3..4).random())
+
+                val batch = db.batch()
+                picks.forEach { doc ->
+                    val wk = doc.toObject(WorkoutItem::class.java) ?: return@forEach
+
+                    val sets = (2..4).random()
+                    val reps = (10..15).random()
+                    val mins = (2..3).random()
+                    val secs = 0                                       // keep whole minutes
+
+                    val todo = WorkoutTodo(
+                        workoutName = wk.name,
+                        sets = sets,
+                        reps = reps,
+                        minutes = mins,
+                        seconds = secs,
+                        scheduledDate = date,
+                        userId = userId!!,
+                        muscleGroups = wk.muscle_groups.toGroupList()
+                    )
+                    val newDoc = db.collection("userTodoList")
+                        .document(userId!!)
+                        .collection("workoutPlan")
+                        .document()            // auto-id
+                    batch.set(newDoc, todo)
+                }
+                batch.commit()
+            }
         }
     }
 }

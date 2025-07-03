@@ -232,6 +232,7 @@
             android:exported="false"
             android:parentActivityName=".TodoHubActivity"
             android:screenOrientation="portrait" />
+        <activity android:name=".AutoGenerateWorkoutActivity" />
     </application>
 
 </manifest>
