@@ -622,7 +622,16 @@ class WorkoutTodoActivity : AppCompatActivity() {
                 showError("Please enter valid sets & reps or time")
                 return
             }
-            createWorkoutTodoAsync(selectedWorkout, sets, reps, minutes, seconds)
+
+            // 👉 NEW: validate against fracture info and ask confirmation if needed
+            if (needsFractureConfirmation(selectedWorkout)) {
+                showFractureDialog(selectedWorkout) {
+                    // onConfirm → proceed adding
+                    createWorkoutTodoAsync(selectedWorkout, sets, reps, minutes, seconds)
+                }
+            } else {
+                createWorkoutTodoAsync(selectedWorkout, sets, reps, minutes, seconds)
+            }
         } catch (e: Exception) {
             handleError("Error adding workout", e)
         }
@@ -1308,6 +1317,52 @@ class WorkoutTodoActivity : AppCompatActivity() {
             }
         }
     }
+
+    // ------------------ FRACTURE CHECK ------------------
+    private fun needsFractureConfirmation(workout: WorkoutItem): Boolean {
+        val fractureType = completeMedicalInfo?.fractures?.lowercase() ?: "none"
+        if (fractureType == "none" || fractureType.isBlank()) return false
+
+        fun String.containsAny(vararg keys: String) = keys.any { this.contains(it, true) }
+
+        val mGroups = workout.muscle_groups.lowercase()
+        val wName = workout.name.lowercase()
+        val warning = workout.safety_warning.lowercase()
+
+        return when (fractureType) {
+            "shoulder" -> mGroups.contains("shoulder") || mGroups.contains("deltoid") ||
+                wName.containsAny("shoulder", "press", "raise", "fly") || warning.contains("shoulder")
+            "arm" -> mGroups.containsAny("arm", "bicep", "tricep", "forearm") ||
+                wName.containsAny("curl", "press") || warning.containsAny("arm", "elbow")
+            "back" -> mGroups.containsAny("back", "lat", "trap", "spine") ||
+                wName.containsAny("deadlift", "row", "pull") || warning.containsAny("back", "spine")
+            "leg" -> mGroups.containsAny("leg", "quad", "hamstring", "calf", "glute") ||
+                wName.containsAny("squat", "lunge", "leg") || warning.containsAny("knee", "ankle")
+            "wrist" -> wName.containsAny("push", "plank", "press") || warning.containsAny("wrist", "hand")
+            "ankle" -> wName.containsAny("jump", "run", "calf", "hop") || warning.containsAny("ankle", "foot")
+            else -> false
+        }
+    }
+
+    private fun showFractureDialog(workout: WorkoutItem, onConfirm: () -> Unit) {
+        try {
+            val builder = AlertDialog.Builder(androidx.appcompat.view.ContextThemeWrapper(this, androidx.appcompat.R.style.ThemeOverlay_AppCompat_Dialog_Alert))
+                .setTitle("Confirm: ${completeMedicalInfo?.fractures?.replaceFirstChar { it.uppercase() }}")
+                .setMessage("This exercise may stress your ${completeMedicalInfo?.fractures}.\n\nAre you sure you want to add \"${workout.name}\"?")
+                .setNegativeButton("No") { d, _ -> d.dismiss() }
+                .setPositiveButton("Yes") { d, _ ->
+                    d.dismiss()
+                    onConfirm()
+                }
+            builder.show()
+        } catch (e: Exception) {
+            Log.e("WorkoutTodo", "Dialog inflate failed, falling back to toast", e)
+            // Fallback: if dialog fails, still ask via Toast (quick) and proceed
+            Toast.makeText(this, "Adding '${workout.name}' may stress your ${completeMedicalInfo?.fractures}", Toast.LENGTH_LONG).show()
+            onConfirm()
+        }
+    }
+    // -----------------------------------------------------
 }
 
 // Adapter for WorkoutTodo RecyclerView

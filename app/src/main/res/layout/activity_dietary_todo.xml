@@ -265,6 +265,22 @@
                     </LinearLayout>
                 </LinearLayout>
 
+                <!-- Auto Generate Meals Button -->
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnAutoGenerateMeals"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/button_height_large"
+                    android:text="Auto-Generate Meals"
+                    android:textSize="@dimen/text_body_large"
+                    android:textStyle="bold"
+                    android:backgroundTint="@color/theme_accent"
+                    app:elevation="6dp"
+                    app:cornerRadius="16dp"
+                    app:icon="@drawable/add"
+                    app:iconGravity="textStart"
+                    app:iconPadding="@dimen/spacing_sm"
+                    android:layout_marginBottom="8dp" />
+
                 <!-- Add Button -->
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnAddMeal"

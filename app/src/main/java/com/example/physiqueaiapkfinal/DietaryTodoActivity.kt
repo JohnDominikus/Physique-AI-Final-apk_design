@@ -48,6 +48,7 @@ class DietaryTodoActivity : AppCompatActivity() {
     private lateinit var btnSelectDate: Button
     private lateinit var btnSelectTime: Button
     private lateinit var btnAddMeal: Button
+    private lateinit var btnAutoGenerateMeals: Button
     private lateinit var recyclerView: RecyclerView
     private lateinit var tvAllergyWarning: TextView
     private lateinit var progressBar: ProgressBar
@@ -63,6 +64,7 @@ class DietaryTodoActivity : AppCompatActivity() {
     private var selectedDate = ""
     private var selectedTime = ""
     private var userMedicalInfo: UserMedicalInfo? = null
+    private var userGymMode: String = "no_preference"
     private var todoListener: ListenerRegistration? = null
     
     // Executor for background operations
@@ -72,7 +74,7 @@ class DietaryTodoActivity : AppCompatActivity() {
     // Loading states
     private var isDataLoaded = false
     private var loadedComponents = 0
-    private val totalComponents = 3 // meals, medical info, todo list
+    private val totalComponents = 4 // meals, medical info, gym mode, todo list
     
     private val mealTypes = listOf("Select Meal Type", "Breakfast", "Lunch", "Dinner", "Snack")
     
@@ -139,6 +141,7 @@ class DietaryTodoActivity : AppCompatActivity() {
             btnSelectDate = findViewById(R.id.btnSelectDate)
             btnSelectTime = findViewById(R.id.btnSelectTime)
             btnAddMeal = findViewById(R.id.btnAddMeal)
+            btnAutoGenerateMeals = findViewById(R.id.btnAutoGenerateMeals)
             recyclerView = findViewById(R.id.recyclerMealTodos)
             tvAllergyWarning = findViewById(R.id.tvAllergyWarning)
             progressBar = findViewById(R.id.progressBar)
@@ -150,6 +153,7 @@ class DietaryTodoActivity : AppCompatActivity() {
             btnSelectDate.isEnabled = true
             btnSelectTime.isEnabled = true
             btnAddMeal.isEnabled = true
+            btnAutoGenerateMeals.isEnabled = true
             mealSpinner.isEnabled = true
             mealTypeSpinner.isEnabled = true
             
@@ -212,6 +216,15 @@ class DietaryTodoActivity : AppCompatActivity() {
                     addMealTodo() 
                 } catch (e: Exception) {
                     handleError("Error adding meal", e)
+                }
+            }
+            
+            // Auto-generate meals button
+            btnAutoGenerateMeals.setOnClickListener {
+                try {
+                    autoGenerateMealsNow()
+                } catch (e: Exception) {
+                    handleError("Error auto-generating meals", e)
                 }
             }
             
@@ -314,9 +327,11 @@ class DietaryTodoActivity : AppCompatActivity() {
         
         // Load data in sequence to prevent overwhelming Firebase
         loadUserMedicalInfoAsync {
-            loadMealDataAsync {
-                loadTodoListAsync {
-                    onAllDataLoaded()
+            loadUserGymModeAsync {
+                loadMealDataAsync {
+                    loadTodoListAsync {
+                        onAllDataLoaded()
+                    }
                 }
             }
         }
@@ -346,6 +361,36 @@ class DietaryTodoActivity : AppCompatActivity() {
                     }
             } catch (e: Exception) {
                 handleError("Medical info loading error", e)
+                onComplete()
+            }
+        }
+    }
+    
+    private fun loadUserGymModeAsync(onComplete: () -> Unit) {
+        backgroundExecutor.execute {
+            try {
+                firestore.collection("userinfo")
+                    .document(userId)
+                    .get()
+                    .addOnSuccessListener { doc ->
+                        try {
+                            val physicalInfo = doc.get("physicalInfo") as? Map<*, *>
+                            userGymMode = ((physicalInfo?.get("gymMode") as? String)?.lowercase() ?: "no_preference").replace('_', '-')
+                        } catch (e: Exception) {
+                            android.util.Log.e("DietaryTodoActivity", "Gym mode parse error", e)
+                        } finally {
+                            incrementLoadedComponents()
+                            onComplete()
+                        }
+                    }
+                    .addOnFailureListener { e ->
+                        android.util.Log.e("DietaryTodoActivity", "Gym mode load fail", e)
+                        incrementLoadedComponents()
+                        onComplete()
+                    }
+            } catch (e: Exception) {
+                android.util.Log.e("DietaryTodoActivity", "Gym mode load exception", e)
+                incrementLoadedComponents()
                 onComplete()
             }
         }
@@ -489,7 +534,8 @@ class DietaryTodoActivity : AppCompatActivity() {
         val loadingMessage = when (loadedComponents) {
             0 -> "Loading meal data..."
             1 -> "Loading medical information..."
-            2 -> "Loading your meal plans..."
+            2 -> "Loading gym mode..."
+            3 -> "Loading your meal plans..."
             else -> "Almost ready..."
         }
         
@@ -509,6 +555,7 @@ class DietaryTodoActivity : AppCompatActivity() {
                 btnAddMeal.isEnabled = true
                 btnSelectDate.isEnabled = true
                 btnSelectTime.isEnabled = true
+                btnAutoGenerateMeals.isEnabled = true
                 mealSpinner.isEnabled = true
                 mealTypeSpinner.isEnabled = true
                 
@@ -696,7 +743,7 @@ class DietaryTodoActivity : AppCompatActivity() {
                         .setTitle("⚠️ Allergy Warning")
                         .setMessage("This meal contains allergens you've reported: ${conflictingAllergies.joinToString(", ")}. Are you sure you want to add it?")
                         .setPositiveButton("Add Anyway") { _, _ -> 
-                            createMealTodoAsync(selectedMeal, selectedMealType)
+                            proceedAfterDietCheck(selectedMeal, selectedMealType)
                         }
                         .setNegativeButton("Cancel", null)
                         .show()
@@ -704,10 +751,31 @@ class DietaryTodoActivity : AppCompatActivity() {
                 }
             }
             
-            createMealTodoAsync(selectedMeal, selectedMealType)
+            // Diet preference check (keto / vegetarian / high protein)
+            proceedAfterDietCheck(selectedMeal, selectedMealType)
             
         } catch (e: Exception) {
             handleError("Error adding meal", e)
+        }
+    }
+    
+    private fun proceedAfterDietCheck(meal: MealItem, mealType: String) {
+        try {
+            if (userGymMode != "no_preference" && !matchesGymMode(meal)) {
+                AlertDialog.Builder(this)
+                    .setTitle("⚠️ Diet Preference Warning")
+                    .setMessage("This meal may not align with your $userGymMode diet preference. Are you sure you want to add it?")
+                    .setPositiveButton("Add Anyway") { _, _ ->
+                        createMealTodoAsync(meal, mealType)
+                    }
+                    .setNegativeButton("Cancel", null)
+                    .show()
+            } else {
+                createMealTodoAsync(meal, mealType)
+            }
+        } catch (e: Exception) {
+            handleError("Diet check error", e)
+            createMealTodoAsync(meal, mealType)
         }
     }
     
@@ -1043,6 +1111,77 @@ class DietaryTodoActivity : AppCompatActivity() {
             
         } catch (e: Exception) {
             handleError("Error testing UI elements", e)
+        }
+    }
+
+    /** Auto-generate 3–4 random meals for the currently selected date */
+    private fun autoGenerateMealsNow() {
+        try {
+            if (!isDataLoaded || mealList.isEmpty()) {
+                showError("Please wait for meals to load")
+                return
+            }
+
+            btnAutoGenerateMeals.isEnabled = false
+
+            val mealCount = (3..4).random()
+
+            val eligibleMeals = mealList.filter { matchesGymMode(it) }
+            val source = if (eligibleMeals.size >= mealCount) eligibleMeals else mealList
+            val randomMeals = source.shuffled().take(mealCount)
+
+            val timeDefaults = mapOf(
+                "Breakfast" to "08:00",
+                "Lunch" to "12:00",
+                "Dinner" to "18:00",
+                "Snack" to "15:00"
+            )
+
+            val batch = firestore.batch()
+            val mealPlanRef = firestore.collection("userTodoList").document(userId)
+                .collection("mealPlan")
+
+            for (meal in randomMeals) {
+                val todo = MealTodo(
+                    mealId = meal.id,
+                    mealName = meal.mealName,
+                    mealType = meal.mealType,
+                    scheduledDate = selectedDate,
+                    scheduledTime = timeDefaults[meal.mealType] ?: selectedTime,
+                    userId = userId,
+                    calories = meal.calories,
+                    allergies = meal.allergies,
+                    prepTime = meal.prepTime,
+                    imageUrl = meal.imageUrl
+                )
+
+                batch.set(mealPlanRef.document(), todo)
+            }
+
+            batch.commit()
+                .addOnSuccessListener {
+                    mainHandler.post {
+                        Toast.makeText(this, "✅ Generated ${randomMeals.size} meals!", Toast.LENGTH_SHORT).show()
+                        btnAutoGenerateMeals.isEnabled = true
+                    }
+                }
+                .addOnFailureListener { e ->
+                    handleError("Failed to generate meals", e)
+                    mainHandler.post { btnAutoGenerateMeals.isEnabled = true }
+                }
+
+        } catch (e: Exception) {
+            handleError("Auto-generate meals error", e)
+            btnAutoGenerateMeals.isEnabled = true
+        }
+    }
+
+    private fun matchesGymMode(meal: MealItem): Boolean {
+        return when (userGymMode) {
+            "vegetarian" -> meal.dietaryRestrictions.any { it.equals("Vegetarian", true) }
+            "keto" -> meal.dietaryRestrictions.any { it.equals("Keto", true) || it.equals("Low-carb", true) }
+            "high-protein" -> meal.dietaryRestrictions.any { it.contains("High", true) && it.contains("protein", true) }
+            else -> true // no preference
         }
     }
 }

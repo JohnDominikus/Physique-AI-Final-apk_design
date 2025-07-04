@@ -48,6 +48,7 @@ import android.graphics.Typeface
 import androidx.core.content.ContextCompat
 import com.bumptech.glide.Glide
 import com.google.firebase.storage.FirebaseStorage
+import kotlin.math.roundToInt
 
 // Data classes for dashboard
 data class DashboardStats(
@@ -149,6 +150,9 @@ class DashboardActivity : AppCompatActivity() {
     // New UI components
     private var btnResetCalories: ImageButton? = null
 
+    // ===== Auto-generate meals =====
+    private var autoMealGenTriggered = false // ensure we run only once per session
+
     override fun onCreate(savedInstanceState: Bundle?) {
         try {
             super.onCreate(savedInstanceState)
@@ -219,6 +223,11 @@ class DashboardActivity : AppCompatActivity() {
             
             userId = currentUser?.uid
             Log.d("DashboardActivity", "Firebase initialized for user: $userId")
+            
+            // 🔄 Auto-generate today's meals if none exist yet
+            userId?.let { uid ->
+                autoGenerateMealsIfNeeded(uid)
+            }
             
         } catch (e: Exception) {
             Log.e("DashboardActivity", "Firebase initialization failed", e)
@@ -1304,5 +1313,141 @@ class DashboardActivity : AppCompatActivity() {
                 Log.e("DashboardActivity", "Error resetting daily calories", e)
             }
         }
+    }
+
+    /**
+     * Ensures the user has exactly 1 Breakfast, 1 Lunch, 1 Dinner and 1 Snack for today.
+     * Runs once per app session. Skips generation if any meal docs already exist for today.
+     */
+    private fun autoGenerateMealsIfNeeded(uid: String) {
+        if (autoMealGenTriggered) return
+        autoMealGenTriggered = true
+
+        try {
+            val today = getCurrentDate()
+            firestore.collection("userTodoList").document(uid)
+                .collection("mealPlan")
+                .whereEqualTo("scheduledDate", today)
+                .get()
+                .addOnSuccessListener { snapshot ->
+                    if (snapshot == null || snapshot.isEmpty) {
+                        generateMealsForToday(uid)
+                    } else {
+                        Log.d("DashboardActivity", "Meals already exist for $today – skipping auto-generate")
+                    }
+                }
+                .addOnFailureListener { e ->
+                    Log.e("DashboardActivity", "Failed mealPlan existence check", e)
+                }
+        } catch (e: Exception) {
+            Log.e("DashboardActivity", "autoGenerateMealsIfNeeded error", e)
+        }
+    }
+
+    /**
+     * Randomly pick one meal of each type from the dietarylist and write to mealPlan.
+     */
+    private fun generateMealsForToday(uid: String) {
+        val mealTypes = listOf("Breakfast", "Lunch", "Dinner", "Snack")
+        val today = getCurrentDate()
+
+        val selectedMeals = mutableListOf<Pair<String, com.example.physiqueaiapkfinal.MealItem>>()
+        var finishedQueries = 0
+
+        for (type in mealTypes) {
+            firestore.collection("dietarylist")
+                .whereEqualTo("mealType", type)
+                .get()
+                .addOnSuccessListener { docs ->
+                    if (docs != null && !docs.isEmpty) {
+                        val randomDoc = docs.documents.random()
+                        // Manually map to avoid class-mapper type errors (e.g., prepTime as String)
+                        val mealObj = com.example.physiqueaiapkfinal.MealItem(
+                            id = randomDoc.id,
+                            mealName = randomDoc.getString("mealName") ?: "",
+                            mealType = randomDoc.getString("mealType") ?: type,
+                            prepTime = randomDoc.get("prepTime").toIntSafe(),
+                            imageUrl = randomDoc.getString("imageUrl") ?: "",
+                            allergies = randomDoc.get("allergies").toStringList(),
+                            calories = randomDoc.get("calories").toIntSafe(),
+                            ingredients = randomDoc.get("ingredients").toStringList(),
+                            dietaryRestrictions = randomDoc.get("dietaryRestrictions").toStringList(),
+                            nutritionFacts = randomDoc.get("nutritionFacts") as? Map<String,String> ?: emptyMap()
+                        )
+                        selectedMeals.add(type to mealObj)
+                    } else {
+                        Log.w("DashboardActivity", "No meals found for type $type")
+                    }
+
+                    finishedQueries++
+                    if (finishedQueries == mealTypes.size) {
+                        // All queries done – write selected meals
+                        writeMealsBatch(uid, today, selectedMeals)
+                    }
+                }
+                .addOnFailureListener { e ->
+                    Log.e("DashboardActivity", "Error fetching meals for type $type", e)
+                    finishedQueries++
+                    if (finishedQueries == mealTypes.size) {
+                        writeMealsBatch(uid, today, selectedMeals)
+                    }
+                }
+        }
+    }
+
+    private fun writeMealsBatch(uid: String, date: String, meals: List<Pair<String, com.example.physiqueaiapkfinal.MealItem>>) {
+        if (meals.isEmpty()) {
+            Log.w("DashboardActivity", "No meals selected – skipping batch write")
+            return
+        }
+
+        val mealTimeDefaults = mapOf(
+            "Breakfast" to "08:00",
+            "Lunch" to "12:00",
+            "Dinner" to "18:00",
+            "Snack" to "15:00"
+        )
+
+        val batch = firestore.batch()
+        val mealPlanRef = firestore.collection("userTodoList").document(uid).collection("mealPlan")
+
+        for ((type, meal) in meals) {
+            val todo = MealTodo(
+                mealId = meal.id,
+                mealName = meal.mealName,
+                mealType = type,
+                scheduledDate = date,
+                scheduledTime = mealTimeDefaults[type] ?: "00:00",
+                userId = uid,
+                calories = meal.calories,
+                allergies = meal.allergies,
+                prepTime = meal.prepTime,
+                imageUrl = meal.imageUrl
+            )
+
+            val newDocRef = mealPlanRef.document() // auto-id
+            batch.set(newDocRef, todo)
+        }
+
+        batch.commit()
+            .addOnSuccessListener {
+                Log.d("DashboardActivity", "Auto-generated meals for $date saved (${meals.size})")
+            }
+            .addOnFailureListener { e ->
+                Log.e("DashboardActivity", "Failed to commit auto-generated meals", e)
+            }
+    }
+
+    /* ╔═══════ HELPERS ═══════╗ */
+    private fun Any?.toIntSafe(): Int = when (this) {
+        is Number -> this.toDouble().roundToInt()
+        is String -> this.toDoubleOrNull()?.roundToInt() ?: 0
+        else -> 0
+    }
+
+    private fun Any?.toStringList(): List<String> = when (this) {
+        is List<*> -> this.filterIsInstance<String>()
+        is String -> listOf(this)
+        else -> emptyList()
     }
 } 
