@@ -47,17 +47,14 @@ class ProfileActivity : AppCompatActivity() {
     private var layoutActionButtons: LinearLayout? = null
 
     // Physical & Medical Views
-    private var tvBodyLevel: TextView? = null
-    private var tvBodyClassification: TextView? = null
-    private var tvExerciseRoutine: TextView? = null
-    private var tvOtherInfo: TextView? = null
-    private var tvGymMode: TextView? = null
+    private var etBodyLevel: TextInputEditText? = null
+    private var etBodyType: TextInputEditText? = null
+    private var etExerciseRoutine: TextInputEditText? = null
+    private var etDietMode: TextInputEditText? = null
 
-    private var tvCondition: TextView? = null
-    private var tvMedication: TextView? = null
-    private var tvAllergies: TextView? = null
-    private var tvFractures: TextView? = null
-    private var tvOtherConditions: TextView? = null
+    private var etCondition: TextInputEditText? = null
+    private var etMedication: TextInputEditText? = null
+    private var etAllergies: TextInputEditText? = null
 
     private var btnEditPhysical: MaterialButton? = null
     private var btnEditMedical: MaterialButton? = null
@@ -131,18 +128,15 @@ class ProfileActivity : AppCompatActivity() {
             layoutActionButtons = findViewById(R.id.layoutActionButtons)
             
             // Physical
-            tvBodyLevel = findViewById(R.id.tvBodyLevel)
-            tvBodyClassification = findViewById(R.id.tvBodyClassification)
-            tvExerciseRoutine = findViewById(R.id.tvExerciseRoutine)
-            tvOtherInfo = findViewById(R.id.tvOtherInfo)
-            tvGymMode = findViewById(R.id.tvGymMode)
+            etBodyLevel = findViewById(R.id.etBodyLevel)
+            etBodyType = findViewById(R.id.etBodyType)
+            etExerciseRoutine = findViewById(R.id.etExerciseRoutine)
+            etDietMode = findViewById(R.id.etDietMode)
 
             // Medical
-            tvCondition = findViewById(R.id.tvCondition)
-            tvMedication = findViewById(R.id.tvMedication)
-            tvAllergies = findViewById(R.id.tvAllergies)
-            tvFractures = findViewById(R.id.tvFractures)
-            tvOtherConditions = findViewById(R.id.tvOtherConditions)
+            etCondition = findViewById(R.id.etCondition)
+            etMedication = findViewById(R.id.etMedication)
+            etAllergies = findViewById(R.id.etAllergies)
 
             btnEditPhysical = findViewById(R.id.btnEditPhysical)
             btnEditMedical = findViewById(R.id.btnEditMedical)
@@ -290,19 +284,23 @@ class ProfileActivity : AppCompatActivity() {
                             
                             // Physical Info
                             val physical = document.get("physicalInfo") as? Map<*, *>
-                            tvBodyLevel?.text = "Body Level: ${physical?.get("bodyLevel") ?: "-"}"
-                            tvBodyClassification?.text = "Body Type: ${physical?.get("bodyClassification") ?: "-"}"
-                            tvExerciseRoutine?.text = "Routine: ${physical?.get("exerciseRoutine") ?: "-"}"
-                            tvOtherInfo?.text = "Other Info: ${physical?.get("otherInfo") ?: "-"}"
-                            tvGymMode?.text = "Diet Mode: ${physical?.get("gymMode") ?: "-"}"
+                            etBodyLevel?.setText("${physical?.get("bodyLevel") ?: "-"}")
+                            etBodyType?.setText("${physical?.get("bodyClassification") ?: "-"}")
+                            etExerciseRoutine?.setText("${physical?.get("exerciseRoutine") ?: "-"}")
+                            etDietMode?.setText("${physical?.get("gymMode") ?: "-"}")
 
                             // Medical Info
                             val medical = document.get("medicalInfo") as? Map<*, *>
-                            tvCondition?.text = "Condition: ${medical?.get("condition") ?: "-"}"
-                            tvMedication?.text = "Medication: ${medical?.get("medication") ?: "-"}"
-                            tvAllergies?.text = "Allergies: ${medical?.get("allergies") ?: "-"}"
-                            tvFractures?.text = "Fractures: ${medical?.get("fractures") ?: "-"}"
-                            tvOtherConditions?.text = "Other Conditions: ${medical?.get("otherConditions") ?: "-"}"
+                            etCondition?.setText("${medical?.get("condition") ?: "-"}")
+                            etMedication?.setText("${medical?.get("medication") ?: "-"}")
+                            
+                            // Handle allergies (could be a list)
+                            val allergies = medical?.get("allergies")
+                            val allergiesText = when (allergies) {
+                                is List<*> -> allergies.joinToString(", ") { it.toString() }
+                                else -> allergies?.toString() ?: "-"
+                            }
+                            etAllergies?.setText(allergiesText)
                             
                             Log.d("ProfileActivity", "User info loaded successfully")
                         } else {

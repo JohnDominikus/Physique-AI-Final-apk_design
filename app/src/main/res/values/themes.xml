@@ -312,15 +312,26 @@
     <!-- Modern Bottom Navigation -->
     <style name="Widget.App.BottomNavigation" parent="Widget.Material3.BottomNavigationView">
         <item name="android:background">@color/nav_background</item>
-        <item name="itemIconTint">@color/nav_unselected</item>
-        <item name="itemTextColor">@color/nav_unselected</item>
+        <item name="itemIconTint">@color/bottom_nav_selector</item>
+        <item name="itemTextColor">@color/bottom_nav_selector</item>
         <item name="itemActiveIndicatorStyle">@style/Widget.App.BottomNavigation.ActiveIndicator</item>
         <item name="android:elevation">8dp</item>
         <item name="labelVisibilityMode">labeled</item>
+        <item name="itemPaddingTop">8dp</item>
+        <item name="itemPaddingBottom">8dp</item>
     </style>
 
     <style name="Widget.App.BottomNavigation.ActiveIndicator" parent="Widget.Material3.BottomNavigationView.ActiveIndicator">
         <item name="android:color">@color/nav_selected</item>
+        <item name="android:width">56dp</item>
+        <item name="android:height">32dp</item>
+        <item name="shapeAppearance">@style/ShapeAppearance.App.SmallComponent</item>
+    </style>
+    
+    <!-- Shape appearance for rounded navigation indicators -->
+    <style name="ShapeAppearance.App.SmallComponent" parent="ShapeAppearance.Material3.SmallComponent">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">16dp</item>
     </style>
 
     <!-- Modern Progress Bar -->

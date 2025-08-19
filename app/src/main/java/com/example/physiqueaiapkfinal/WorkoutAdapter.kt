@@ -23,7 +23,6 @@ class WorkoutAdapter(
         val muscleGroups: TextView = view.findViewById(R.id.workoutMuscleGroups)
         val difficulty: TextView = view.findViewById(R.id.workoutDifficulty)
         val thumbmail: ImageView = view.findViewById(R.id.workoutImage)
-        val heartIcon: ImageView = view.findViewById(R.id.heartIcon)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): WorkoutViewHolder {
@@ -48,59 +47,14 @@ class WorkoutAdapter(
 
         holder.itemView.setOnClickListener { onItemClick(workout) }
 
-        updateHeartIcon(holder, workoutId)
-
-        holder.heartIcon.setOnClickListener {
-            val userId = FirebaseAuth.getInstance().currentUser?.uid
-            if (userId == null) {
-                Toast.makeText(holder.itemView.context, "Please log in to like workouts", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
-            }
-
-            val db = FirebaseFirestore.getInstance()
-            val userLikedWorkoutsRef = db.collection("users").document(userId).collection("likedWorkouts")
-            val workoutDoc = userLikedWorkoutsRef.document(workoutId)
-
-            val currentlyLiked = likedWorkoutIds.contains(workoutId)
-
-            if (currentlyLiked) {
-                workoutDoc.delete()
-                    .addOnSuccessListener {
-                        likedWorkoutIds.remove(workoutId)
-                        updateHeartIcon(holder, workoutId)
-                        Toast.makeText(holder.itemView.context, "${workout.name} unliked", Toast.LENGTH_SHORT).show()
-                    }
-                    .addOnFailureListener { e ->
-                        Toast.makeText(holder.itemView.context, "Error unliking workout: ${e.message}", Toast.LENGTH_SHORT).show()
-                    }
-            } else {
-                workoutDoc.set(mapOf("workoutId" to workoutId))
-                    .addOnSuccessListener {
-                        likedWorkoutIds.add(workoutId)
-                        updateHeartIcon(holder, workoutId)
-                        Toast.makeText(holder.itemView.context, "${workout.name} liked", Toast.LENGTH_SHORT).show()
-                    }
-                    .addOnFailureListener { e ->
-                        Toast.makeText(holder.itemView.context, "Error liking workout: ${e.message}", Toast.LENGTH_SHORT).show()
-                    }
-            }
-        }
+        // Removed heart like interactions
     }
 
     override fun getItemCount() = workouts.size
 
-    private fun updateHeartIcon(holder: WorkoutViewHolder, workoutId: String) {
-        if (likedWorkoutIds.contains(workoutId)) {
-            holder.heartIcon.setImageResource(R.drawable.fav_filled)
-        } else {
-            holder.heartIcon.setImageResource(R.drawable.fav)
-        }
-    }
+    // Removed heart icon updates
 
-    fun setLikedWorkoutIds(likedIds: Set<String>) {
-        this.likedWorkoutIds = likedIds.toMutableSet()
-        notifyDataSetChanged()
-    }
+    // Liked workouts feature removed
 
     fun updateData(newList: List<Workout>) {
         workouts.clear()

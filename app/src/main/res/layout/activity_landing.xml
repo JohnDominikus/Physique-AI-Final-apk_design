@@ -50,7 +50,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Welcome to"
-                android:textColor="#E0FFFFFF"
+                android:textColor="#424242"
                 android:textSize="18sp"
                 android:fontFamily="@font/poppins_medium"
                 android:layout_marginBottom="8dp" />
@@ -60,7 +60,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="PHYSIQUE AI"
-                android:textColor="@color/absolute_white"
+                android:textColor="@color/surface_dark"
                 android:textSize="36sp"
                 android:textStyle="bold"
                 android:fontFamily="@font/poppins_bold"
@@ -71,7 +71,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Your AI Fitness Companion"
-                android:textColor="#C0FFFFFF"
+                android:textColor="#424242"
                 android:textSize="16sp"
                 android:fontFamily="@font/poppins_medium"
                 android:layout_marginBottom="48dp"
@@ -145,13 +145,13 @@
                         android:layout_height="40dp"
                         android:src="@drawable/excercise"
                         android:layout_marginBottom="8dp"
-                        app:tint="#C0FFFFFF" />
+                        app:tint="#757575" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="AI Workouts"
-                        android:textColor="#C0FFFFFF"
+                        android:textColor="#121212"
                         android:textSize="12sp"
                         android:fontFamily="@font/poppins_medium"
                         android:gravity="center" />
@@ -171,13 +171,13 @@
                         android:layout_height="40dp"
                         android:src="@drawable/dietary"
                         android:layout_marginBottom="8dp"
-                        app:tint="#C0FFFFFF" />
+                        app:tint="#FF9800" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Nutrition"
-                        android:textColor="#C0FFFFFF"
+                        android:textColor="#121212"
                         android:textSize="12sp"
                         android:fontFamily="@font/poppins_medium"
                         android:gravity="center" />
@@ -197,13 +197,13 @@
                         android:layout_height="40dp"
                         android:src="@drawable/pose"
                         android:layout_marginBottom="8dp"
-                        app:tint="#C0FFFFFF" />
+                        app:tint="#FFE66D" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Pose AI"
-                        android:textColor="#C0FFFFFF"
+                        android:textColor="#121212"
                         android:textSize="12sp"
                         android:fontFamily="@font/poppins_medium"
                         android:gravity="center" />

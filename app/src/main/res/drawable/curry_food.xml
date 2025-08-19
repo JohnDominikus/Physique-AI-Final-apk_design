@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <!-- Curry bowl icon -->
+    <path
+        android:fillColor="#FF8C42"
+        android:pathData="M4,12c0,4.4 3.6,8 8,8s8-3.6 8-8h-16z"/>
+    <path
+        android:fillColor="#FFA726"
+        android:pathData="M4,12h16v2H4z"/>
+    <path
+        android:fillColor="#FF6F00"
+        android:pathData="M6,14c0,1.1 0.9,2 2,2h8c1.1,0 2-0.9 2-2H6z"/>
+</vector>

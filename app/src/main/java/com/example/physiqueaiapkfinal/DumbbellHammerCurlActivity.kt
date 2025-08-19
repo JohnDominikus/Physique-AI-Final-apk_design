@@ -54,12 +54,12 @@ class DumbbellHammerCurlActivity : AppCompatActivity() {
     // Ultra-accurate hammer curl detection variables
     private var isRaised = false
     private var lastHammerCurlTime = 0L
-    private val MIN_HAMMER_CURL_INTERVAL = 500L // Reduced time for more responsive counting
+    private val MIN_HAMMER_CURL_INTERVAL = 500L // Balanced for responsive but accurate counting
 
     // Advanced detection variables
     private var raisedFrameCount = 0
     private var loweredFrameCount = 0
-    private val MIN_STABLE_FRAMES = 1 // Maximum responsiveness for counting
+    private val MIN_STABLE_FRAMES = 1 // Immediate responsiveness - count on first detection
 
     // Simplified history tracking for hammer curl detection
     private val shoulderAngleHistory = mutableListOf<Float>()
@@ -69,7 +69,7 @@ class DumbbellHammerCurlActivity : AppCompatActivity() {
 
     // Performance optimization variables
     private var frameSkipCounter = 0
-    private val FRAME_SKIP_COUNT = 3 // Increase skip to improve performance
+    private val FRAME_SKIP_COUNT = 2 // Balanced frame processing for stability
 
     // Camera switching variables
     private var isUsingFrontCamera = true
@@ -382,7 +382,7 @@ class DumbbellHammerCurlActivity : AppCompatActivity() {
             val allLandmarks = listOf(leftShoulder, rightShoulder, leftElbow, rightElbow, leftWrist, rightWrist)
             val avgConfidence = allLandmarks.map { it.inFrameLikelihood }.average().toFloat()
 
-            if (avgConfidence < 0.6f) { // Balanced threshold for better detection
+            if (avgConfidence < 0.5f) { // Balanced threshold for reliable detection
                 Log.d(TAG, "Low confidence: ${(avgConfidence*100).toInt()}%")
                 return
             }
@@ -411,8 +411,8 @@ class DumbbellHammerCurlActivity : AppCompatActivity() {
             val isUpright = avgShoulderY < avgHipY // Shoulders above hips
 
             // 4. Balanced both arms detection for hammer curls
-            val leftArmVisible = leftWrist.inFrameLikelihood > 0.7f && leftElbow.inFrameLikelihood > 0.7f && leftShoulder.inFrameLikelihood > 0.7f
-            val rightArmVisible = rightWrist.inFrameLikelihood > 0.7f && rightElbow.inFrameLikelihood > 0.7f && rightShoulder.inFrameLikelihood > 0.7f
+            val leftArmVisible = leftWrist.inFrameLikelihood > 0.6f && leftElbow.inFrameLikelihood > 0.6f && leftShoulder.inFrameLikelihood > 0.6f
+            val rightArmVisible = rightWrist.inFrameLikelihood > 0.6f && rightElbow.inFrameLikelihood > 0.6f && rightShoulder.inFrameLikelihood > 0.6f
             val bothArmsUsed = leftArmVisible && rightArmVisible
 
             // Calculate individual arm positions for strict detection
@@ -420,14 +420,14 @@ class DumbbellHammerCurlActivity : AppCompatActivity() {
             val rightWristToElbowDiff = rightWristY - rightElbowY
 
             // NEW: STRICT SINGLE ARM DETECTION - Detect if only one arm is moving
-            val leftArmMoving = kotlin.math.abs(leftWristToElbowDiff) > 8f // Reduced threshold for better detection
-            val rightArmMoving = kotlin.math.abs(rightWristToElbowDiff) > 8f // Reduced threshold for better detection
+            val leftArmMoving = kotlin.math.abs(leftWristToElbowDiff) > 8f // Balanced threshold for proper detection
+            val rightArmMoving = kotlin.math.abs(rightWristToElbowDiff) > 8f // Balanced threshold for proper detection
             val singleArmDetected = (leftArmMoving && !rightArmMoving) || (rightArmMoving && !leftArmMoving)
             val bothArmsMoving = leftArmMoving && rightArmMoving
 
-            // STRICT ARM SYNCHRONIZATION - Both arms must move in similar amounts
+            // BALANCED ARM SYNCHRONIZATION - Both arms must move in similar amounts
             val armMovementDifference = kotlin.math.abs(leftWristToElbowDiff - rightWristToElbowDiff)
-            val armsMovingSynchronously = armMovementDifference < 25f // Much stricter than before (was 80f)
+            val armsMovingSynchronously = armMovementDifference < 40f // Balanced - not too strict
 
             // 5. HAMMER CURL SPECIFIC CONSTRAINTS to prevent false positives from other exercises:
 
@@ -518,16 +518,16 @@ class DumbbellHammerCurlActivity : AppCompatActivity() {
                             !singleArmDetected && // NEW: Block single arm movements
                             armsMovingSynchronously && // NEW: Arms must move in sync
                             isUpright &&
-                            avgConfidence > 0.3f &&
+                            avgConfidence > 0.3f && // Balanced for reliable detection
                             isNotElbowRaise && // Critical addition
                             !isLateralRaise && // Critical: block lateral raise
                             armsCloseToBody // Basic requirement: arms must be close to body
                     )
 
-            // TEMPORARILY calculate smoothed diff for position detection
+            // TEMPORARILY calculate smoothed diff for position detection - balanced for stability
             val tempHistory = shoulderAngleHistory.toMutableList()
             tempHistory.add(wristToElbowDiff)
-            if (tempHistory.size > 7) {
+            if (tempHistory.size > 5) {
                 tempHistory.removeAt(0)
             }
             val smoothedDiff = if (tempHistory.isNotEmpty()) tempHistory.average().toFloat() else wristToElbowDiff
@@ -535,15 +535,15 @@ class DumbbellHammerCurlActivity : AppCompatActivity() {
             // HAMMER CURL POSITION DETECTION with STRICT validation:
             // Only count if it's a valid hammer curl movement
 
-            // HAMMER CURL SPECIFIC: Focus on wrist-to-elbow movement only
+            // HAMMER CURL SPECIFIC: Focus on wrist-to-elbow movement only - BALANCED RESPONSE
             val isLoweredPosition = (
-                    smoothedDiff > 10f && // Very sensitive - wrists clearly below elbows
-                            bothArmsUsed && bothArmsMoving && !singleArmDetected && armsMovingSynchronously && avgConfidence > 0.3f // Strict requirements
+                    smoothedDiff > 12f && // Balanced sensitivity - wrists clearly below elbows
+                            bothArmsUsed && bothArmsMoving && !singleArmDetected && armsMovingSynchronously && avgConfidence > 0.3f // Balanced confidence
                     )
 
             val isRaisedPosition = (
-                    smoothedDiff <= 10f && // Wrists at or slightly above elbow level
-                            bothArmsUsed && bothArmsMoving && !singleArmDetected && armsMovingSynchronously && avgConfidence > 0.3f // Strict requirements
+                    smoothedDiff <= 5f && // More forgiving for raised position
+                            bothArmsUsed && bothArmsMoving && !singleArmDetected && armsMovingSynchronously && avgConfidence > 0.3f // Balanced confidence
                     )
 
             // Enhanced logging for debugging (reduced frequency)
@@ -574,49 +574,31 @@ class DumbbellHammerCurlActivity : AppCompatActivity() {
                 isRaised = false // Reset raised state
                 lastCountedRaise = false // Reset counting state
                 // Don't reset hasBeenLowered - keep exercise state but prevent counting
+                // Reset timer to prevent immediate false counts
+                lastHammerCurlTime = System.currentTimeMillis()
                 Log.d(TAG, "🚫 BLOCKED: Invalid movement detected - FULL STATE RESET")
                 Log.d(TAG, "    Single arm: $singleArmDetected, Both moving: $bothArmsMoving, Synchronized: $armsMovingSynchronously")
-                Log.d(TAG, "    Cleared history, reset raised state and count flags")
+                Log.d(TAG, "    Cleared history, reset raised state and count flags, reset timer")
             }
-            // Fixed state machine - more reliable counting
-            else when {
-                isLoweredPosition -> {
+            // SIMPLIFIED state machine - similar to working exercises (SquatActivity pattern)
+            else {
+                // Track phase progression similar to working exercises
+                if (isLoweredPosition && !isRaised) {
                     loweredFrameCount++
                     raisedFrameCount = 0
-
-                    // ONLY add to history if valid movement
-                    shoulderAngleHistory.add(wristToElbowDiff)
-                    if (shoulderAngleHistory.size > 7) {
-                        shoulderAngleHistory.removeAt(0)
-                    }
-
+                    
                     if (loweredFrameCount >= MIN_STABLE_FRAMES) {
-                        if (!hasBeenLowered) {
-                            hasBeenLowered = true
-                            val validationStatus = if (isValidHammerCurlMovement) "validated" else "detected"
-                            Log.d(TAG, "✅ LOWERED position established ($validationStatus)")
-                        }
-
-                        if (isRaised) {
-                            isRaised = false
-                            lastCountedRaise = false // Reset counting flag when going down
-                            Log.d(TAG, "RAISED → LOWERED transition - ready for next count")
-                        }
+                        isRaised = false
+                        hasBeenLowered = true
+                        lastCountedRaise = false // Reset count flag when going down
+                        Log.d(TAG, "💪 Position changed to LOWERED - ready for next rep")
                     }
-                }
-
-                isRaisedPosition -> {
+                    
+                } else if (isRaisedPosition && isRaised == false && hasBeenLowered && !lastCountedRaise) {
                     raisedFrameCount++
                     loweredFrameCount = 0
-
-                    // ONLY add to history if valid movement
-                    shoulderAngleHistory.add(wristToElbowDiff)
-                    if (shoulderAngleHistory.size > 7) {
-                        shoulderAngleHistory.removeAt(0)
-                    }
-
-                    // SIMPLIFIED COUNTING: Just check basic requirements
-                    if (raisedFrameCount >= MIN_STABLE_FRAMES && hasBeenLowered && !lastCountedRaise) {
+                    
+                    if (raisedFrameCount >= MIN_STABLE_FRAMES) {
                         // Try validated movement first, then basic movement with anti-elbow-raise check
                         val canCount = isValidHammerCurlMovement || (isBasicValidMovement && isNotElbowRaise)
 
@@ -626,9 +608,9 @@ class DumbbellHammerCurlActivity : AppCompatActivity() {
                                 // Don't count reps during rest period
                                 if (!isRestPeriod) {
                                     hammerCurlCount++
-                                    isRaised = true
-                                    lastCountedRaise = true
                                     lastHammerCurlTime = currentTime
+                                    lastCountedRaise = true // Prevent double counting
+                                    isRaised = true // Mark as raised
 
                                 // Play sound feedback in background thread
                                 backgroundExecutor.execute {
@@ -642,9 +624,12 @@ class DumbbellHammerCurlActivity : AppCompatActivity() {
                                 }
 
                                     val countType = if (isValidHammerCurlMovement) "validated" else "basic (not elbow raise)"
-                                    Log.d(TAG, "🎉 HAMMER CURL COUNTED! Total: $hammerCurlCount ($countType)")
+                                    Log.d(TAG, "🎉 HAMMER CURL #$hammerCurlCount COUNTED! ($countType)")
 
                                     updateHammerCurlCounter()
+                                    
+                                    // Reset cycle tracking for next rep (like other exercises)
+                                    hasBeenLowered = false
                                 }
                             } else {
                                 Log.d(TAG, "⏰ Count blocked by time interval (${currentTime - lastHammerCurlTime}ms < ${MIN_HAMMER_CURL_INTERVAL}ms)")
@@ -661,12 +646,10 @@ class DumbbellHammerCurlActivity : AppCompatActivity() {
                         }
                     } else {
                         // Debug why counting is not happening
-                        Log.d(TAG, "🔍 Count conditions: frames=$raisedFrameCount>=$MIN_STABLE_FRAMES, lowered=$hasBeenLowered, notCounted=${!lastCountedRaise}")
+                        Log.d(TAG, "🔍 Count conditions: frames=$raisedFrameCount>=$MIN_STABLE_FRAMES, lowered=$hasBeenLowered, notCounted=${!lastCountedRaise}, notRaised=${!isRaised}")
                     }
-                }
-
-                else -> {
-                    // Don't reset frame counters too aggressively - only if confidence is very low
+                } else {
+                    // Reset frame counters if not in a clear position
                     if (avgConfidence < 0.3f) {
                         raisedFrameCount = 0
                         loweredFrameCount = 0

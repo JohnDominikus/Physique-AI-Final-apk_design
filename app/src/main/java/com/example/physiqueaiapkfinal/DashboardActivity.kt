@@ -107,9 +107,7 @@ class DashboardActivity : AppCompatActivity() {
     private var cardBMI: CardView? = null
     private var cardWorkouts: CardView? = null
     private var cardCalories: CardView? = null
-    private var cardStartWorkout: CardView? = null
-    private var cardBMICalc: CardView? = null
-    private var cardPoseAI: CardView? = null
+
     
     // Profile menu
     private var btnProfileMenu: ImageButton? = null
@@ -262,9 +260,7 @@ class DashboardActivity : AppCompatActivity() {
             cardBMI = findViewById(R.id.cardBMI)
             cardWorkouts = findViewById(R.id.cardWorkouts)
             cardCalories = findViewById(R.id.cardCalories)
-            cardStartWorkout = findViewById(R.id.cardStartWorkout)
-            cardBMICalc = findViewById(R.id.cardBMICalc)
-            cardPoseAI = findViewById(R.id.cardPoseAI)
+
             
             // Initialize profile menu
             btnProfileMenu = findViewById(R.id.btnProfileMenu)
@@ -377,29 +373,6 @@ class DashboardActivity : AppCompatActivity() {
             }
             
             // Card click listeners with null safety
-            cardStartWorkout?.setOnClickListener {
-                try {
-                    startActivity(Intent(this, WorkoutListActivity::class.java))
-                } catch (e: Exception) {
-                    Log.e("DashboardActivity", "Error navigating to workouts", e)
-                }
-            }
-            
-            cardBMICalc?.setOnClickListener {
-                try {
-                    startActivity(Intent(this, BmiCalculatorActivity::class.java))
-                } catch (e: Exception) {
-                    Log.e("DashboardActivity", "Error navigating to BMI calculator", e)
-                }
-            }
-            
-            cardPoseAI?.setOnClickListener {
-                try {
-                    startActivity(Intent(this, PoseActivity::class.java))
-                } catch (e: Exception) {
-                    Log.e("DashboardActivity", "Error navigating to Pose AI", e)
-                }
-            }
             
             cardWorkouts?.setOnClickListener {
                 try {
@@ -409,13 +382,7 @@ class DashboardActivity : AppCompatActivity() {
                 }
             }
             
-            cardCalories?.setOnClickListener {
-                try {
-                    startActivity(Intent(this, TodoHubActivity::class.java))
-                } catch (e: Exception) {
-                    Log.e("DashboardActivity", "Error navigating to todo hub", e)
-                }
-            }
+
             
             btnViewTodo?.setOnClickListener {
                 try {
@@ -425,16 +392,15 @@ class DashboardActivity : AppCompatActivity() {
                 }
             }
             
-            // TEMPORARY: Test direct profile navigation (for debugging)
+            // BMI card click listener - navigate to BMI calculator
             cardBMI?.setOnClickListener {
                 try {
-                    Log.d("DashboardActivity", "BMI card clicked - testing profile navigation")
-                    val intent = Intent(this, ProfileActivity::class.java)
-                    startActivity(intent)
-                    Log.d("DashboardActivity", "Profile navigation from BMI card successful")
+                    Log.d("DashboardActivity", "BMI card clicked - navigating to BMI calculator")
+                    startActivity(Intent(this, BmiCalculatorActivity::class.java))
+                    Log.d("DashboardActivity", "BMI calculator navigation successful")
                 } catch (e: Exception) {
-                    Log.e("DashboardActivity", "Error navigating to Profile from BMI card", e)
-                    Toast.makeText(this, "Profile error: ${e.message}", Toast.LENGTH_LONG).show()
+                    Log.e("DashboardActivity", "Error navigating to BMI calculator", e)
+                    Toast.makeText(this, "Navigation error: ${e.message}", Toast.LENGTH_SHORT).show()
                 }
             }
             
@@ -918,9 +884,11 @@ class DashboardActivity : AppCompatActivity() {
                         tvNoExercisesToday?.visibility = View.GONE
                         if (rvAddedExercises?.adapter == null) {
                             rvAddedExercises?.layoutManager = LinearLayoutManager(this)
-                            rvAddedExercises?.adapter = AddedExercisesAdapter(exercises) { exercise ->
-                                navigateToExerciseActivity(exercise)
-                            }
+                            rvAddedExercises?.adapter = AddedExercisesAdapter(
+                                exercises,
+                                onStartClick = { exercise -> navigateToExerciseActivity(exercise) },
+                                onItemClick = { exercise -> navigateToWorkoutDetails(exercise) }
+                            )
                         } else {
                             (rvAddedExercises?.adapter as? AddedExercisesAdapter)?.updateExercises(exercises)
                         }
@@ -1000,6 +968,90 @@ class DashboardActivity : AppCompatActivity() {
         startActivity(intent)
     }
 
+    private fun navigateToWorkoutDetails(exercise: AddedExercise) {
+        try {
+            // Find the workout in the workoutcollection by name
+            firestore.collection("workoutcollection")
+                .whereEqualTo("name", exercise.workoutName)
+                .limit(1)
+                .get()
+                .addOnSuccessListener { documents ->
+                    if (!documents.isEmpty) {
+                        val workoutDoc = documents.documents[0]
+                        val workoutId = workoutDoc.id
+                        
+                        // Navigate to WorkoutDetailActivity with the correct workout ID
+                        val intent = Intent(this, WorkoutDetailActivity::class.java).apply {
+                            putExtra("workoutId", workoutId)
+                            putExtra("workoutName", exercise.workoutName)
+                        }
+                        startActivity(intent)
+                        Log.d("DashboardActivity", "Navigating to workout details for: ${exercise.workoutName} with ID: $workoutId")
+                    } else {
+                        // If not found by exact name, try alternative names
+                        findWorkoutByAlternativeNames(exercise)
+                    }
+                }
+                .addOnFailureListener { e ->
+                    Log.e("DashboardActivity", "Error finding workout", e)
+                    Toast.makeText(this, "Could not find workout details", Toast.LENGTH_SHORT).show()
+                }
+        } catch (e: Exception) {
+            Log.e("DashboardActivity", "Error navigating to workout details", e)
+            Toast.makeText(this, "Error opening workout details: ${e.message}", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun findWorkoutByAlternativeNames(exercise: AddedExercise) {
+        // Try common alternative names for exercises
+        val alternativeNames = when (exercise.workoutName.lowercase().trim()) {
+            "sit ups", "sit-ups" -> listOf("Sit Ups", "Sit-Ups", "situps", "Crunches")
+            "push ups", "push-ups", "pushups" -> listOf("Push Ups", "Push-Ups", "pushups", "Push-up")
+            "squats" -> listOf("Squats", "Squat", "squat")
+            "dumbbell front raise" -> listOf("Dumbbell Front Raise", "Front Raise", "Dumbbell Raise")
+            "dumbbell hammer curl" -> listOf("Dumbbell Hammer Curl", "Hammer Curl", "Hammer Curls")
+            "hip thrusts" -> listOf("Hip Thrusts", "Hip Thrust", "hip thrust")
+            "military press" -> listOf("Military Press", "Shoulder Press", "Overhead Press")
+            "windmill" -> listOf("Windmill", "Windmills", "Wind Mill")
+            else -> listOf(exercise.workoutName)
+        }
+
+        // Try each alternative name
+        tryFindWorkoutByNames(alternativeNames, 0, exercise)
+    }
+
+    private fun tryFindWorkoutByNames(names: List<String>, index: Int, exercise: AddedExercise) {
+        if (index >= names.size) {
+            Toast.makeText(this, "Workout '${exercise.workoutName}' not found in database", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        firestore.collection("workoutcollection")
+            .whereEqualTo("name", names[index])
+            .limit(1)
+            .get()
+            .addOnSuccessListener { documents ->
+                if (!documents.isEmpty) {
+                    val workoutDoc = documents.documents[0]
+                    val workoutId = workoutDoc.id
+                    
+                    val intent = Intent(this, WorkoutDetailActivity::class.java).apply {
+                        putExtra("workoutId", workoutId)
+                        putExtra("workoutName", exercise.workoutName)
+                    }
+                    startActivity(intent)
+                    Log.d("DashboardActivity", "Found workout with alternative name: ${names[index]} -> ID: $workoutId")
+                } else {
+                    // Try next alternative name
+                    tryFindWorkoutByNames(names, index + 1, exercise)
+                }
+            }
+            .addOnFailureListener { 
+                // Try next alternative name on failure too
+                tryFindWorkoutByNames(names, index + 1, exercise)
+            }
+    }
+
     private fun toggleWorkoutCompletion(exercise: AddedExercise) {
         userId?.let { uid ->
             // When an exercise is "Done", we remove it from the list
@@ -1038,9 +1090,11 @@ class DashboardActivity : AppCompatActivity() {
                         tvNoMealsToday?.visibility = View.GONE
                         if (rvAddedMeals?.adapter == null) {
                             rvAddedMeals?.layoutManager = LinearLayoutManager(this)
-                            rvAddedMeals?.adapter = AddedMealsAdapter(meals) { meal ->
-                                toggleMealCompletion(meal)
-                            }
+                            rvAddedMeals?.adapter = AddedMealsAdapter(
+                                meals,
+                                onDoneClick = { meal -> toggleMealCompletion(meal) },
+                                onItemClick = { meal -> navigateToRecipeDetails(meal) }
+                            )
                         } else {
                             (rvAddedMeals?.adapter as? AddedMealsAdapter)?.updateMeals(meals)
                         }
@@ -1052,6 +1106,131 @@ class DashboardActivity : AppCompatActivity() {
         } catch (e: Exception) {
             Log.e("DashboardActivity", "Error in updateAddedMeals", e)
         }
+    }
+
+    private fun navigateToRecipeDetails(meal: MealTodo) {
+        try {
+            Log.d("DashboardActivity", "Searching for recipe: ${meal.mealName}")
+            
+            // Try searching in both possible collections with different approaches
+            searchRecipeInCollections(meal, 0)
+        } catch (e: Exception) {
+            Log.e("DashboardActivity", "Error navigating to recipe details", e)
+            Toast.makeText(this, "Error opening recipe details: ${e.message}", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun searchRecipeInCollections(meal: MealTodo, collectionIndex: Int) {
+        val collections = listOf("recipe", "dietarylist")
+        
+        if (collectionIndex >= collections.size) {
+            // If all collections fail, try alternative names in the first collection
+            Log.d("DashboardActivity", "All collections searched, trying alternative names")
+            findRecipeByAlternativeNames(meal)
+            return
+        }
+        
+        val currentCollection = collections[collectionIndex]
+        Log.d("DashboardActivity", "Searching in collection: $currentCollection")
+        
+        firestore.collection(currentCollection)
+            .whereEqualTo("mealName", meal.mealName)
+            .limit(1)
+            .get()
+            .addOnSuccessListener { documents ->
+                if (!documents.isEmpty) {
+                    val recipeDoc = documents.documents[0]
+                    val recipeId = recipeDoc.id
+                    
+                    Log.d("DashboardActivity", "Found recipe in $currentCollection: ID = $recipeId")
+                    
+                    // Navigate to RecipeDetailActivity with the correct recipe ID
+                    val intent = Intent(this, RecipeDetailActivity::class.java).apply {
+                        putExtra("recipeId", recipeId)
+                        putExtra("recipeName", meal.mealName)
+                    }
+                    startActivity(intent)
+                    Log.d("DashboardActivity", "Navigating to recipe details for: ${meal.mealName}")
+                } else {
+                    Log.d("DashboardActivity", "Recipe not found in $currentCollection, trying next collection")
+                    // Try next collection
+                    searchRecipeInCollections(meal, collectionIndex + 1)
+                }
+            }
+            .addOnFailureListener { e ->
+                Log.e("DashboardActivity", "Error searching in $currentCollection", e)
+                // Try next collection
+                searchRecipeInCollections(meal, collectionIndex + 1)
+            }
+    }
+
+    private fun findRecipeByAlternativeNames(meal: MealTodo) {
+        // Try common alternative names for recipes
+        val alternativeNames = when (meal.mealName.lowercase().trim()) {
+            "protein shake", "protein smoothie" -> listOf("Protein Shake", "Protein Smoothie", "protein shake")
+            "chicken salad" -> listOf("Chicken Salad", "chicken salad", "Grilled Chicken Salad")
+            "greek yogurt", "yogurt" -> listOf("Greek Yogurt", "Yogurt", "greek yogurt")
+            "oatmeal", "oats" -> listOf("Oatmeal", "Oats", "oatmeal")
+            "scrambled eggs", "eggs" -> listOf("Scrambled Eggs", "Eggs", "scrambled eggs")
+            else -> listOf(meal.mealName)
+        }
+
+        // Try each alternative name
+        tryFindRecipeByNames(alternativeNames, 0, meal)
+    }
+
+    private fun tryFindRecipeByNames(names: List<String>, index: Int, meal: MealTodo) {
+        if (index >= names.size) {
+            Toast.makeText(this, "Recipe '${meal.mealName}' not found in database", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        Log.d("DashboardActivity", "Trying alternative name: ${names[index]}")
+        
+        // Try all collections for each alternative name
+        tryFindRecipeInCollections(names[index], meal, 0) { found ->
+            if (!found) {
+                // Try next alternative name
+                tryFindRecipeByNames(names, index + 1, meal)
+            }
+        }
+    }
+
+    private fun tryFindRecipeInCollections(searchName: String, meal: MealTodo, collectionIndex: Int, onComplete: (Boolean) -> Unit) {
+        val collections = listOf("recipe", "dietarylist")
+        
+        if (collectionIndex >= collections.size) {
+            onComplete(false)
+            return
+        }
+        
+        val currentCollection = collections[collectionIndex]
+        
+        firestore.collection(currentCollection)
+            .whereEqualTo("mealName", searchName)
+            .limit(1)
+            .get()
+            .addOnSuccessListener { documents ->
+                if (!documents.isEmpty) {
+                    val recipeDoc = documents.documents[0]
+                    val recipeId = recipeDoc.id
+                    
+                    val intent = Intent(this, RecipeDetailActivity::class.java).apply {
+                        putExtra("recipeId", recipeId)
+                        putExtra("recipeName", meal.mealName)
+                    }
+                    startActivity(intent)
+                    Log.d("DashboardActivity", "Found recipe with alternative name: $searchName in $currentCollection -> ID: $recipeId")
+                    onComplete(true)
+                } else {
+                    // Try next collection
+                    tryFindRecipeInCollections(searchName, meal, collectionIndex + 1, onComplete)
+                }
+            }
+            .addOnFailureListener { 
+                // Try next collection on failure too
+                tryFindRecipeInCollections(searchName, meal, collectionIndex + 1, onComplete)
+            }
     }
 
     private fun toggleMealCompletion(meal: MealTodo) {
@@ -1175,10 +1354,6 @@ class DashboardActivity : AppCompatActivity() {
                             }
                             R.id.nav_workout -> {
                                 safeNavigateToActivity(WorkoutListActivity::class.java)
-                                true
-                            }
-                            R.id.nav_posture -> {
-                                safeNavigateToActivity(PoseActivity::class.java)
                                 true
                             }
                             R.id.nav_dietary -> {

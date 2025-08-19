@@ -35,14 +35,7 @@
             android:textColor="@android:color/white"
             android:gravity="center"/>
 
-        <ImageButton
-            android:id="@+id/likedRecipesButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:contentDescription="Liked Recipes"
-            android:src="@drawable/fav"
-            android:layout_marginEnd="8dp"/> <!-- Using outlined for consistency -->
+        <!-- Removed liked recipes heart button -->
 
         <!-- Moved search input to its own section below the top bar -->
     </LinearLayout>

@@ -12,7 +12,7 @@
         android:id="@+id/ivProfile"
         android:layout_width="80dp"
         android:layout_height="80dp"
-        android:src="@drawable/profile"
+        android:src="@drawable/profile2"
         android:contentDescription="@string/profile_image_description"
         android:layout_marginBottom="10dp" />
 

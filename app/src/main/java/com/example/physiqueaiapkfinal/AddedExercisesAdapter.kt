@@ -9,7 +9,8 @@ import androidx.recyclerview.widget.RecyclerView
 
 class AddedExercisesAdapter(
     private var exercises: List<AddedExercise>,
-    private val onStartClick: (AddedExercise) -> Unit
+    private val onStartClick: (AddedExercise) -> Unit,
+    private val onItemClick: (AddedExercise) -> Unit
 ) : RecyclerView.Adapter<AddedExercisesAdapter.ViewHolder>() {
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
@@ -33,6 +34,12 @@ class AddedExercisesAdapter(
         holder.tvReps.text = "${exercise.reps} reps"
         holder.tvTime.text = "${exercise.minutes}m ${exercise.seconds}s"
 
+        // Click on the entire item goes to exercise details
+        holder.itemView.setOnClickListener {
+            onItemClick(exercise)
+        }
+
+        // Click on the start button goes to the exercise activity
         holder.btnStartExercise.setOnClickListener {
             onStartClick(exercise)
         }

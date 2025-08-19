@@ -149,10 +149,6 @@ class TodoHubActivity : AppCompatActivity() {
                             navigateToActivityAsync(WorkoutListActivity::class.java, "Workout List")
                             true
                         }
-                        R.id.nav_posture -> {
-                            navigateToActivityAsync(PoseActivity::class.java, "Pose AI")
-                            true
-                        }
                         R.id.nav_dietary -> {
                             navigateToActivityAsync(RecipeListActivity::class.java, "Recipe List")
                             true

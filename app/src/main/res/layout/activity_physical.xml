@@ -58,6 +58,7 @@
             android:layout_marginBottom="20dp"
             android:background="@drawable/custom_spinner_background"
             android:elevation="4dp"
+            android:textColor="@color/black"
             android:spinnerMode="dropdown" />
 
         <!-- Enhanced Spinner - Body Classification -->
@@ -116,24 +117,7 @@
             android:elevation="4dp"
             android:spinnerMode="dropdown" />
 
-        <!-- Simple Spinner - Other Gym Info -->
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Other Gym Info:"
-            android:textSize="20sp"
-            android:layout_marginBottom="8dp"
-            android:textColor="@color/black"
-            android:fontFamily="sans-serif-medium" />
 
-        <Spinner
-            android:id="@+id/spinnerOthers"
-            android:layout_width="match_parent"
-            android:layout_height="60dp"
-            android:layout_marginBottom="20dp"
-            android:background="@drawable/custom_spinner_background"
-            android:elevation="4dp"
-            android:spinnerMode="dropdown" />
 
         <!-- Enhanced Spinner - Gym Mode -->
         <LinearLayout

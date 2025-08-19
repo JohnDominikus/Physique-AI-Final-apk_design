@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
@@ -36,15 +37,13 @@ class PhysicalActivity : AppCompatActivity() {
         val spinnerBodyLevel = findViewById<Spinner>(R.id.spinnerBodyLevel)
         val spinnerBodyClassification = findViewById<Spinner>(R.id.spinnerBodyClassification)
         val spinnerExercise = findViewById<Spinner>(R.id.spinnerExercise)
-        val spinnerOthers = findViewById<Spinner>(R.id.spinnerOthers)
         val spinnerGymMode = findViewById<Spinner>(R.id.spinnerGymMode)
 
         val btnBackToNext: ImageButton = findViewById(R.id.btnBackToNext)
         val btnNext = findViewById<Button>(R.id.btnNext)
 
-        // Simple spinner setup for Body Level and Others
-        setupSimpleSpinner(spinnerBodyLevel, arrayOf("Select", "Beginner", "Intermediate", "Advanced"))
-        setupSimpleSpinner(spinnerOthers, arrayOf("Select", "Gym member", "Home workout", "Personal trainer", "Other"))
+        // Simple spinner setup for Body Level
+        setupSimpleSpinner(spinnerBodyLevel, arrayOf("Select", "Beginner", "Intermediate"))
 
         // Enhanced setup for the 3 special spinners
         setupSpinnerWithDescriptions(spinnerBodyClassification, arrayOf(
@@ -76,7 +75,6 @@ class PhysicalActivity : AppCompatActivity() {
             val bodyLevel = spinnerBodyLevel.selectedItem.toString()
             val bodyClassification = (spinnerBodyClassification.selectedItem as? SpinnerItem)?.saveValue ?: DEFAULT_SELECT
             val exerciseRoutine = (spinnerExercise.selectedItem as? SpinnerItem)?.saveValue ?: DEFAULT_SELECT
-            val otherInfo = spinnerOthers.selectedItem.toString()
             val gymMode = (spinnerGymMode.selectedItem as? SpinnerItem)?.saveValue ?: DEFAULT_SELECT
 
             if (!isValidSelection(bodyLevel, bodyClassification, exerciseRoutine)) {
@@ -84,7 +82,7 @@ class PhysicalActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
 
-            savePhysicalInfo(bodyLevel, bodyClassification, exerciseRoutine, otherInfo, gymMode)
+            savePhysicalInfo(bodyLevel, bodyClassification, exerciseRoutine, gymMode)
         }
     }
 
@@ -130,7 +128,19 @@ class PhysicalActivity : AppCompatActivity() {
     }
 
     private fun setupSimpleSpinner(spinner: Spinner, items: Array<String>) {
-        val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, items)
+        val adapter = object : ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, items) {
+            override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
+                val v = super.getView(position, convertView, parent)
+                (v as? TextView)?.setTextColor(ContextCompat.getColor(context, R.color.black))
+                return v
+            }
+
+            override fun getDropDownView(position: Int, convertView: View?, parent: ViewGroup): View {
+                val v = super.getDropDownView(position, convertView, parent)
+                (v as? TextView)?.setTextColor(ContextCompat.getColor(context, R.color.black))
+                return v
+            }
+        }
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         spinner.adapter = adapter
     }
@@ -214,7 +224,6 @@ class PhysicalActivity : AppCompatActivity() {
         bodyLevel: String,
         bodyClassification: String,
         exerciseRoutine: String,
-        otherInfo: String,
         gymMode: String
     ) {
         val userId = auth.currentUser?.uid
@@ -227,7 +236,6 @@ class PhysicalActivity : AppCompatActivity() {
             "bodyLevel" to bodyLevel,
             "bodyClassification" to bodyClassification,
             "exerciseRoutine" to exerciseRoutine,
-            "otherInfo" to otherInfo,
             "gymMode" to gymMode
         )
 

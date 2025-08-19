@@ -57,11 +57,4 @@
         android:src="@android:drawable/ic_menu_info_details"
         android:contentDescription="Info" />
 
-    <ImageView
-        android:id="@+id/heartIcon"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@drawable/fav"
-        android:contentDescription="Like" />
-
 </LinearLayout>

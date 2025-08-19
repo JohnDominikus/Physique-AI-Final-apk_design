@@ -465,7 +465,7 @@ class SitUpsActivity : AppCompatActivity() {
 
     private fun startCountdownTimer() {
         countDownTimer?.cancel() // Cancel any existing timer
-        
+
         countDownTimer = object : CountDownTimer(timeRemaining, 1000) {
             override fun onTick(millisUntilFinished: Long) {
                 timeRemaining = millisUntilFinished
@@ -508,7 +508,7 @@ class SitUpsActivity : AppCompatActivity() {
             binding.tvSetLabel.text = "🎉 Workout Complete!"
             binding.tvSetLabel.setTextColor(ContextCompat.getColor(this, android.R.color.holo_green_light))
             Toast.makeText(this, "Done!", Toast.LENGTH_LONG).show()
-            
+
             // Remove exercise from dashboard and return
             removeExerciseAndFinish()
         }
@@ -528,7 +528,7 @@ class SitUpsActivity : AppCompatActivity() {
         isRestPeriod = false
         timeRemaining = totalTimeInMillis
         updateSetDisplay()
-        
+
         Toast.makeText(this, "🔥 Starting Set $currentSet!", Toast.LENGTH_SHORT).show()
         startCountdownTimer()
     }
@@ -547,7 +547,7 @@ class SitUpsActivity : AppCompatActivity() {
     private fun updateTimeDisplay(millisUntilFinished: Long) {
         val minutes = (millisUntilFinished / 1000) / 60
         val seconds = (millisUntilFinished / 1000) % 60
-        
+
         if (isRestPeriod) {
             binding.tvTimeLabel.text = "Rest: ${seconds}s"
             binding.tvTimeLabel.setTextColor(ContextCompat.getColor(this, android.R.color.holo_orange_light))
@@ -613,7 +613,7 @@ class SitUpsActivity : AppCompatActivity() {
             val auth = com.google.firebase.auth.FirebaseAuth.getInstance()
             val firestore = com.google.firebase.firestore.FirebaseFirestore.getInstance()
             val userId = auth.currentUser?.uid
-            
+
             if (userId != null) {
                 firestore.collection("userTodoList").document(userId)
                     .collection("workoutPlan").document(workoutId)

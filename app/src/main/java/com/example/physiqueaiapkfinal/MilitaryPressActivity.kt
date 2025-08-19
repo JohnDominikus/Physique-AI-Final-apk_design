@@ -428,13 +428,13 @@ class MilitaryPressActivity : AppCompatActivity() {
                 val rightWristAboveShoulder = rightShoulderY - rightWristY
                 val avgWristAboveShoulder = (leftWristAboveShoulder + rightWristAboveShoulder) / 2
 
-                // READY POSITION: Arms up at sides with elbows bent (like picture - flexing pose)
+                // READY POSITION: MORE FORGIVING - easier to establish starting pose
                 val isReadyPosition = (
-                        leftElbowAngle > 60f && leftElbowAngle < 120f && // Elbows bent like in picture
-                                rightElbowAngle > 60f && rightElbowAngle < 120f &&
-                                leftWristAboveShoulder > -20f && leftWristAboveShoulder < 80f && // Wrists around shoulder level
-                                rightWristAboveShoulder > -20f && rightWristAboveShoulder < 80f &&
-                                bothArmsUsed && avgConfidence > 0.25f &&
+                        leftElbowAngle > 45f && leftElbowAngle < 130f && // More forgiving elbow angle range
+                                rightElbowAngle > 45f && rightElbowAngle < 130f &&
+                                leftWristAboveShoulder > -30f && leftWristAboveShoulder < 100f && // More forgiving wrist position
+                                rightWristAboveShoulder > -30f && rightWristAboveShoulder < 100f &&
+                                bothArmsUsed && avgConfidence > 0.15f && // Lower confidence requirement
                                 !singleArmDetected
                         )
 
@@ -478,11 +478,11 @@ class MilitaryPressActivity : AppCompatActivity() {
                                 !isTooWide // Not extremely wide
                         )
 
-                // UP POSITION: SIMPLIFIED - just need arms up and reasonable positioning
+                // UP POSITION: MORE FORGIVING - easier to detect arms extended overhead
                 val isUpPosition = (
-                        leftElbowAngle > 130f && rightElbowAngle > 130f && // Lower angle requirement
-                                leftWristAboveShoulder > 40f && rightWristAboveShoulder > 40f && // Lower height requirement
-                                bothArmsUsed && avgConfidence > 0.15f && // Even lower confidence
+                        leftElbowAngle > 120f && rightElbowAngle > 120f && // More forgiving angle requirement
+                                leftWristAboveShoulder > 30f && rightWristAboveShoulder > 30f && // More forgiving height requirement
+                                bothArmsUsed && avgConfidence > 0.1f && // Very low confidence for better detection
                                 !singleArmDetected
                         // Removed diamond shape and crossing checks temporarily
                         )
@@ -501,12 +501,12 @@ class MilitaryPressActivity : AppCompatActivity() {
                     Log.d(TAG, "📏 Wrist Heights: L=${String.format("%.1f", leftWristAboveShoulder)}px | R=${String.format("%.1f", rightWristAboveShoulder)}px")
 
                     // DETAILED UP POSITION CHECK
-                    val leftAngleOK = leftElbowAngle > 130f
-                    val rightAngleOK = rightElbowAngle > 130f
+                    val leftAngleOK = leftElbowAngle > 120f
+                    val rightAngleOK = rightElbowAngle > 120f
                     val bothArmsOK = bothArmsUsed
-                    val confidenceOK = avgConfidence > 0.15f
+                    val confidenceOK = avgConfidence > 0.1f
                     val singleArmOK = !singleArmDetected
-                    val heightOK = leftWristAboveShoulder > 40f && rightWristAboveShoulder > 40f
+                    val heightOK = leftWristAboveShoulder > 30f && rightWristAboveShoulder > 30f
 
                     // DIAMOND SHAPE CHECK
                     val diamondOK = wristDistance < shoulderDistance * 1.2f && wristDistance > 20f

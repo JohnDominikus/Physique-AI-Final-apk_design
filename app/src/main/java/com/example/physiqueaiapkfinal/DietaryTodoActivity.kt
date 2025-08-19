@@ -6,11 +6,15 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
+import android.view.View
+import android.view.ViewGroup
 import android.widget.*
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
@@ -167,12 +171,36 @@ class DietaryTodoActivity : AppCompatActivity() {
             btnSelectTime.text = selectedTime
             
             // Setup meal type spinner with placeholder
-            val mealTypeAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, mealTypes)
+            val mealTypeAdapter = object : ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, mealTypes) {
+                override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
+                    val v = super.getView(position, convertView, parent)
+                    (v as? TextView)?.setTextColor(ContextCompat.getColor(context, R.color.black))
+                    return v
+                }
+
+                override fun getDropDownView(position: Int, convertView: View?, parent: ViewGroup): View {
+                    val v = super.getDropDownView(position, convertView, parent)
+                    (v as? TextView)?.setTextColor(ContextCompat.getColor(context, R.color.black))
+                    return v
+                }
+            }
             mealTypeAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
             mealTypeSpinner.adapter = mealTypeAdapter
             
             // Setup meal spinner with placeholder initially
-            val initialMealAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, listOf("Select a Meal"))
+            val initialMealAdapter = object : ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, listOf("Select a Meal")) {
+                override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
+                    val v = super.getView(position, convertView, parent)
+                    (v as? TextView)?.setTextColor(ContextCompat.getColor(context, R.color.black))
+                    return v
+                }
+
+                override fun getDropDownView(position: Int, convertView: View?, parent: ViewGroup): View {
+                    val v = super.getDropDownView(position, convertView, parent)
+                    (v as? TextView)?.setTextColor(ContextCompat.getColor(context, R.color.black))
+                    return v
+                }
+            }
             initialMealAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
             mealSpinner.adapter = initialMealAdapter
             
@@ -452,7 +480,19 @@ class DietaryTodoActivity : AppCompatActivity() {
                 mainHandler.post { mealSpinner.isEnabled = true }
             }
 
-            val spinnerAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, mealNames)
+            val spinnerAdapter = object : ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, mealNames) {
+                override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
+                    val v = super.getView(position, convertView, parent)
+                    (v as? TextView)?.setTextColor(ContextCompat.getColor(context, R.color.black))
+                    return v
+                }
+
+                override fun getDropDownView(position: Int, convertView: View?, parent: ViewGroup): View {
+                    val v = super.getDropDownView(position, convertView, parent)
+                    (v as? TextView)?.setTextColor(ContextCompat.getColor(context, R.color.black))
+                    return v
+                }
+            }
             spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
             mainHandler.post {
                 mealSpinner.adapter = spinnerAdapter
@@ -467,7 +507,19 @@ class DietaryTodoActivity : AppCompatActivity() {
                         filteredNames.addAll(filtered.map { "${it.mealName} (${it.calories} cal, ${it.prepTime}min)" })
                     }
 
-                    val filterAdapter = ArrayAdapter(this@DietaryTodoActivity, android.R.layout.simple_spinner_item, filteredNames)
+                    val filterAdapter = object : ArrayAdapter<String>(this@DietaryTodoActivity, android.R.layout.simple_spinner_item, filteredNames) {
+                        override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
+                            val v = super.getView(position, convertView, parent)
+                            (v as? TextView)?.setTextColor(ContextCompat.getColor(context, R.color.black))
+                            return v
+                        }
+
+                        override fun getDropDownView(position: Int, convertView: View?, parent: ViewGroup): View {
+                            val v = super.getDropDownView(position, convertView, parent)
+                            (v as? TextView)?.setTextColor(ContextCompat.getColor(context, R.color.black))
+                            return v
+                        }
+                    }
                     filterAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
                     mainHandler.post {
                         mealSpinner.adapter = filterAdapter
@@ -579,7 +631,14 @@ class DietaryTodoActivity : AppCompatActivity() {
         mainHandler.post {
             showLoading(false)
             showError("$message. Please try again.")
+            
+            // Temporarily disable button to prevent rapid clicking
             btnAddMeal.isEnabled = false
+            
+            // Re-enable button after 2 seconds to allow retry
+            mainHandler.postDelayed({
+                btnAddMeal.isEnabled = true
+            }, 2000)
         }
     }
     
@@ -694,6 +753,9 @@ class DietaryTodoActivity : AppCompatActivity() {
     
     private fun addMealTodo() {
         try {
+            // Ensure button is enabled (recovery from any previous error state)
+            btnAddMeal.isEnabled = true
+            
             // Check if data is loaded
             if (mealList.isEmpty()) {
                 showError("Meal data is still loading. Please wait a moment.")
@@ -837,6 +899,14 @@ class DietaryTodoActivity : AppCompatActivity() {
             
             // Hide allergy warning
             tvAllergyWarning.visibility = android.view.View.GONE
+            
+            // Re-enable all UI elements
+            btnAddMeal.isEnabled = true
+            btnAutoGenerateMeals.isEnabled = true
+            btnSelectDate.isEnabled = true
+            btnSelectTime.isEnabled = true
+            mealSpinner.isEnabled = true
+            mealTypeSpinner.isEnabled = true
             
             // Update date to next meal time suggestion
             val calendar = Calendar.getInstance()
@@ -1228,11 +1298,8 @@ class MealTodoAdapter(
             holder.tvAllergies.visibility = android.view.View.GONE
         }
         
-        // Load meal image if available
-        if (todo.imageUrl.isNotEmpty()) {
-            // Use Glide or Picasso to load image
-            // Glide.with(holder.itemView.context).load(todo.imageUrl).into(holder.ivMealImage)
-        }
+        // Load meal image
+        loadMealImage(holder.ivMealImage, todo)
         
         holder.checkBox.setOnCheckedChangeListener { _, _ ->
             onToggleCompletion(todo)
@@ -1243,4 +1310,51 @@ class MealTodoAdapter(
     }
     
     override fun getItemCount() = todoList.size
+    
+    private fun loadMealImage(imageView: ImageView, todo: MealTodo) {
+        // First try to load from URL if available
+        if (todo.imageUrl.isNotEmpty() && todo.imageUrl != "placeholder") {
+            Glide.with(imageView.context)
+                .load(todo.imageUrl)
+                .placeholder(getFallbackImage(todo.mealName))
+                .error(getFallbackImage(todo.mealName))
+                .into(imageView)
+        } else {
+            // Use fallback image based on meal name
+            imageView.setImageResource(getFallbackImage(todo.mealName))
+        }
+    }
+    
+    private fun getFallbackImage(mealName: String): Int {
+        val name = mealName.lowercase()
+        return when {
+            // Curry and lentil dishes - use curry icon
+            name.contains("curry") -> R.drawable.curry_food
+            name.contains("lentil") -> R.drawable.curry_food
+            
+            // Tofu and vegetarian dishes - use tofu icon
+            name.contains("tofu") -> R.drawable.tofu_food
+            name.contains("veggie") -> R.drawable.tofu_food
+            name.contains("vegetarian") -> R.drawable.tofu_food
+            name.contains("bowl") -> R.drawable.tofu_food
+            
+            // Smoothies and drinks - use smoothie thumbnail
+            name.contains("smoothie") -> R.drawable.smoothie_thumb
+            name.contains("protein") && (name.contains("shake") || name.contains("peanut")) -> R.drawable.smoothie_thumb
+            name.contains("peanut butter") -> R.drawable.smoothie_thumb
+            
+            // Breakfast items - use breakfast thumbnail
+            name.contains("oatmeal") -> R.drawable.breakfast_thumb
+            name.contains("cereal") -> R.drawable.breakfast_thumb
+            name.contains("pancake") -> R.drawable.breakfast_thumb
+            name.contains("toast") -> R.drawable.breakfast_thumb
+            name.contains("breakfast") -> R.drawable.breakfast_thumb
+            
+            // Salads and healthy dishes - use meal prep thumbnail
+            name.contains("salad") -> R.drawable.meal_prep_thumb
+            
+            // Default meal categories - use general food image
+            else -> R.drawable.diet1
+        }
+    }
 } 

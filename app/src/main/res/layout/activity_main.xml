@@ -31,10 +31,10 @@
         <!-- Bottom Navigation Bar -->
         <com.google.android.material.bottomnavigation.BottomNavigationView
             android:id="@+id/bottomNavigationView"
+            style="@style/Widget.App.BottomNavigation"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom"
-            android:background="@android:color/white"
             app:menu="@menu/bottom_navigation_menu" />
     </LinearLayout>
 

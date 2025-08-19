@@ -489,23 +489,23 @@ class DumbbellFrontRaiseActivity : AppCompatActivity() {
 
                             Log.d(TAG, "🎉 FRONT RAISE #$frontRaiseCount COUNTED! Lowered → Shoulder Level")
 
-                        mainHandler.post {
-                            updateFrontRaiseCounter()
-                            binding.tvPositionStatus.text = "Position: COUNTED +1! Perfect Form ✓"
-                            binding.tvPositionStatus.setTextColor(ContextCompat.getColor(this@DumbbellFrontRaiseActivity, android.R.color.holo_orange_light))
-                        }
-
-                        // Audio feedback
-                        try {
-                            val toneGenerator = ToneGenerator(AudioManager.STREAM_NOTIFICATION, 100)
-                            toneGenerator.startTone(ToneGenerator.TONE_PROP_BEEP, 300)
-                            backgroundExecutor.execute {
-                                Thread.sleep(350)
-                                toneGenerator.release()
+                            mainHandler.post {
+                                updateFrontRaiseCounter()
+                                binding.tvPositionStatus.text = "Position: COUNTED +1! Perfect Form ✓"
+                                binding.tvPositionStatus.setTextColor(ContextCompat.getColor(this@DumbbellFrontRaiseActivity, android.R.color.holo_orange_light))
                             }
-                        } catch (e: Exception) {
-                            Log.w(TAG, "Audio feedback failed: ${e.message}")
-                        }
+
+                            // Audio feedback - play beep when rep is counted
+                            backgroundExecutor.execute {
+                                try {
+                                    val toneGenerator = ToneGenerator(AudioManager.STREAM_MUSIC, 100)
+                                    toneGenerator.startTone(ToneGenerator.TONE_PROP_BEEP, 200)
+                                    Thread.sleep(250)
+                                    toneGenerator.release()
+                                } catch (e: Exception) {
+                                    Log.e(TAG, "Failed to play beep sound: ${e.message}")
+                                }
+                            }
                         }
                     }
                     hasBeenLowered = false // Reset for next cycle

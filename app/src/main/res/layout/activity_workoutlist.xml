@@ -59,15 +59,6 @@
         android:layout_weight="1"
         android:layout_marginTop="16dp" />
 
-    <!-- Liked Workouts Button -->
-    <ImageButton
-        android:id="@+id/likedWorkoutsButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@android:drawable/btn_star_big_on"
-        android:contentDescription="Liked Workouts"
-        android:layout_gravity="end"
-        android:background="?attr/selectableItemBackgroundBorderless"
-        android:layout_marginTop="8dp" />
+    <!-- Removed liked workouts star button -->
 
 </LinearLayout>

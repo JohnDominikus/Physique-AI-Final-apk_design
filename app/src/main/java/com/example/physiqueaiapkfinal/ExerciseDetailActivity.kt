@@ -26,7 +26,6 @@ class ExerciseDetailActivity : AppCompatActivity() {
         val safetyText: TextView = findViewById(R.id.safetyWarning)
         val equipmentText: TextView = findViewById(R.id.equipment)
         val targetText: TextView = findViewById(R.id.target)
-        val poseBtn: Button = findViewById(R.id.btnPoseDetection)
 
         FirebaseFirestore.getInstance().collection("workoutcollection")
             .document(exerciseId)
@@ -47,11 +46,5 @@ class ExerciseDetailActivity : AppCompatActivity() {
                     .load(ex.gif_url ?: "")
                     .into(gifImage)
             }
-
-        poseBtn.setOnClickListener {
-            val intent = Intent(this, WorkoutPoseAIFragment::class.java)
-            intent.putExtra("exerciseId", exerciseId)
-            startActivity(intent)
-        }
     }
 }

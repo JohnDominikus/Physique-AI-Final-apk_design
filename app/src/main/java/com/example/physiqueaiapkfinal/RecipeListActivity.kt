@@ -21,7 +21,7 @@ class RecipeListActivity : AppCompatActivity() {
     private lateinit var recyclerView: RecyclerView
     private lateinit var searchEditText: EditText
     private lateinit var mealTypeSpinner: Spinner
-    private lateinit var likedRecipesButton: ImageButton // ImageButton for liked recipes
+    // Removed liked recipes button
 
     private val recipeList = mutableListOf<Recipe>()
     private var filteredList = mutableListOf<Recipe>()
@@ -42,7 +42,7 @@ class RecipeListActivity : AppCompatActivity() {
         recyclerView = findViewById(R.id.recipeRecycler)
         searchEditText = findViewById(R.id.searchRecipeEditText)
         mealTypeSpinner = findViewById(R.id.mealTypeSpinner)
-        likedRecipesButton = findViewById(R.id.likedRecipesButton) // Find the liked recipes button
+        // No liked recipes button
 
         recyclerView.layoutManager = LinearLayoutManager(this)
         adapter = RecipeAdapter(filteredList) { recipe ->
@@ -56,8 +56,7 @@ class RecipeListActivity : AppCompatActivity() {
         setupMealTypeSpinner()
         setupSearchAndFilter()
         listenForRecipesRealtime()
-        setupLikedRecipesButton()
-        listenForLikedRecipes() // Start listening for liked recipes
+        // Liked recipes feature removed
     }
 
     private fun setupMealTypeSpinner() {
@@ -135,41 +134,13 @@ class RecipeListActivity : AppCompatActivity() {
         adapter.notifyDataSetChanged()
     }
 
-    private fun setupLikedRecipesButton() {
-        likedRecipesButton.setOnClickListener {
-            val intent = Intent(this, LikedRecipesActivity::class.java)
-            startActivity(intent)
-        }
-    }
+    // Removed setupLikedRecipesButton
 
-    private fun listenForLikedRecipes() {
-        val userId = auth.currentUser?.uid
-        if (userId != null) {
-            likedRecipesListener = db.collection("users").document(userId).collection("likedRecipes")
-                .addSnapshotListener { snapshot, error ->
-                    if (error != null) {
-                        // Handle error
-                        return@addSnapshotListener
-                    }
-
-                    if (snapshot != null) {
-                        likedRecipeIds.clear()
-                        for (doc in snapshot.documents) {
-                            doc.getString("recipeId")?.let { likedRecipeIds.add(it) }
-                        }
-                        // Update the adapter to reflect liked status changes
-                        adapter.setLikedRecipeIds(likedRecipeIds)
-                    }
-                }
-        } else {
-            likedRecipeIds.clear()
-            adapter.setLikedRecipeIds(likedRecipeIds)
-        }
-    }
+    // Removed listenForLikedRecipes
 
     override fun onDestroy() {
         super.onDestroy()
         firestoreListener?.remove()
-        likedRecipesListener?.remove() // Remove liked recipes listener
+        // No liked recipes listener to remove
     }
 }

@@ -218,16 +218,6 @@
             android:layout_height="wrap_content"
             android:textColor="@android:color/black" />
 
-        <!-- Pose Detection Button -->
-        <Button
-            android:id="@+id/btnPoseDetection"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Start Pose Detection"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginTop="24dp"
-            android:layout_marginBottom="16dp"/>
-
     </LinearLayout>
 
 </ScrollView>

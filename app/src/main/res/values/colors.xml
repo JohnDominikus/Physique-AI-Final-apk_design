@@ -28,9 +28,9 @@
     <color name="surface_dark">#121212</color>
     
     <!-- Text Colors -->
-    <color name="text_primary_light">#212121</color>
-    <color name="text_secondary_light">#757575</color>
-    <color name="text_hint_light">#BDBDBD</color>
+    <color name="text_primary_light">#000000</color>
+    <color name="text_secondary_light">#000000</color>
+    <color name="text_hint_light">#000000</color>
     <color name="text_primary_dark">#FFFFFF</color>
     <color name="text_secondary_dark">#B3FFFFFF</color>
     
@@ -148,7 +148,8 @@
     <color name="overlay_dark">#4D000000</color>
     
     <!-- Navigation Colors -->
-    <color name="nav_selected">#D32F2F</color>
+    <color name="nav_selected">#1AD32F2F</color> <!-- 10% opacity red for background -->
+    <color name="nav_selected_icon">#D32F2F</color> <!-- Solid red for icons and text -->
     <color name="nav_unselected">#757575</color>
     <color name="nav_unselected_dark">#BDBDBD</color>
     <color name="nav_background">#FFFFFF</color>

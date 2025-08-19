@@ -8,8 +8,11 @@ import android.widget.Button
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 
-class AddedMealsAdapter(private var meals: List<MealTodo>, private val onDoneClick: (MealTodo) -> Unit) :
-    RecyclerView.Adapter<AddedMealsAdapter.ViewHolder>() {
+class AddedMealsAdapter(
+    private var meals: List<MealTodo>, 
+    private val onDoneClick: (MealTodo) -> Unit,
+    private val onItemClick: (MealTodo) -> Unit
+) : RecyclerView.Adapter<AddedMealsAdapter.ViewHolder>() {
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val tvMealName: TextView = view.findViewById(R.id.tvMealName)
@@ -32,6 +35,12 @@ class AddedMealsAdapter(private var meals: List<MealTodo>, private val onDoneCli
         holder.tvCalories.text = "${meal.calories} kcal"
         holder.tvTime.text = meal.scheduledTime
 
+        // Click on the entire item goes to recipe details
+        holder.itemView.setOnClickListener {
+            onItemClick(meal)
+        }
+
+        // Click on the done button marks meal as completed
         holder.btnDoneMeal.setOnClickListener {
             onDoneClick(meal)
         }

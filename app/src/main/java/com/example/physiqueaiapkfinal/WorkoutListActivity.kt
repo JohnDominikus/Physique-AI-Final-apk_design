@@ -21,7 +21,7 @@ class WorkoutListActivity : AppCompatActivity() {
     private lateinit var recyclerView: RecyclerView
     private lateinit var searchEditText: EditText
     private lateinit var categorySpinner: Spinner
-    private lateinit var likedWorkoutsButton: ImageButton // ImageButton for liked workouts
+    // Removed liked workouts button
 
     private val workoutList = mutableListOf<Workout>()
     private var filteredList = mutableListOf<Workout>()
@@ -42,7 +42,7 @@ class WorkoutListActivity : AppCompatActivity() {
         recyclerView = findViewById(R.id.workoutRecycler)
         searchEditText = findViewById(R.id.searchWorkoutEditText)
         categorySpinner = findViewById(R.id.categorySpinner)
-        likedWorkoutsButton = findViewById(R.id.likedWorkoutsButton) // Find the liked workouts button
+        // No liked workouts button
 
         recyclerView.layoutManager = LinearLayoutManager(this)
         adapter = WorkoutAdapter(filteredList) { workout ->
@@ -56,8 +56,7 @@ class WorkoutListActivity : AppCompatActivity() {
         setupCategorySpinner()
         setupSearchAndFilter()
         listenForWorkoutsRealtime()
-        setupLikedWorkoutsButton()
-        listenForLikedWorkouts() // Start listening for liked workouts
+        // Liked workouts feature removed
     }
 
     private fun setupCategorySpinner() {
@@ -158,41 +157,13 @@ class WorkoutListActivity : AppCompatActivity() {
         adapter.notifyDataSetChanged()
     }
 
-    private fun setupLikedWorkoutsButton() {
-        likedWorkoutsButton.setOnClickListener {
-            val intent = Intent(this, LikedWorkoutsActivity::class.java)
-            startActivity(intent)
-        }
-    }
+    // Removed setupLikedWorkoutsButton
 
-    private fun listenForLikedWorkouts() {
-        val userId = auth.currentUser?.uid
-        if (userId != null) {
-            likedWorkoutsListener = db.collection("users").document(userId).collection("likedWorkouts")
-                .addSnapshotListener { snapshot, error ->
-                    if (error != null) {
-                        // Handle error
-                        return@addSnapshotListener
-                    }
-
-                    if (snapshot != null) {
-                        likedWorkoutIds.clear()
-                        for (doc in snapshot.documents) {
-                            doc.getString("workoutId")?.let { likedWorkoutIds.add(it) }
-                        }
-                        // Update the adapter to reflect liked status changes
-                        adapter.setLikedWorkoutIds(likedWorkoutIds)
-                    }
-                }
-        } else {
-            likedWorkoutIds.clear()
-            adapter.setLikedWorkoutIds(likedWorkoutIds)
-        }
-    }
+    // Removed listenForLikedWorkouts
 
     override fun onDestroy() {
         super.onDestroy()
         firestoreListener?.remove()
-        likedWorkoutsListener?.remove() // Remove liked workouts listener
+        // No liked workouts listener to remove
     }
 }

@@ -25,6 +25,7 @@ import java.util.concurrent.TimeUnit
 import com.example.physiqueaiapkfinal.WorkoutTodo
 import com.example.physiqueaiapkfinal.UserMedicalInfo
 import android.view.View
+import android.view.ViewGroup
 
 // Import UserMedicalInfo from DietaryTodoActivity
 
@@ -391,11 +392,19 @@ class WorkoutTodoActivity : AppCompatActivity() {
             val options = mutableListOf("Select Exercise")
             options.addAll(workoutList.map { it.name })
 
-            val adapter = ArrayAdapter(
-                this,
-                android.R.layout.simple_spinner_item,
-                options
-            ).also { it.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item) }
+            val adapter = object : ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, options) {
+                override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
+                    val v = super.getView(position, convertView, parent)
+                    (v as? TextView)?.setTextColor(ContextCompat.getColor(context, R.color.black))
+                    return v
+                }
+
+                override fun getDropDownView(position: Int, convertView: View?, parent: ViewGroup): View {
+                    val v = super.getDropDownView(position, convertView, parent)
+                    (v as? TextView)?.setTextColor(ContextCompat.getColor(context, R.color.black))
+                    return v
+                }
+            }.also { it.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item) }
 
             mainHandler.post {
                 workoutSpinner.adapter = adapter
@@ -408,11 +417,20 @@ class WorkoutTodoActivity : AppCompatActivity() {
                     val filtered = workoutList
                         .filter { it.name.contains(s.toString(), true) }
                         .map { it.name }
-                    val fAdapter = ArrayAdapter(
-                        this@WorkoutTodoActivity,
-                        android.R.layout.simple_spinner_item,
-                        mutableListOf("Select Exercise").apply { addAll(filtered) }
-                    ).also { it.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item) }
+                    val fOptions = mutableListOf("Select Exercise").apply { addAll(filtered) }
+                    val fAdapter = object : ArrayAdapter<String>(this@WorkoutTodoActivity, android.R.layout.simple_spinner_item, fOptions) {
+                        override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
+                            val v = super.getView(position, convertView, parent)
+                            (v as? TextView)?.setTextColor(ContextCompat.getColor(context, R.color.black))
+                            return v
+                        }
+
+                        override fun getDropDownView(position: Int, convertView: View?, parent: ViewGroup): View {
+                            val v = super.getDropDownView(position, convertView, parent)
+                            (v as? TextView)?.setTextColor(ContextCompat.getColor(context, R.color.black))
+                            return v
+                        }
+                    }.also { it.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item) }
                     mainHandler.post { workoutSpinner.adapter = fAdapter }
                 }
                 override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}

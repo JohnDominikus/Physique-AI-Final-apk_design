@@ -25,7 +25,6 @@ class RecipeAdapter(
         val thumbnail: ImageView = view.findViewById(R.id.recipeImage)
         val dietaryTags: TextView = view.findViewById(R.id.recipeDietaryTags)
         val infoIcon: ImageView = view.findViewById(R.id.infoIcon)
-        val heartIcon: ImageView = view.findViewById(R.id.heartIcon)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecipeViewHolder {
@@ -49,55 +48,9 @@ class RecipeAdapter(
 
         holder.itemView.setOnClickListener { onItemClick(recipe) }
 
-        // Check if the current recipe is liked and set the heart icon
-        if (likedRecipeIds.contains(recipe.id)) {
-            holder.heartIcon.setImageResource(R.drawable.fav_filled) // Assuming you have a filled heart icon drawable
-        } else {
-            holder.heartIcon.setImageResource(R.drawable.fav) // Assuming you have an outlined heart icon drawable
-        }
-
         holder.infoIcon.setOnClickListener {
             // TODO: Implement action for info icon click (e.g., show a dialog with more details)
             Toast.makeText(holder.itemView.context, "Info clicked for ${recipe.mealName}", Toast.LENGTH_SHORT).show()
-        }
-
-        holder.heartIcon.setOnClickListener {
-            val userId = FirebaseAuth.getInstance().currentUser?.uid
-            if (userId != null) {
-                val db = FirebaseFirestore.getInstance()
-                val userLikedRecipesRef = db.collection("users").document(userId).collection("likedRecipes")
-
-                userLikedRecipesRef.document(recipe.id).get()
-                    .addOnSuccessListener { documentSnapshot ->
-                        if (documentSnapshot.exists()) {
-                            // Recipe is liked, so unlike it (remove from Firebase)
-                            userLikedRecipesRef.document(recipe.id).delete()
-                                .addOnSuccessListener {
-                                    // The listener in RecipeListActivity will handle the UI update
-                                    Toast.makeText(holder.itemView.context, "${recipe.mealName} unliked", Toast.LENGTH_SHORT).show()
-                                }
-                                .addOnFailureListener { e ->
-                                    Toast.makeText(holder.itemView.context, "Error unliking recipe: ${e.message}", Toast.LENGTH_SHORT).show()
-                                }
-                        } else {
-                            // Recipe is not liked, so like it (add to Firebase)
-                            userLikedRecipesRef.document(recipe.id).set(mapOf("recipeId" to recipe.id)) // Store just the ID
-                                .addOnSuccessListener {
-                                    // The listener in RecipeListActivity will handle the UI update
-                                    Toast.makeText(holder.itemView.context, "${recipe.mealName} liked", Toast.LENGTH_SHORT).show()
-                                }
-                                .addOnFailureListener { e ->
-                                    Toast.makeText(holder.itemView.context, "Error liking recipe: ${e.message}", Toast.LENGTH_SHORT).show()
-                                }
-                        }
-                    }
-                    .addOnFailureListener { e ->
-                        Toast.makeText(holder.itemView.context, "Error checking liked status: ${e.message}", Toast.LENGTH_SHORT).show()
-                    }
-
-            } else {
-                Toast.makeText(holder.itemView.context, "Please log in to like recipes", Toast.LENGTH_SHORT).show()
-            }
         }
     }
 

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <!-- Tofu/veggie bowl icon -->
+    <path
+        android:fillColor="#4CAF50"
+        android:pathData="M4,12c0,4.4 3.6,8 8,8s8-3.6 8-8h-16z"/>
+    <path
+        android:fillColor="#66BB6A"
+        android:pathData="M4,12h16v2H4z"/>
+    <path
+        android:fillColor="#388E3C"
+        android:pathData="M8,10h2v2H8z M10,8h2v2h-2z M12,10h2v2h-2z M14,8h2v2h-2z"/>
+</vector>

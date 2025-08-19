@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
@@ -159,7 +160,19 @@ class MedicalActivity : AppCompatActivity() {
     }
 
     private fun setupSimpleSpinner(spinner: Spinner, items: Array<String>) {
-        val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, items)
+        val adapter = object : ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, items) {
+            override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
+                val v = super.getView(position, convertView, parent)
+                (v as? TextView)?.setTextColor(ContextCompat.getColor(context, R.color.black))
+                return v
+            }
+
+            override fun getDropDownView(position: Int, convertView: View?, parent: ViewGroup): View {
+                val v = super.getDropDownView(position, convertView, parent)
+                (v as? TextView)?.setTextColor(ContextCompat.getColor(context, R.color.black))
+                return v
+            }
+        }
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         spinner.adapter = adapter
     }

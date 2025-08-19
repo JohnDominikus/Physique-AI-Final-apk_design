@@ -133,7 +133,7 @@ class WorkoutDetailActivity : AppCompatActivity() {
     }
 
     private fun setupTabs(workoutId: String) {
-        val tabTitles = listOf("INFO", "INSTRUCTION", "POSE AI")
+        val tabTitles = listOf("INFO", "INSTRUCTION")
         viewPager.adapter = WorkoutDetailPagerAdapter(this, workoutId, tabTitles.size)
 
         TabLayoutMediator(tabLayout, viewPager) { tab, position ->
@@ -157,7 +157,6 @@ class WorkoutDetailActivity : AppCompatActivity() {
             return when (position) {
                 0 -> WorkoutInfoFragment.newInstance(workoutId)
                 1 -> WorkoutInstructionsFragment.newInstance(workoutId)
-                2 -> WorkoutPoseAIFragment.newInstance(workoutId)
                 else -> throw IllegalStateException("Invalid tab position")
             }
         }

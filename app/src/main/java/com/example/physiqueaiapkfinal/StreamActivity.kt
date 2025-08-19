@@ -54,12 +54,12 @@ class StreamActivity : AppCompatActivity() {
     private var isDown = false
     private var lastPushupTime = 0L
     private val MIN_PUSHUP_INTERVAL = 800L // Increased for maximum accuracy
-
+    
     // Advanced detection variables
     private var downFrameCount = 0
     private var upFrameCount = 0
     private val MIN_STABLE_FRAMES = 6 // Increased for maximum stability
-
+    
     // Multi-dimensional history tracking
     private val shoulderElbowDiffHistory = mutableListOf<Float>()
     private val armAngleHistory = mutableListOf<Float>()
@@ -68,27 +68,27 @@ class StreamActivity : AppCompatActivity() {
     private val velocityHistory = mutableListOf<Float>()
     private val accelerationHistory = mutableListOf<Float>()
     private val HISTORY_SIZE = 10 // Increased for better temporal analysis
-
+    
     // Biomechanical validation
     private var previousElbowY = 0f
     private var previousVelocity = 0f
     private val motionPhases = mutableListOf<String>()
     private val PHASE_HISTORY_SIZE = 5
-
+    
     // Quality metrics
     private var highConfidenceFrames = 0
     private val MIN_CONFIDENCE_FRAMES = 5
     private var lastFrameTime = 0L
-
+    
     // Orientation tracking
     private var lastRotation = Surface.ROTATION_0
-
+    
     // Performance optimization variables
     private var frameSkipCounter = 0
     private val FRAME_SKIP_COUNT = 1 // Reduce skip for better accuracy
-
+    
     // Camera switching variables
-    private var isUsingFrontCamera = true
+    private var isUsingFrontCamera = false
     private var cameraProvider: ProcessCameraProvider? = null
 
     // Ultra-accurate push-up detection with multiple criteria
@@ -246,13 +246,8 @@ class StreamActivity : AppCompatActivity() {
 
     private fun resetPoseDetectionState() {
         isDown = false
-        hasBeenDown = false
-        lastCountedUp = false
-        downFrameCount = 0
-        upFrameCount = 0
-        shoulderElbowDiffHistory.clear()
-        armAngleHistory.clear()
-
+        lastPushupTime = 0L
+        
         Log.d(TAG, "Pose detection state reset for camera switch")
     }
 
@@ -402,10 +397,10 @@ class StreamActivity : AppCompatActivity() {
         val rightElbow = pose.getPoseLandmark(PoseLandmark.RIGHT_ELBOW)
         val leftWrist = pose.getPoseLandmark(PoseLandmark.LEFT_WRIST)
         val rightWrist = pose.getPoseLandmark(PoseLandmark.RIGHT_WRIST)
-
-        if (leftShoulder != null && rightShoulder != null && leftElbow != null &&
+        
+        if (leftShoulder != null && rightShoulder != null && leftElbow != null && 
             rightElbow != null && leftWrist != null && rightWrist != null) {
-
+            
             // Reset detection state if orientation changed
             if (rotation != lastRotation) {
                 Log.d(TAG, "Orientation changed from $lastRotation to $rotation - resetting detection state")
@@ -418,137 +413,56 @@ class StreamActivity : AppCompatActivity() {
                 lastCountedUp = false
                 lastRotation = rotation
             }
-
-            // Much stricter detection to prevent false positives
-
-            // Higher confidence requirement
-            val allLandmarks = listOf(leftShoulder, rightShoulder, leftElbow, rightElbow, leftWrist, rightWrist)
-            val avgConfidence = allLandmarks.map { it.inFrameLikelihood }.average().toFloat()
-
-            if (avgConfidence < 0.7f) { // Increased from 0.5f to 0.7f for better accuracy
-                Log.d(TAG, "Low confidence: ${(avgConfidence*100).toInt()}%")
-                return
-            }
-
-            // Calculate elbow angles with stricter validation
-            val leftElbowAngle = calculateAngle(leftShoulder.position3D, leftElbow.position3D, leftWrist.position3D)
-            val rightElbowAngle = calculateAngle(rightShoulder.position3D, rightElbow.position3D, rightWrist.position3D)
-            val avgElbowAngle = (leftElbowAngle + rightElbowAngle) / 2
-
-            // Check arm symmetry - both arms should be similar
-            val armSymmetry = Math.abs(leftElbowAngle - rightElbowAngle)
-            val isSymmetric = armSymmetry < 30f // Both arms should move similarly
-
-            // Position-based detection with stricter thresholds
-            val avgElbowY = (leftElbow.position.y + rightElbow.position.y) * 0.5f
-            val avgShoulderY = (leftShoulder.position.y + rightShoulder.position.y) * 0.5f
-            val avgWristY = (leftWrist.position.y + rightWrist.position.y) * 0.5f
-            val shoulderElbowDiff = avgElbowY - avgShoulderY
-
-            // Additional validation: wrists should be lower than shoulders in down position
-            val wristBelowShoulder = avgWristY > avgShoulderY + 0.02f
-
-            // Add to history for smoothing (keep longer history for stability)
-            shoulderElbowDiffHistory.add(shoulderElbowDiff)
-            armAngleHistory.add(avgElbowAngle)
-
-            if (shoulderElbowDiffHistory.size > 8) { // Increased from 5 to 8 for better smoothing
-                shoulderElbowDiffHistory.removeAt(0)
-                armAngleHistory.removeAt(0)
-            }
-
-            val smoothedDiff = shoulderElbowDiffHistory.average().toFloat()
-            val smoothedAngle = armAngleHistory.average().toFloat()
-
-            // Much stricter detection criteria to prevent false positives
-            val isDownPosition = smoothedDiff > 0.05f && // Increased threshold from 0.03f
-                    smoothedAngle < 110f && smoothedAngle > 40f && // Stricter angle range
-                    isSymmetric && // Both arms must be symmetric
-                    wristBelowShoulder && // Wrists must be below shoulders
-                    avgConfidence > 0.7f // High confidence required
-
-            Log.d(TAG, "Detection - Diff: ${String.format("%.3f", smoothedDiff)}, Angle: ${smoothedAngle.toInt()}°, Down: $isDownPosition, HasBeenDown: $hasBeenDown, Symmetric: $isSymmetric, Confidence: ${(avgConfidence*100).toInt()}%")
-
-            // State tracking with higher stability requirements
-            if (isDownPosition) {
-                downFrameCount++
-                upFrameCount = 0
-                lastCountedUp = false // Reset count flag when going down
-            } else {
-                upFrameCount++
-                downFrameCount = 0
-            }
-
-            var stateChanged = false
-
-            // State changes with stricter frame requirements
-            if (!isDown && downFrameCount >= 5) { // Increased from 3 to 5 frames
+            
+            // CLEAN AND SIMPLE PUSH-UP DETECTION
+            // Only check elbow position relative to shoulder - nothing else
+            val avgElbowY = (leftElbow.position.y + rightElbow.position.y) / 2f
+            val avgShoulderY = (leftShoulder.position.y + rightShoulder.position.y) / 2f
+            
+            // Simple detection: if elbow is significantly below shoulder = down position
+            val isInDownPosition = avgElbowY > avgShoulderY + 0.08f
+            
+            Log.d(TAG, "CLEAN Detection - ElbowY: ${String.format("%.3f", avgElbowY)}, ShoulderY: ${String.format("%.3f", avgShoulderY)}, InDown: $isInDownPosition, CurrentState: $isDown, Count: $pushupCount")
+            
+            // STATE MACHINE: Only two states - UP or DOWN
+            if (isInDownPosition && !isDown) {
+                // Transition from UP to DOWN - COUNT HERE
                 isDown = true
-                hasBeenDown = true // Mark that person has been in down position
-                stateChanged = true
-                Log.d(TAG, "💪 Position changed to DOWN - cycle started")
-            } else if (isDown && upFrameCount >= 5 && !lastCountedUp) { // Only count UP motion and prevent double counting
-                // Only count if person has been down first (complete cycle) AND we haven't just counted
-                if (hasBeenDown) {
-                    val currentTime = System.currentTimeMillis()
-
-                    if (currentTime - lastPushupTime >= MIN_PUSHUP_INTERVAL) {
-                        // Don't count reps during rest period
-                        if (!isRestPeriod) {
-                            pushupCount++
-                        lastPushupTime = currentTime
-                        lastCountedUp = true // Prevent double counting
-                        stateChanged = true
-
-                            Log.d(TAG, "🎉 Push-up #$pushupCount completed! UP motion detected, Angle: ${smoothedAngle.toInt()}°")
-
-                            mainHandler.post {
-                                updatePushupCounter()
-                                binding.tvPositionStatus.text = "Position: COUNT +1 (UP)!"
-                                binding.tvPositionStatus.setTextColor(ContextCompat.getColor(this@StreamActivity, android.R.color.holo_orange_light))
-                            }
-
-                            // Audio feedback
-                            try {
-                                val toneGenerator = ToneGenerator(AudioManager.STREAM_NOTIFICATION, 80)
-                                toneGenerator.startTone(ToneGenerator.TONE_PROP_BEEP, 200)
-                                backgroundExecutor.execute {
-                                    Thread.sleep(250)
-                                    toneGenerator.release()
-                                }
-                            } catch (e: Exception) {
-                                // Ignore audio errors
-                            }
-                        }
-                    }
-
-                    // Reset cycle tracking for next push-up
-                    hasBeenDown = false
-                } else {
-                    Log.d(TAG, "⚠️ Going UP but no DOWN detected first - no count")
-                }
-
-                isDown = false
-            }
-
-            // UI updates with clearer status messages
-            if (stateChanged || (frameSkipCounter % 30 == 0)) {
-                mainHandler.post {
-                    if (isDown) {
-                        binding.tvPositionStatus.text = "Position: Down (${smoothedAngle.toInt()}°) - Hold Position"
-                        binding.tvPositionStatus.setTextColor(ContextCompat.getColor(this@StreamActivity, android.R.color.holo_blue_light))
-                    } else {
-                        val statusText = when {
-                            lastCountedUp -> "Position: Up - Great Job!"
-                            hasBeenDown -> "Position: Up - Push Up Now!"
-                            else -> "Position: Up - Go Down First"
-                        }
-                        binding.tvPositionStatus.text = statusText
+                
+                val currentTime = System.currentTimeMillis()
+                if (currentTime - lastPushupTime >= MIN_PUSHUP_INTERVAL && !isRestPeriod) {
+                    pushupCount++
+                    lastPushupTime = currentTime
+                    
+                    Log.d(TAG, "✅ COUNTED #$pushupCount - DOWN position detected")
+                    
+                    mainHandler.post {
+                        updatePushupCounter()
+                        binding.tvPositionStatus.text = "COUNTED #$pushupCount - Down position!"
                         binding.tvPositionStatus.setTextColor(ContextCompat.getColor(this@StreamActivity, android.R.color.holo_green_light))
                     }
+                    
+                    // Audio feedback
+                    try {
+                        val toneGenerator = ToneGenerator(AudioManager.STREAM_NOTIFICATION, 80)
+                        toneGenerator.startTone(ToneGenerator.TONE_PROP_BEEP, 200)
+                        backgroundExecutor.execute {
+                            Thread.sleep(250)
+                            toneGenerator.release()
+                        }
+                    } catch (e: Exception) { }
+                }
+            } else if (!isInDownPosition && isDown) {
+                // Transition from DOWN to UP - NO COUNTING, just state change
+                isDown = false
+                Log.d(TAG, "⬆️ UP position - No counting, ready for next")
+                
+                mainHandler.post {
+                    binding.tvPositionStatus.text = "Position: Up - Go down to count next"
+                    binding.tvPositionStatus.setTextColor(ContextCompat.getColor(this@StreamActivity, android.R.color.holo_blue_light))
                 }
             }
-
+            
         } else {
             // Reset when landmarks are lost
             if (isDown) {
@@ -558,43 +472,28 @@ class StreamActivity : AppCompatActivity() {
                     binding.tvPositionStatus.setTextColor(ContextCompat.getColor(this@StreamActivity, android.R.color.holo_red_light))
                 }
             }
-            downFrameCount = 0
-            upFrameCount = 0
-            shoulderElbowDiffHistory.clear()
-            armAngleHistory.clear()
-            hasBeenDown = false // Reset cycle tracking when pose is lost
-            lastCountedUp = false
         }
     }
 
     private fun resetPushupCounter() {
         pushupCount = 0
         isDown = false
-        hasBeenDown = false
-        lastCountedUp = false
         lastPushupTime = 0L
-
-        // Reset simplified detection variables
-        downFrameCount = 0
-        upFrameCount = 0
-        shoulderElbowDiffHistory.clear()
-        armAngleHistory.clear()
-
+        
         // Reset the pose classifier processor counter as well
         backgroundExecutor.execute {
             poseClassifierProcessor?.resetCounters()
         }
-
+        
         updatePushupCounter()
-
-        binding.tvPositionStatus.text = "Position: Ready - Go Down First"
+        binding.tvPositionStatus.text = "Position: Ready - Go down to count"
         binding.tvPositionStatus.setTextColor(ContextCompat.getColor(this, android.R.color.holo_orange_light))
-
-        Log.d(TAG, "Push-up counter and detection state reset to 0")
+        
+        Log.d(TAG, "Push-up counter reset to 0")
     }
 
     private fun updatePushupCounter() {
-        binding.tvPushupCounter.text = "Push-ups: ${pushupCount}/${targetReps}"
+        binding.tvPushupCounter.text = getString(R.string.pushup_counter_with_target, pushupCount, targetReps)
         // Early set completion check
         if (!isRestPeriod && pushupCount >= targetReps) {
             countDownTimer?.cancel()

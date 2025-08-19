@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/background_primary">
+    android:background="#FED7D7">
 
     <ScrollView
         android:layout_width="match_parent"
@@ -46,7 +46,7 @@
                             android:id="@+id/ivProfileImage"
                             android:layout_width="60dp"
                             android:layout_height="60dp"
-                            android:src="@drawable/profile"
+                            android:src="@drawable/profile2"
                             android:scaleType="centerCrop"
                             android:background="@drawable/circle_background"
                             android:padding="2dp" />
@@ -130,6 +130,9 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:layout_marginEnd="8dp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:foreground="?android:attr/selectableItemBackground"
                     app:cardCornerRadius="16dp"
                     app:cardElevation="6dp"
                     app:cardBackgroundColor="@color/bmi_normal">
@@ -299,15 +302,7 @@
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 
-            <!-- Quick Actions -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Quick Actions"
-                android:textSize="20sp"
-                android:textColor="@color/text_primary_light"
-                android:fontFamily="@font/poppins_bold"
-                android:layout_marginBottom="12dp" />
+
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -328,131 +323,11 @@
                     app:cardCornerRadius="16dp"
                     app:cardElevation="4dp"
                     app:cardBackgroundColor="@color/surface_light">
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:padding="16dp"
-                        android:gravity="center">
-
-                        <ImageView
-                            android:layout_width="40dp"
-                            android:layout_height="40dp"
-                            android:src="@drawable/excercise"
-                            android:tint="@color/fitness_primary"
-                            tools:ignore="UseAppTint" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Start Workout"
-                            android:textSize="14sp"
-                            android:textColor="@color/text_primary_light"
-                            android:fontFamily="@font/poppins_bold"
-                            android:layout_marginTop="8dp"
-                            android:gravity="center" />
-                    </LinearLayout>
                 </androidx.cardview.widget.CardView>
 
-                <!-- BMI Calculator Card -->
-                <androidx.cardview.widget.CardView
-                    android:id="@+id/cardBMICalc"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:layout_marginStart="8dp"
-                    android:clickable="true"
-                    android:focusable="true"
-                    android:foreground="?android:attr/selectableItemBackground"
-                    app:cardCornerRadius="16dp"
-                    app:cardElevation="4dp"
-                    app:cardBackgroundColor="@color/surface_light">
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:padding="16dp"
-                        android:gravity="center">
-
-                        <ImageView
-                            android:layout_width="40dp"
-                            android:layout_height="40dp"
-                            android:src="@drawable/bmi"
-                            android:tint="@color/fitness_secondary" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="BMI Calculator"
-                            android:textSize="14sp"
-                            android:textColor="@color/text_primary_light"
-                            android:fontFamily="@font/poppins_bold"
-                            android:layout_marginTop="8dp"
-                            android:gravity="center" />
-                    </LinearLayout>
-                </androidx.cardview.widget.CardView>
             </LinearLayout>
 
-            <!-- Pose AI Card -->
-            <androidx.cardview.widget.CardView
-                android:id="@+id/cardPoseAI"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                android:clickable="true"
-                android:focusable="true"
-                android:foreground="?android:attr/selectableItemBackground"
-                app:cardCornerRadius="16dp"
-                app:cardElevation="4dp"
-                app:cardBackgroundColor="@color/surface_light">
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:padding="16dp"
-                    android:gravity="center_vertical">
-
-                    <ImageView
-                        android:layout_width="48dp"
-                        android:layout_height="48dp"
-                        android:src="@drawable/pose"
-                        android:tint="@color/fitness_accent" />
-
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:orientation="vertical"
-                        android:layout_marginStart="16dp">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Pose AI"
-                            android:textSize="18sp"
-                            android:textColor="@color/text_primary_light"
-                            android:fontFamily="@font/poppins_bold" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Get real-time pose feedback"
-                            android:textSize="14sp"
-                            android:textColor="@color/text_secondary_light"
-                            android:fontFamily="@font/poppins_medium"
-                            android:layout_marginTop="4dp" />
-                    </LinearLayout>
-
-                    <ImageView
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        android:src="@drawable/ic_arrow_forward"
-                        android:tint="@color/text_secondary_light" />
-                </LinearLayout>
-            </androidx.cardview.widget.CardView>
 
             <!-- Todo Section -->
             <LinearLayout
@@ -471,7 +346,6 @@
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
                         android:text="Today's Tasks"
                         android:textSize="20sp"
                         android:textColor="@color/fitness_primary"
@@ -609,13 +483,10 @@
     <!-- Bottom Navigation -->
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottom_navigation"
+        style="@style/Widget.App.BottomNavigation"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:background="@color/surface_light"
-        app:elevation="8dp"
-        app:itemIconTint="@color/bottom_nav_selector"
-        app:itemTextColor="@color/bottom_nav_selector"
         app:menu="@menu/bottom_navigation_menu" />
 
 </RelativeLayout> 

@@ -107,7 +107,7 @@
                         android:id="@+id/profileImageView"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:src="@drawable/profile"
+                        android:src="@drawable/profile2"
                         android:scaleType="centerCrop"
                         android:contentDescription="Profile Picture" />
                 </androidx.cardview.widget.CardView>
@@ -214,160 +214,199 @@
                         android:inputType="none" />
                 </com.google.android.material.textfield.TextInputLayout>
 
-                <!-- Physical Information Card -->
-                <androidx.cardview.widget.CardView
+                <!-- Physical Details Section Header -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Physical Details"
+                    android:textStyle="bold"
+                    android:textSize="18sp"
+                    android:textColor="@color/text_primary_light"
+                    android:layout_marginTop="@dimen/spacing_lg"
+                    android:layout_marginBottom="@dimen/spacing_md" />
+
+                <!-- Body Level -->
+                <com.google.android.material.textfield.TextInputLayout
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="@dimen/spacing_md"
-                    app:cardCornerRadius="16dp"
-                    app:cardElevation="4dp"
-                    app:cardBackgroundColor="@color/surface_light">
+                    android:hint="Body Level"
+                    app:boxStrokeColor="@color/theme_secondary"
+                    app:hintTextColor="?attr/textColorSecondary"
+                    app:startIconDrawable="@drawable/ic_training">
 
-                    <LinearLayout
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/etBodyLevel"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:padding="@dimen/spacing_lg">
+                        android:focusable="false"
+                        android:clickable="false"
+                        android:inputType="none" />
+                </com.google.android.material.textfield.TextInputLayout>
 
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Physical Details"
-                            android:textStyle="bold"
-                            android:textSize="18sp"
-                            android:textColor="@android:color/black"
-                            android:layout_marginBottom="@dimen/spacing_md" />
-
-                        <TextView
-                            android:id="@+id/tvBodyLevel"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text="Body Level: -"
-                            android:textSize="14sp"
-                            android:textColor="@android:color/black" />
-
-                        <TextView
-                            android:id="@+id/tvBodyClassification"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text="Body Type: -"
-                            android:textSize="14sp"
-                            android:textColor="@android:color/black" />
-
-                        <TextView
-                            android:id="@+id/tvExerciseRoutine"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text="Routine: -"
-                            android:textSize="14sp"
-                            android:textColor="@android:color/black" />
-
-                        <TextView
-                            android:id="@+id/tvOtherInfo"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text="Other Info: -"
-                            android:textSize="14sp"
-                            android:textColor="@android:color/black" />
-
-                        <TextView
-                            android:id="@+id/tvGymMode"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text="Diet Mode: -"
-                            android:textSize="14sp"
-                            android:textColor="@android:color/black" />
-
-                        <com.google.android.material.button.MaterialButton
-                            android:id="@+id/btnEditPhysical"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="@dimen/spacing_md"
-                            android:text="Edit Physical"
-                            android:textSize="14sp"
-                            app:icon="@drawable/ic_edit"
-                            app:iconPadding="@dimen/spacing_sm"
-                            app:iconGravity="textStart"/>
-
-                    </LinearLayout>
-                </androidx.cardview.widget.CardView>
-
-                <!-- Medical Information Card -->
-                <androidx.cardview.widget.CardView
+                <!-- Body Type -->
+                <com.google.android.material.textfield.TextInputLayout
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="@dimen/spacing_xl"
-                    app:cardCornerRadius="16dp"
-                    app:cardElevation="4dp"
-                    app:cardBackgroundColor="@color/surface_light">
+                    android:layout_marginBottom="@dimen/spacing_md"
+                    android:hint="Body Type"
+                    app:boxStrokeColor="@color/theme_secondary"
+                    app:hintTextColor="?attr/textColorSecondary"
+                    app:startIconDrawable="@drawable/person">
 
-                    <LinearLayout
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/etBodyType"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:padding="@dimen/spacing_lg">
+                        android:focusable="false"
+                        android:clickable="false"
+                        android:inputType="none" />
+                </com.google.android.material.textfield.TextInputLayout>
 
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Medical Details"
-                            android:textStyle="bold"
-                            android:textSize="18sp"
-                            android:textColor="@android:color/black"
-                            android:layout_marginBottom="@dimen/spacing_md" />
+                <!-- Exercise Routine -->
+                <com.google.android.material.textfield.TextInputLayout
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="@dimen/spacing_md"
+                    android:hint="Exercise Routine"
+                    app:boxStrokeColor="@color/theme_secondary"
+                    app:hintTextColor="?attr/textColorSecondary"
+                    app:startIconDrawable="@drawable/excercise">
 
-                        <TextView
-                            android:id="@+id/tvCondition"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text="Condition: -"
-                            android:textSize="14sp"
-                            android:textColor="@android:color/black" />
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/etExerciseRoutine"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:focusable="false"
+                        android:clickable="false"
+                        android:inputType="none" />
+                </com.google.android.material.textfield.TextInputLayout>
 
-                        <TextView
-                            android:id="@+id/tvMedication"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text="Medication: -"
-                            android:textSize="14sp"
-                            android:textColor="@android:color/black" />
+                <!-- Diet Mode -->
+                <com.google.android.material.textfield.TextInputLayout
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="@dimen/spacing_md"
+                    android:hint="Diet Mode"
+                    app:boxStrokeColor="@color/theme_secondary"
+                    app:hintTextColor="?attr/textColorSecondary"
+                    app:startIconDrawable="@drawable/dietary">
 
-                        <TextView
-                            android:id="@+id/tvAllergies"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text="Allergies: -"
-                            android:textSize="14sp"
-                            android:textColor="@android:color/black" />
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/etDietMode"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:focusable="false"
+                        android:clickable="false"
+                        android:inputType="none" />
+                </com.google.android.material.textfield.TextInputLayout>
 
-                        <TextView
-                            android:id="@+id/tvFractures"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text="Fractures: -"
-                            android:textSize="14sp"
-                            android:textColor="@android:color/black" />
+                <!-- Edit Physical Button -->
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnEditPhysical"
+                    android:layout_width="wrap_content"
+                    android:layout_height="@dimen/button_height_medium"
+                    android:layout_marginBottom="@dimen/spacing_lg"
+                    android:text="Edit Physical"
+                    android:textSize="@dimen/text_body_medium"
+                    android:textStyle="bold"
+                    android:backgroundTint="@color/theme_secondary"
+                    app:cornerRadius="12dp"
+                    app:icon="@drawable/ic_edit"
+                    app:iconTint="@android:color/white"
+                    app:iconGravity="textStart"
+                    app:iconPadding="@dimen/spacing_sm" />
 
-                        <TextView
-                            android:id="@+id/tvOtherConditions"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text="Other Conditions: -"
-                            android:textSize="14sp"
-                            android:textColor="@android:color/black" />
+                <!-- Medical Details Section Header -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Medical Details"
+                    android:textStyle="bold"
+                    android:textSize="18sp"
+                    android:textColor="@color/text_primary_light"
+                    android:layout_marginTop="@dimen/spacing_lg"
+                    android:layout_marginBottom="@dimen/spacing_md" />
 
-                        <com.google.android.material.button.MaterialButton
-                            android:id="@+id/btnEditMedical"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="@dimen/spacing_md"
-                            android:text="Edit Medical"
-                            android:textSize="14sp"
-                            app:icon="@drawable/ic_edit"
-                            app:iconPadding="@dimen/spacing_sm"
-                            app:iconGravity="textStart"/>
-                    </LinearLayout>
-                </androidx.cardview.widget.CardView>
+                <!-- Medical Condition -->
+                <com.google.android.material.textfield.TextInputLayout
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="@dimen/spacing_md"
+                    android:hint="Medical Condition"
+                    app:boxStrokeColor="@color/theme_secondary"
+                    app:hintTextColor="?attr/textColorSecondary"
+                    app:startIconDrawable="@drawable/ic_info">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/etCondition"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:focusable="false"
+                        android:clickable="false"
+                        android:inputType="none" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <!-- Medication -->
+                <com.google.android.material.textfield.TextInputLayout
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="@dimen/spacing_md"
+                    android:hint="Current Medication"
+                    app:boxStrokeColor="@color/theme_secondary"
+                    app:hintTextColor="?attr/textColorSecondary"
+                    app:startIconDrawable="@drawable/ic_drop">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/etMedication"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:focusable="false"
+                        android:clickable="false"
+                        android:inputType="none" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <!-- Allergies -->
+                <com.google.android.material.textfield.TextInputLayout
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="@dimen/spacing_md"
+                    android:hint="Known Allergies"
+                    app:boxStrokeColor="@color/theme_secondary"
+                    app:hintTextColor="?attr/textColorSecondary"
+                    app:startIconDrawable="@drawable/ic_warning">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/etAllergies"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:focusable="false"
+                        android:clickable="false"
+                        android:inputType="none" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <!-- Edit Medical Button -->
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnEditMedical"
+                    android:layout_width="wrap_content"
+                    android:layout_height="@dimen/button_height_medium"
+                    android:layout_marginBottom="@dimen/spacing_xl"
+                    android:text="Edit Medical"
+                    android:textSize="@dimen/text_body_medium"
+                    android:textStyle="bold"
+                    android:backgroundTint="@color/theme_secondary"
+                    app:cornerRadius="12dp"
+                    app:icon="@drawable/ic_edit"
+                    app:iconTint="@android:color/white"
+                    app:iconGravity="textStart"
+                    app:iconPadding="@dimen/spacing_sm" />
 
                 <!-- Action Buttons -->
                 <LinearLayout
