@@ -4,7 +4,6 @@ import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.util.Log
-import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.physiqueaiapkfinal.databinding.ActivityLandingBinding
@@ -20,158 +19,135 @@ class LandingActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Log.d(TAG, "onCreate: Activity starting.")
-        
+
         try {
-            // Initialize ViewBinding
-            Log.d(TAG, "onCreate: Inflating layout.")
+            // ✅ View Binding
             binding = ActivityLandingBinding.inflate(layoutInflater)
             setContentView(binding.root)
-            Log.d(TAG, "onCreate: Layout inflated successfully.")
 
-            // Initialize Firebase Authentication
+            // ✅ Firebase Auth
             auth = FirebaseAuth.getInstance()
-            Log.d(TAG, "onCreate: Firebase Auth initialized.")
+            Log.d(TAG, "Firebase Auth initialized.")
 
-            // Set up NEW Sign In button click listener
-            binding.btnNewSignIn.setOnClickListener {
-                Log.d(TAG, "NEW Sign In button clicked!")
-                Toast.makeText(this, "NEW Sign In Button Clicked!", Toast.LENGTH_SHORT).show()
+            // ✅ Login Button (btnGetStarted - now Log In)
+            binding.btnGetStarted.setOnClickListener {
+                Log.d(TAG, "Login button clicked!")
+                Toast.makeText(this, "Opening Login Screen...", Toast.LENGTH_SHORT).show()
                 navigateToLoginScreen()
             }
-            
-            // Set up Sign Up button click listener
-            binding.txtSignUp.setOnClickListener {
-                Log.d(TAG, "Sign Up button clicked!")
-                Toast.makeText(this, "Sign Up Clicked!", Toast.LENGTH_SHORT).show()
+
+            // ✅ Register Button (tvSignIn - now Register)
+            binding.tvSignIn.setOnClickListener {
+                Log.d(TAG, "Register button clicked!")
+                Toast.makeText(this, "Opening Registration Screen...", Toast.LENGTH_SHORT).show()
                 navigateToRegisterScreen()
             }
 
-            Log.d(TAG, "onCreate: NEW button setup complete.")
-            Toast.makeText(this, "Landing Page Ready - NEW Sign In Button", Toast.LENGTH_SHORT).show()
-
+            Log.d(TAG, "Landing screen setup complete.")
         } catch (e: Exception) {
             Log.e(TAG, "FATAL: Exception in onCreate", e)
-            Toast.makeText(this, "Failed to load landing page: ${e.message}", Toast.LENGTH_LONG).show()
+            Toast.makeText(this, "Error loading landing page: ${e.message}", Toast.LENGTH_LONG).show()
         }
     }
 
+    // ✅ Navigate to LoginActivity
     private fun navigateToLoginScreen() {
         try {
-            Log.d(TAG, "navigateToLoginScreen: Starting navigation")
-            Toast.makeText(this, "Opening Login Screen...", Toast.LENGTH_SHORT).show()
-            
             val intent = Intent(this, LoginActivity::class.java)
             intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
-            
-            Log.d(TAG, "navigateToLoginScreen: Starting LoginActivity")
             startActivity(intent)
-            Log.d(TAG, "navigateToLoginScreen: Navigation successful")
-            
         } catch (e: Exception) {
             Log.e(TAG, "navigateToLoginScreen: ERROR", e)
             Toast.makeText(this, "Navigation Error: ${e.message}", Toast.LENGTH_LONG).show()
         }
     }
 
+    // ✅ Navigate to RegisterActivity
     private fun navigateToRegisterScreen() {
         try {
-            Log.d(TAG, "navigateToRegisterScreen: Starting navigation")
-            Toast.makeText(this, "Opening Register Screen...", Toast.LENGTH_SHORT).show()
-            
             val intent = Intent(this, RegisterActivity::class.java)
             intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
-            
             startActivity(intent)
-            
         } catch (e: Exception) {
             Log.e(TAG, "navigateToRegisterScreen: ERROR", e)
             Toast.makeText(this, "Register Error: ${e.message}", Toast.LENGTH_LONG).show()
         }
     }
 
+    // ✅ Check if user is logged in (Firebase + SharedPrefs optional)
     private fun isUserLoggedIn(): Boolean {
-        try {
+        return try {
             val currentUser = auth.currentUser
-            if (currentUser == null) {
-                Log.d(TAG, "isUserLoggedIn: Firebase user is null.")
-                return false
-            }
-
-            val sharedPreferences: SharedPreferences = getSharedPreferences("USER_DATA", MODE_PRIVATE)
-            val storedUserId = sharedPreferences.getString("USER_ID", null)
-            
-            if (storedUserId == null) {
-                Log.d(TAG, "isUserLoggedIn: Stored user ID is null.")
-                return false
-            }
-
-            val isLoggedIn = currentUser.uid == storedUserId
-            Log.d(TAG, "isUserLoggedIn: Check result - $isLoggedIn")
-            return isLoggedIn
-
+            currentUser != null
         } catch (e: Exception) {
-            Log.e(TAG, "isUserLoggedIn: Exception while checking login status", e)
-            return false
+            Log.e(TAG, "isUserLoggedIn: Exception", e)
+            false
         }
     }
 
+    // ✅ Auto-login logic
     override fun onStart() {
         super.onStart()
         try {
-            if (isUserLoggedIn()) {
-                Log.d(TAG, "User already logged in - checking profile completion")
-                val currentUser = auth.currentUser
-                currentUser?.let {
-                    routeUserBasedOnProfile(it.uid)
-                } ?: run {
-                    Log.e(TAG, "auth currentUser null despite login indicator")
-                }
+            val currentUser = auth.currentUser
+            if (currentUser != null) {
+                Log.d(TAG, "User already logged in - checking Firestore profile completion")
+                checkUserProfile(currentUser.uid)
             } else {
                 Log.d(TAG, "User not logged in - staying on landing screen")
             }
         } catch (e: Exception) {
-            Log.e(TAG, "Error in onStart auto-login check", e)
+            Log.e(TAG, "Error in auto-login check", e)
         }
     }
 
-    private fun routeUserBasedOnProfile(userId: String) {
+    // ✅ Check Firestore user info and route accordingly
+    private fun checkUserProfile(userId: String) {
         val db = FirebaseFirestore.getInstance()
         db.collection("userinfo").document(userId).get()
             .addOnSuccessListener { document ->
-                val physicalInfo = document.get("physicalInfo") as? Map<*, *>
-                val medicalInfo = document.get("medicalInfo") as? Map<*, *>
+                if (document.exists()) {
+                    val physicalInfo = document.get("physicalInfo") as? Map<*, *>
+                    val medicalInfo = document.get("medicalInfo") as? Map<*, *>
 
-                when {
-                    physicalInfo == null || physicalInfo.isEmpty() -> {
-                        Log.d(TAG, "Physical info missing – redirecting to PhysicalActivity")
-                        startActivity(Intent(this, PhysicalActivity::class.java).apply {
-                            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                        })
-                        finish()
+                    when {
+                        physicalInfo == null || physicalInfo.isEmpty() -> {
+                            Log.d(TAG, "Physical info missing – redirecting to PhysicalActivity")
+                            startActivity(Intent(this, PhysicalActivity::class.java).apply {
+                                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                            })
+                            finish()
+                        }
+                        medicalInfo == null || medicalInfo.isEmpty() -> {
+                            Log.d(TAG, "Medical info missing – redirecting to MedicalActivity")
+                            startActivity(Intent(this, MedicalActivity::class.java).apply {
+                                putExtra("userId", userId)
+                                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                            })
+                            finish()
+                        }
+                        else -> {
+                            Log.d(TAG, "All info complete – going to Dashboard")
+                            goToDashboard()
+                        }
                     }
-                    medicalInfo == null || medicalInfo.isEmpty() -> {
-                        Log.d(TAG, "Medical info missing – redirecting to MedicalActivity")
-                        startActivity(Intent(this, MedicalActivity::class.java).apply {
-                            putExtra("userId", userId)
-                            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                        })
-                        finish()
-                    }
-                    else -> {
-                        Log.d(TAG, "All info present – going to Dashboard")
-                        startActivity(Intent(this, DashboardActivity::class.java).apply {
-                            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                        })
-                        finish()
-                    }
+                } else {
+                    Log.d(TAG, "User document not found – redirecting to Dashboard by default")
+                    goToDashboard()
                 }
             }
             .addOnFailureListener { error ->
                 Log.e(TAG, "Failed to fetch user profile: ${error.message}")
-                startActivity(Intent(this, DashboardActivity::class.java).apply {
-                    flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                })
-                finish()
+                goToDashboard()
             }
+    }
+
+    // ✅ Go to DashboardActivity
+    private fun goToDashboard() {
+        Log.d(TAG, "Navigating to DashboardActivity")
+        val intent = Intent(this, DashboardActivity::class.java)
+        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        startActivity(intent)
+        finish()
     }
 }

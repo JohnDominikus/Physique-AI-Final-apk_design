@@ -1,219 +1,196 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout 
+<androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/rootLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/modern_landing_background"
+    android:background="@drawable/physiquebackground"
+    android:fitsSystemWindows="true"
     tools:context=".LandingActivity">
 
-    <ScrollView
+    <!-- Top Left Logo and Title -->
+    <LinearLayout
+        android:id="@+id/topSection"
+        android:layout_width="306dp"
+        android:layout_height="101dp"
+        android:layout_margin="24dp"
+        android:layout_marginTop="16dp"
+        android:elevation="8dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingHorizontal="20dp"
+        android:paddingVertical="14dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+            android:id="@+id/imgLogo"
+            android:layout_width="97dp"
+            android:layout_height="76dp"
+            android:scaleType="fitCenter"
+            android:src="@drawable/physiqueailogo" />
+
+        <TextView
+            android:layout_width="153dp"
+            android:layout_height="47dp"
+            android:fontFamily="@font/poppins_bold"
+            android:letterSpacing="0.08"
+            android:shadowColor="#000000"
+            android:shadowDx="0"
+            android:shadowDy="2"
+            android:shadowRadius="8"
+            android:text="PHYSIQUE AI"
+            android:textColor="#FFFFFF"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+    <!-- Bottom Content Section -->
+    <LinearLayout
         android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:fillViewport="true"
-        app:layout_constraintTop_toTopOf="parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:paddingHorizontal="32dp"
+        android:paddingBottom="40dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintWidth_max="420dp">
 
-        <LinearLayout
+        <TextView
+            android:layout_width="307dp"
+            android:layout_height="85dp"
+            android:layout_marginTop="24dp"
+            android:layout_marginBottom="16dp"
+            android:fontFamily="@font/poppins_bold"
+            android:gravity="center"
+            android:letterSpacing="-0.01"
+            android:lineSpacingExtra="4dp"
+            android:shadowColor="#000000"
+            android:shadowDx="0"
+            android:shadowDy="6"
+            android:shadowRadius="20"
+            android:text="Transform Your Body\nWith Physique AI"
+            android:textColor="#FFFFFF"
+            android:textSize="30dp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="39dp"
+            android:layout_marginBottom="32dp"
+            android:alpha="0.95"
+            android:fontFamily="@font/poppins_regular"
+            android:gravity="center"
+            android:lineSpacingExtra="4dp"
+            android:paddingHorizontal="16dp"
+            android:shadowColor="#000000"
+            android:shadowDx="0"
+            android:shadowDy="3"
+            android:shadowRadius="12"
+            android:text="Your personal AI fitness coach for a healthier,\nstronger you through smart exercise"
+            android:textColor="#F5F5F5"
+            android:textSize="15sp" />
+
+        <!-- MAIN BUTTON - NOW "LOG IN" -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnGetStarted"
             android:layout_width="match_parent"
+            android:layout_height="66dp"
+            android:layout_marginBottom="18dp"
+            android:fontFamily="@font/poppins_bold"
+            android:letterSpacing="0.02"
+            android:stateListAnimator="@null"
+            android:text="Log In"
+            android:textAllCaps="false"
+            android:textColor="#FFFFFF"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            app:backgroundTint="#FF3B3B"
+            app:cornerRadius="33dp"
+            app:elevation="20dp"
+            app:rippleColor="#40FFFFFF"
+            app:strokeWidth="0dp" />
+
+        <!-- REGISTER LINK SECTION -->
+        <LinearLayout
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:gravity="center_horizontal"
-            android:paddingHorizontal="32dp"
-            android:paddingVertical="56dp">
+            android:layout_marginBottom="16dp"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:paddingHorizontal="20dp"
+            android:paddingVertical="12dp">
 
-            <!-- Logo Card Section -->
-            <androidx.cardview.widget.CardView
-                android:layout_width="180dp"
-                android:layout_height="180dp"
-                android:layout_marginBottom="32dp"
-                app:cardCornerRadius="90dp"
-                app:cardElevation="24dp"
-                app:cardBackgroundColor="@color/absolute_white">
-
-                <ImageView
-                    android:id="@+id/imgLogo"
-                    android:layout_width="130dp"
-                    android:layout_height="130dp"
-                    android:layout_gravity="center"
-                    android:src="@drawable/physiqueailogo"
-                    android:scaleType="centerInside" />
-
-            </androidx.cardview.widget.CardView>
-
-            <!-- Welcome Section -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Welcome to"
-                android:textColor="#424242"
-                android:textSize="18sp"
-                android:fontFamily="@font/poppins_medium"
-                android:layout_marginBottom="8dp" />
+                android:alpha="0.9"
+                android:fontFamily="@font/poppins_regular"
+                android:shadowColor="#000000"
+                android:shadowDx="0"
+                android:shadowDy="2"
+                android:shadowRadius="6"
+                android:text="Don't have an account? "
+                android:textColor="#EEEEEE"
+                android:textSize="14sp" />
 
             <TextView
-                android:id="@+id/txtAppDescription"
+                android:id="@+id/tvSignIn"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="PHYSIQUE AI"
-                android:textColor="@color/surface_dark"
-                android:textSize="36sp"
-                android:textStyle="bold"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:clickable="true"
+                android:focusable="true"
                 android:fontFamily="@font/poppins_bold"
-                android:letterSpacing="0.02"
-                android:layout_marginBottom="12dp" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Your AI Fitness Companion"
-                android:textColor="#424242"
-                android:textSize="16sp"
-                android:fontFamily="@font/poppins_medium"
-                android:layout_marginBottom="48dp"
-                android:gravity="center" />
-
-            <!-- Action Buttons Section -->
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnNewSignIn"
-                android:layout_width="match_parent"
-                android:layout_height="64dp"
-                android:layout_marginBottom="20dp"
-                android:text="Sign In"
-                android:textColor="@color/primary"
-                android:textSize="18sp"
+                android:paddingHorizontal="8dp"
+                android:paddingVertical="4dp"
+                android:text="Register"
+                android:textColor="#FF5252"
+                android:textSize="13sp"
                 android:textStyle="bold"
-                android:fontFamily="@font/poppins_semibold"
-                android:letterSpacing="0.02"
-                app:backgroundTint="@color/absolute_white"
-                app:cornerRadius="32dp"
-                app:elevation="12dp"
-                app:strokeColor="@android:color/transparent"
-                app:strokeWidth="0dp"
-                app:icon="@drawable/person"
-                app:iconGravity="textStart"
-                app:iconPadding="12dp"
-                app:iconTint="@color/primary" />
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/txtSignUp"
-                android:layout_width="match_parent"
-                android:layout_height="64dp"
-                android:layout_marginBottom="32dp"
-                android:text="Create Account"
-                android:textColor="@color/absolute_white"
-                android:textSize="18sp"
-                android:textStyle="bold"
-                android:fontFamily="@font/poppins_semibold"
-                android:letterSpacing="0.02"
-                app:backgroundTint="@color/transparent"
-                app:strokeColor="@color/absolute_white"
-                app:strokeWidth="3dp"
-                app:cornerRadius="32dp"
-                app:icon="@drawable/add"
-                app:iconGravity="textStart"
-                app:iconPadding="12dp"
-                app:iconTint="@color/absolute_white"
-                android:onClick="onCreateAccountClicked" />
-
-            <!-- Divider Section -->
-
-            <!-- Google Sign In Button -->
-
-            <!-- Feature Preview Section -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center"
-                android:layout_marginTop="24dp">
-
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:orientation="vertical"
-                    android:gravity="center"
-                    android:padding="12dp">
-
-                    <ImageView
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
-                        android:src="@drawable/excercise"
-                        android:layout_marginBottom="8dp"
-                        app:tint="#757575" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="AI Workouts"
-                        android:textColor="#121212"
-                        android:textSize="12sp"
-                        android:fontFamily="@font/poppins_medium"
-                        android:gravity="center" />
-
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:orientation="vertical"
-                    android:gravity="center"
-                    android:padding="12dp">
-
-                    <ImageView
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
-                        android:src="@drawable/dietary"
-                        android:layout_marginBottom="8dp"
-                        app:tint="#FF9800" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Nutrition"
-                        android:textColor="#121212"
-                        android:textSize="12sp"
-                        android:fontFamily="@font/poppins_medium"
-                        android:gravity="center" />
-
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:orientation="vertical"
-                    android:gravity="center"
-                    android:padding="12dp">
-
-                    <ImageView
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
-                        android:src="@drawable/pose"
-                        android:layout_marginBottom="8dp"
-                        app:tint="#FFE66D" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Pose AI"
-                        android:textColor="#121212"
-                        android:textSize="12sp"
-                        android:fontFamily="@font/poppins_medium"
-                        android:gravity="center" />
-
-                </LinearLayout>
-
-            </LinearLayout>
+                tools:ignore="TouchTargetSizeCheck" />
 
         </LinearLayout>
 
-    </ScrollView>
+        <!-- FOOTER -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:paddingHorizontal="16dp"
+            android:paddingVertical="8dp">
 
-</androidx.constraintlayout.widget.ConstraintLayout> 
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:alpha="0.8"
+                android:fontFamily="@font/poppins_regular"
+                android:shadowColor="#000000"
+                android:shadowDx="0"
+                android:shadowDy="1"
+                android:shadowRadius="4"
+                android:text="© 2024 "
+                android:textColor="#BBBBBB"
+                android:textSize="12sp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/poppins_bold"
+                android:letterSpacing="0.06"
+                android:text="Physique AI"
+                android:textColor="#FF3B3B"
+                android:textSize="12sp"
+                android:textStyle="bold" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
